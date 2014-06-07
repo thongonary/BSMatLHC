@@ -26,6 +26,12 @@ void CMSRazor::Loop(string outFileName) {
   int BOX_NUM;
   double W_EFF;
 
+  double HT, MHT, DeltaPhi;
+  double jetPt[4];
+  double jetEta[4];
+  double jetPhi[4];
+  int numJets;
+
   // Open Output file
   TFile *file = new TFile(outFileName.c_str(),"UPDATE");
 
@@ -36,6 +42,13 @@ void CMSRazor::Loop(string outFileName) {
   outTree->Branch("RSQNEW", &RSQNEW, "RSQNEW/D");
   outTree->Branch("BOX_NUM", &BOX_NUM, "BOX_NUM/I");
   outTree->Branch("W_EFF", &W_EFF, "W_EFF/D");
+  outTree->Branch("HT", &HT, "HT/D");
+  outTree->Branch("MHT", &MHT, "MHT/D");
+  outTree->Branch("DeltaPhi", &DeltaPhi, "DeltaPhi/D");
+  outTree->Branch("jetPt", jetPt, "jetPt[4]/D");
+  outTree->Branch("jetEta", jetEta, "jetEta[4]/D");
+  outTree->Branch("jetPhi", jetPhi, "jetPhi[4]/D");
+  outTree->Branch("numJets", &numJets, "numJets/I");
 
   double xedge[17] = {300, 350, 400.,450.,500.,550.,600.,650.,700.,800.,900.,1000.,1200.,1600.,2000.,2800.,3500.};
   double yedge[6] = {0.11,0.18,0.20,0.30,0.40,0.50};
@@ -66,6 +79,17 @@ void CMSRazor::Loop(string outFileName) {
     nb = fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
+    //reset jet variables
+    HT = 0;
+    MHT = 0;
+    DeltaPhi = -1;
+    numJets = 0;
+    for(int i = 0; i < 4; i++){
+        jetPt[i] = -1;
+        jetEta[i] = -999;
+        jetPhi[i] = -999;
+    }
+
     // Build the event at generator level
     PFReco();
     vector<fastjet::PseudoJet> empty;
@@ -80,9 +104,28 @@ void CMSRazor::Loop(string outFileName) {
     // narrow jets
     fastjet::JetDefinition AK04_def(fastjet::antikt_algorithm, 0.4);
     fastjet::ClusterSequence pfAK04ClusterSequence = JetMaker(JetsConst, AK04_def);
-    vector<fastjet::PseudoJet> pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),40., 2.4);
+    vector<fastjet::PseudoJet> pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),40., 3.0);
 
     if(pfAK04.size()<2) continue;
+
+    double px = 0;
+    double py = 0;
+    numJets = pfAK04.size();
+    for(int i = 0; i < pfAK04.size(); i++){
+        HT += pfAK04[i].pt();
+        px += pfAK04[i].px();
+        py += pfAK04[i].py();
+    }
+    MHT = sqrt(px*px + py*py);
+
+    DeltaPhi = pfAK04[0].delta_phi_to(pfAK04[1]);
+
+    for(int i = 0; i < pfAK04.size(); i++){
+        if(i > 3) break;
+        jetPt[i] = pfAK04[i].pt();
+        jetEta[i] = pfAK04[i].eta();
+        jetPhi[i] = pfAK04[i].phi();
+    }
 
     GenMET();
     PFMET = genMET;
@@ -97,7 +140,7 @@ void CMSRazor::Loop(string outFileName) {
     
     // 1a) cluster hemispheres using kT in exclusive mode, using jets as ingredients
     // some backward compatibility test will be needed here
-    fastjet::ClusterSequence cs(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, 1.0));
+    fastjet::ClusterSequence cs(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, 9.0));
     vector<TLorentzVector> hemNEW =  ConvertTo4Vector(fastjet::sorted_by_pt(cs.exclusive_jets(2)));
     // 1b) traditional hemispheres
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(pfAK04));
