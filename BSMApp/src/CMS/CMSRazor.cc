@@ -31,6 +31,7 @@ void CMSRazor::Loop(string outFileName) {
   double jetEta[4];
   double jetPhi[4];
   int numJets;
+  double MET;
 
   // Open Output file
   TFile *file = new TFile(outFileName.c_str(),"UPDATE");
@@ -49,6 +50,7 @@ void CMSRazor::Loop(string outFileName) {
   outTree->Branch("jetEta", jetEta, "jetEta[4]/D");
   outTree->Branch("jetPhi", jetPhi, "jetPhi[4]/D");
   outTree->Branch("numJets", &numJets, "numJets/I");
+  outTree->Branch("MET", &MET, "MET/D");
 
   double xedge[17] = {300, 350, 400.,450.,500.,550.,600.,650.,700.,800.,900.,1000.,1200.,1600.,2000.,2800.,3500.};
   double yedge[6] = {0.11,0.18,0.20,0.30,0.40,0.50};
@@ -98,7 +100,7 @@ void CMSRazor::Loop(string outFileName) {
     // wide jets
     fastjet::JetDefinition CA08_def(fastjet::cambridge_algorithm, 0.8);
     fastjet::ClusterSequence pfCA08ClusterSequence = JetMaker(JetsConst, CA08_def);
-    vector<fastjet::PseudoJet> pfCA08 = SelectByAcceptance(fastjet::sorted_by_pt(pfCA08ClusterSequence.inclusive_jets()),40., 2.4);
+    vector<fastjet::PseudoJet> pfCA08 = SelectByAcceptance(fastjet::sorted_by_pt(pfCA08ClusterSequence.inclusive_jets()),40., 3.0); //changed eta cut to 3.0
     fastjet::Pruner pruner(CA08_def, 0.1, 0.25);
 
     // narrow jets
@@ -129,6 +131,7 @@ void CMSRazor::Loop(string outFileName) {
 
     GenMET();
     PFMET = genMET;
+    MET = PFMET.pt();
 
     // Ele reco: WP80 and WP95
     EleReco();
