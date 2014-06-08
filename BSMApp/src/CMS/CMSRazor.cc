@@ -27,9 +27,9 @@ void CMSRazor::Loop(string outFileName) {
   double W_EFF;
 
   double HT, MHT, DeltaPhi;
-  double jetPt[4];
-  double jetEta[4];
-  double jetPhi[4];
+  double jetPt[50];
+  double jetEta[50];
+  double jetPhi[50];
   int numJets;
   double MET;
 
@@ -46,10 +46,10 @@ void CMSRazor::Loop(string outFileName) {
   outTree->Branch("HT", &HT, "HT/D");
   outTree->Branch("MHT", &MHT, "MHT/D");
   outTree->Branch("DeltaPhi", &DeltaPhi, "DeltaPhi/D");
-  outTree->Branch("jetPt", jetPt, "jetPt[4]/D");
-  outTree->Branch("jetEta", jetEta, "jetEta[4]/D");
-  outTree->Branch("jetPhi", jetPhi, "jetPhi[4]/D");
   outTree->Branch("numJets", &numJets, "numJets/I");
+  outTree->Branch("jetPt", jetPt, "jetPt[numJets]/D");
+  outTree->Branch("jetEta", jetEta, "jetEta[numJets]/D");
+  outTree->Branch("jetPhi", jetPhi, "jetPhi[numJets]/D");
   outTree->Branch("MET", &MET, "MET/D");
 
   double xedge[17] = {300, 350, 400.,450.,500.,550.,600.,650.,700.,800.,900.,1000.,1200.,1600.,2000.,2800.,3500.};
@@ -86,7 +86,7 @@ void CMSRazor::Loop(string outFileName) {
     MHT = 0;
     DeltaPhi = -1;
     numJets = 0;
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 50; i++){
         jetPt[i] = -1;
         jetEta[i] = -999;
         jetPhi[i] = -999;
@@ -123,7 +123,6 @@ void CMSRazor::Loop(string outFileName) {
     DeltaPhi = pfAK04[0].delta_phi_to(pfAK04[1]);
 
     for(int i = 0; i < pfAK04.size(); i++){
-        if(i > 3) break;
         jetPt[i] = pfAK04[i].pt();
         jetEta[i] = pfAK04[i].eta();
         jetPhi[i] = pfAK04[i].phi();
