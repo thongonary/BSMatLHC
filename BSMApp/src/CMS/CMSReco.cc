@@ -233,6 +233,21 @@ double CMSReco::CalcMR(fastjet::PseudoJet j1, fastjet::PseudoJet j2){
   return sqrt((ja.P()+jb.P())*(ja.P()+jb.P())-(ja.Pz()+jb.Pz())*(ja.Pz()+jb.Pz()));
 }
 
+double CMSReco::CalcSqrtsR(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet::PseudoJet met){
+  TLorentzVector ja,jb;
+  ja.SetPtEtaPhiE(j1.pt(), j1.eta(), j1.phi(), sqrt(j1.pz()*j1.pz()+j1.perp2()));
+  jb.SetPtEtaPhiE(j2.pt(), j2.eta(), j2.phi(), sqrt(j2.pz()*j2.pz()+j2.perp2()));
+
+  TLorentzVector pTcm(ja.Px()+jb.Px()+met.px(), ja.Py()+jb.Py()+met.py(), 0., 0.);
+  double MR = CalcMR(j1,j2);
+  double Einv = sqrt(met.perp2()+(ja+jb).M2());
+
+  double sqrtsR = sqrt(2.)*sqrt( MR*MR + pTcm.Dot(ja+jb) + MR*sqrt(MR*MR + pTcm.Perp2() + 2.*pTcm.Dot(ja+jb)) );
+  cout << "MR+Einv = " << MR+Einv << endl;
+  cout << "sqrtsR = " << sqrtsR << endl;
+  return MR+Einv;
+}
+
 
 double CMSReco::CalcMR_zinvariant(fastjet::PseudoJet j1, fastjet::PseudoJet j2){
 	TLorentzVector ja,jb;
