@@ -78,6 +78,8 @@ protected:
   double CalcAlphaT(fastjet::PseudoJet ja, fastjet::PseudoJet jb);
   /// Compute MR  [used in SUSY searches]
   double CalcMR(fastjet::PseudoJet ja, fastjet::PseudoJet jb);
+  /// Compute sqrtshatR  [used in SUSY searches]
+  double CalcSqrtsR(fastjet::PseudoJet ja, fastjet::PseudoJet jb, fastjet::PseudoJet met);
   /// Compute MR invariant (use energies in place of |p| for each hemisphere
   double CalcMR_zinvariant(fastjet::PseudoJet ja, fastjet::PseudoJet jb);
   /// Compute MR' [used in SUSY searches]
