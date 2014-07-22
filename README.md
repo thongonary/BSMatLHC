@@ -24,6 +24,11 @@ TO COMPILE THE CODE
 
 The compilation workflow was succesfully tested under Linux SL5
 
+3) Try these commands after your compilation succeeds!
+   > cd BSMGen
+   > ./GenPythia data/pythiaCards/SUSY/SLHAGen_LHC13TeV.pythia T1bbbb_1500_100_13TeV.root
+   > cd ../BSMApp
+   > ./CMSApp ../BSMGen/T1bbbb_1500_100_13TeV.root -sqrts=13000 -Output=output.root --razor13
 
 BEFORE RUNNING BSMGEN
 -----------------------
