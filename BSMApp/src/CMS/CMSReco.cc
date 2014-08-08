@@ -1,4 +1,5 @@
 #include "CMS/CMSReco.hh"
+#include "CMS/ParticleInfo.hh"
 
 using namespace std;
 using namespace stdcomb;
@@ -79,18 +80,21 @@ void CMSReco::PFReco() {
   for(int i=0; i<Muon; i++) {
     fastjet::PseudoJet p(MuonPx[i], MuonPy[i], MuonPz[i], MuonE[i]);
     if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFMuons.push_back(p);
+    p.set_user_info(new ParticleInfo(MuonPdgId[i]));
   }
   
   // list of gen electrons
   for(int i=0; i<Electron; i++) {
     fastjet::PseudoJet p(ElectronPx[i], ElectronPy[i], ElectronPz[i], ElectronE[i]);
     if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFElectrons.push_back(p);
+    p.set_user_info(new ParticleInfo(ElectronPdgId[i]));
   }
 
   // list of gen photons
   for(int i=0; i<Photon; i++) {
     fastjet::PseudoJet p(PhotonPx[i], PhotonPy[i], PhotonPz[i], PhotonE[i]);
     if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFPhotons.push_back(p);
+    p.set_user_info(new ParticleInfo(PhotonPdgId[i]));
   }
 
   // list of gen charged/neutral hadrons
@@ -100,34 +104,60 @@ void CMSReco::PFReco() {
     if(abs(ParticlePdgId[i]) == 11) continue; // already included as electron
     if(abs(ParticlePdgId[i]) == 13) continue; // already included as muon
     if(abs(ParticlePdgId[i]) == 22) continue; // already included as photon
-    if(IsCharged(ParticlePdgId[i])) _PFChHadrons.push_back(p);
-    else _PFNeuHadrons.push_back(p);
-  }
-  
+    if(IsCharged(ParticlePdgId[i])) {
+      int size = _PFChHadrons.size();
+      _PFChHadrons.push_back(p);
+      _PFChHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+    }
+    else {
+      int size = _PFNeuHadrons.size();
+      _PFNeuHadrons.push_back(p);
+      _PFNeuHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+    }
+  }  
   // smear each particle category
 
 }
+
 
 vector<fastjet::PseudoJet> CMSReco::PFJetConstituents(vector<fastjet::PseudoJet> muToRemove,
 						      vector<fastjet::PseudoJet> eleToRemove,
 						      vector<fastjet::PseudoJet> photonToRemove) {
   vector<fastjet::PseudoJet> PFcands;
   for(int i=0; i<_PFElectrons.size(); i++) {
-    if(!FoundParticle(_PFElectrons[i], eleToRemove, 0.01))  
+    if(!FoundParticle(_PFElectrons[i], eleToRemove, 0.01)){
+      int point = PFcands.size();
       PFcands.push_back(_PFElectrons[i]);
+      PFcands[point].set_user_info(new ParticleInfo(ElectronPdgId[i]));
+    }
   }
   for(int i=0; i<_PFMuons.size(); i++) {
-    if(!FoundParticle(_PFMuons[i], muToRemove, 0.01)) 
+    if(!FoundParticle(_PFMuons[i], muToRemove, 0.01)) {
+      int point = PFcands.size();
       PFcands.push_back(_PFMuons[i]);
+      PFcands[point].set_user_info(new ParticleInfo(MuonPdgId[i]));
+    }
   }
   for(int i=0; i<_PFPhotons.size(); i++) {
-    if(!FoundParticle(_PFPhotons[i], photonToRemove, 0.01)) 
+    if(!FoundParticle(_PFPhotons[i], photonToRemove, 0.01)) {
+      int point = PFcands.size();
       PFcands.push_back(_PFPhotons[i]);
+      PFcands[point].set_user_info(new ParticleInfo(PhotonPdgId[i]));
+    }
   }
-  for(int i=0; i<_PFChHadrons.size(); i++) PFcands.push_back(_PFChHadrons[i]);
-  for(int i=0; i<_PFNeuHadrons.size(); i++) PFcands.push_back(_PFNeuHadrons[i]);
+  for(int i=0; i<_PFChHadrons.size(); i++) {
+    int point = PFcands.size();
+    PFcands.push_back(_PFChHadrons[i]);
+    PFcands[point].set_user_info(new ParticleInfo(_PFChHadrons[i].user_info<ParticleInfo>().pdg_id));
+  }
+    
+  for(int i=0; i<_PFNeuHadrons.size(); i++) {
+    int point = PFcands.size();
+    PFcands.push_back(_PFNeuHadrons[i]);
+    PFcands[point].set_user_info(new ParticleInfo(_PFNeuHadrons[i].user_info<ParticleInfo>().pdg_id));
+  }
   return PFcands;
-}
+  }
 
 
 

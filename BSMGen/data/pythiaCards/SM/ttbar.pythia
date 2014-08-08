@@ -15,8 +15,11 @@ Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 13000.                 ! CM energy of collision
 
 ! 3) Settings for the hard-process generation
-Top:all = on                      ! Switches on ALL top production processes (inclusing singletop)
-
+! Top:all = on                      ! Switches on ALL top production processes (inclusing singletop)
+Top:gg2ttbar = on
+Top:qqbar2ttbar = on
+Top:ffbar2ttbar(s:gmZ) = on
+Top:gmgm2ttbar = on
 ! 4) Settings for the event generation process in the Pythia8 library.
 PartonLevel:MI = on                ! no multiple interactions
 PartonLevel:ISR = on               ! no initial-state radiation 

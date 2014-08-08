@@ -2,8 +2,13 @@
 #include <iostream>
 #include <TTree.h>
 #include "CMS/CMSRazor.hh"
+#include "CMS/ParticleInfo.hh"
 #include <fastjet/tools/Pruner.hh>
 #include <vector>
+//for time:
+#include <time.h>
+
+//Use clock() to return the current time.  
 
 CMSRazor::CMSRazor(TTree *tree, double Lumi, string analysis) : CMSReco(tree) {
   _Lumi = Lumi;
@@ -21,14 +26,44 @@ void CMSRazor::SetSqrts(double sqrts) {
 	_sqrts = sqrts;
 }
 
-
 // loop over events - real analysis
 void CMSRazor::Loop(string outFileName) {
 
 	if(fChain == 0) return;
 
-	double MR_Default, RSQ_Default, MR_KT_Jets, RSQ_KT_Jets, MR_AKT_Jets, RSQ_AKT_Jets, MR_CAM_Jets, RSQ_CAM_Jets, MR_KT_Cons, RSQ_KT_Cons, MR_AKT_Cons, RSQ_AKT_Cons, MR_CAM_Cons, RSQ_CAM_Cons;
-	double MRz_Default, MRz_KT_Jets, MRz_KT_Cons, MRz_AKT_Jets, MRz_AKT_Cons, MRz_CAM_Jets, MRz_CAM_Cons, RSQz_Default, RSQz_KT_Jets, RSQz_KT_Cons, RSQz_AKT_Jets, RSQz_AKT_Cons, RSQz_CAM_Jets, RSQz_CAM_Cons;
+	double MR_Default, RSQ_Default, MR_KT_Jets, RSQ_KT_Jets;
+	double MRz_Default, MRz_KT_Jets, RSQz_Default, RSQz_KT_Jets;
+
+	//newly added
+
+	//loop through cone sizes algorithm
+	double MRz_newjetakt, MR_newjetakt, RSQ_newjetakt, RSQz_newjetakt;
+	double MRz_newjetkt, MR_newjetkt, RSQ_newjetkt, RSQz_newjetkt;
+	double MRz_newjetcam, MR_newjetcam, RSQ_newjetcam, RSQz_newjetcam;
+
+	//MRT values
+	double MRt_Default, MRt_KT_Jets;
+        double MRt_newjetcam, MRt_newjetkt, MRt_newjetakt;
+
+	//inclusives jet size
+	double jetlenaktkt, jetlenaktakt, jetlenaktcam;
+	//ofstream outfile;
+	double i;
+	double count1 = 1;
+	
+	//hemisphere properties
+	double Default_mass, Default_px, Default_py, Default_pz, Default_rapidity, Default_phi;
+	double KT_Jets_mass, KT_Jets_px, KT_Jets_py, KT_Jets_pz, KT_Jets_rapidity, KT_Jets_phi;
+        double Default_mass_2, Default_px_2, Default_py_2, Default_pz_2, Default_rapidity_2, Default_phi_2;
+        double KT_Jets_mass_2, KT_Jets_px_2, KT_Jets_py_2, KT_Jets_pz_2, KT_Jets_rapidity_2, KT_Jets_phi_2;
+
+	double newjetcam_px, newjetcam_px_2;
+	double newjetcam_py, newjetcam_py_2;
+	double newjetcam_mass, newjetcam_mass_2;
+	double newjetkt_mass, newjetkt_mass_2;
+	double newjetakt_mass, newjetakt_mass_2;
+	double Default_E, KT_Jets_E, newjetcam_E;
+
 	int BOX_NUM;
 	double W_EFF;
 	int SizesList[7];
@@ -45,45 +80,84 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("MRz_Default", &MRz_Default, "MRz_Default/D");
 	outTree->Branch("RSQ_Default", &RSQ_Default, "RSQ_Default/D");
 	outTree->Branch("RSQz_Default", &RSQz_Default, "RSQz_Default/D");
+	outTree->Branch("MRt_Default", &MRt_Default, "MRt_Default/D");
+
 	
-		
 	outTree->Branch("MR_KT_Jets", &MR_KT_Jets, "MR_KT_Jets/D");
 	outTree->Branch("MRz_KT_Jets", &MRz_KT_Jets, "MRz_KT_Jets/D");
 	outTree->Branch("RSQ_KT_Jets", &RSQ_KT_Jets, "RSQ_KT_Jets/D");
 	outTree->Branch("RSQz_KT_Jets", &RSQz_KT_Jets, "RSQz_KT_Jets/D");
+	outTree->Branch("MRt_KT_Jets", &MRt_KT_Jets, "MRt_KT_Jets/D");
+
 	
-	outTree->Branch("MR_AKT_Jets", &MR_AKT_Jets, "MR_AKT_Jets/D");
-	outTree->Branch("MRz_AKT_Jets", &MRz_AKT_Jets, "MRz_AKT_Jets/D");
-	outTree->Branch("RSQ_AKT_Jets", &RSQ_AKT_Jets, "RSQ_AKT_Jets/D");
-	outTree->Branch("RSQz_AKT_Jets", &RSQz_AKT_Jets, "RSQz_AKT_Jets/D");
-		
-	outTree->Branch("MR_CAM_Jets", &MR_CAM_Jets, "MR_CAM_Jets/D");
-	outTree->Branch("MRz_CAM_Jets", &MRz_CAM_Jets, "MRz_CAM_Jets/D");
-	outTree->Branch("RSQ_CAM_Jets", &RSQ_CAM_Jets, "RSQ_CAM_Jets/D");
-	outTree->Branch("RSQz_CAM_Jets", &RSQz_CAM_Jets, "RSQz_CAM_Jets/D");
-	
-	outTree->Branch("MR_KT_Cons", &MR_KT_Cons, "MR_KT_Cons/D");
-	outTree->Branch("MRz_KT_Cons", &MRz_KT_Cons, "MRz_KT_Cons/D");
-	outTree->Branch("RSQ_KT_Cons", &RSQ_KT_Cons, "RSQ_KT_Cons/D");
-	outTree->Branch("RSQz_KT_Cons", &RSQz_KT_Cons, "RSQz_KT_Cons/D");
-	
-	outTree->Branch("MR_AKT_Cons", &MR_AKT_Cons, "MR_AKT_Cons/D");
-	outTree->Branch("MRz_AKT_Cons", &MRz_AKT_Cons, "MRz_AKT_Cons/D");
-	outTree->Branch("RSQ_AKT_Cons", &RSQ_AKT_Cons, "RSQ_AKT_Cons/D");
-	outTree->Branch("RSQz_AKT_Cons", &RSQz_AKT_Cons, "RSQz_AKT_Cons/D");
-	
-	outTree->Branch("MR_CAM_Cons", &MR_CAM_Cons, "MR_CAM_Cons/D");
-	outTree->Branch("MRz_CAM_Cons", &MRz_CAM_Cons, "MRz_CAM_Cons/D");
-	outTree->Branch("RSQ_CAM_Cons", &RSQ_CAM_Cons, "RSQ_CAM_Cons/D");
-	outTree->Branch("RSQz_CAM_Cons", &RSQz_CAM_Cons, "RSQz_CAM_Cons/D");
-		
+	outTree->Branch("MR_newjetakt", &MR_newjetakt, "MR_newjetakt/D");
+	outTree->Branch("MRz_newjetakt", &MRz_newjetakt, "MRz_newjetakt/D");
+	outTree->Branch("RSQ_newjetakt", &RSQ_newjetakt, "RSQ_newjetakt/D");
+	outTree->Branch("RSQz_newjetakt", &RSQz_newjetakt, "RSQz_newjetakt/D");
+	outTree->Branch("MRt_newjetakt", &MRt_newjetakt, "MRt_newjetakt/D");
+
+	outTree->Branch("MR_newjetkt", &MR_newjetkt, "MR_newjetkt/D");
+	outTree->Branch("MRz_newjetkt", &MRz_newjetkt, "MRz_newjetkt/D");
+	outTree->Branch("RSQ_newjetkt", &RSQ_newjetkt, "RSQ_newjetkt/D");
+	outTree->Branch("RSQz_newjetkt", &RSQz_newjetkt, "RSQz_newjetkt/D");
+	outTree->Branch("MRt_newjetkt", &MRt_newjetkt, "MRt_newjetkt/D");
+
+	outTree->Branch("MR_newjetcam", &MR_newjetcam, "MR_newjetcam/D");
+	outTree->Branch("MRz_newjetcam", &MRz_newjetcam, "MRz_newjetcam/D");
+	outTree->Branch("RSQ_newjetcam", &RSQ_newjetcam, "RSQ_newjetcam/D");
+	outTree->Branch("RSQz_newjetcam", &RSQz_newjetcam, "RSQz_newjetcam/D");
+	outTree->Branch("MRt_newjetcam", &MRt_newjetcam, "MRt_newjetcam/D");
+
 	outTree->Branch("SizesList", SizesList, "SizesList[8]/I");
-		
-		
-		
+
+	//Jet information
 	
+	outTree->Branch("Default_mass", &Default_mass, "Default_mass/D");
+	outTree->Branch("Default_px", &Default_px, "Default_px/D");
+	outTree->Branch("Default_py", &Default_py, "Default_py/D");
+	outTree->Branch("Default_pz", &Default_pz, "Default_pz/D");
+	outTree->Branch("Default_rapidity", &Default_rapidity, "Default_rapidity/D");
+	outTree->Branch("Default_phi", &Default_phi, "Default_phi/D");
+
+	outTree->Branch("Default_mass_2", &Default_mass_2, "Default_mass_2/D");
+	outTree->Branch("Default_px_2", &Default_px_2, "Default_px_2/D");
+	outTree->Branch("Default_py_2", &Default_py_2, "Default_py_2/D");
+	outTree->Branch("Default_pz_2", &Default_pz_2, "Default_pz_2/D");
+	outTree->Branch("Default_rapidity_2", &Default_rapidity_2, "Default_rapidity_2/D");
+	outTree->Branch("Default_phi_2", &Default_phi_2, "Default_phi_2/D");
 	
+	outTree->Branch("KT_Jets_mass", &KT_Jets_mass, "KT_Jets_mass/D");
+	outTree->Branch("KT_Jets_px", &KT_Jets_px, "KT_Jets_px/D");
+	outTree->Branch("KT_Jets_py", &KT_Jets_py, "KT_Jets_py/D");
+	outTree->Branch("KT_Jets_pz", &KT_Jets_pz, "KT_Jets_pz/D");
+	outTree->Branch("KT_Jets_rapidity", &KT_Jets_rapidity, "KT_Jets_rapidity/D");
+	outTree->Branch("KT_Jets_phi", &KT_Jets_phi, "KT_Jets_phi/D");
+
+	outTree->Branch("KT_Jets_mass_2", &KT_Jets_mass_2, "KT_Jets_mass_2/D");
+	outTree->Branch("KT_Jets_px_2", &KT_Jets_px_2, "KT_Jets_px_2/D");
+	outTree->Branch("KT_Jets_py_2", &KT_Jets_py_2, "KT_Jets_py_2/D");
+	outTree->Branch("KT_Jets_pz_2", &KT_Jets_pz_2, "KT_Jets_pz_2/D");
+	outTree->Branch("KT_Jets_rapidity_2", &KT_Jets_rapidity_2, "KT_Jets_rapidity_2/D");
+	outTree->Branch("KT_Jets_phi_2", &KT_Jets_phi_2, "KT_Jets_phi_2/D");
 	
+	outTree->Branch("jetlenaktkt", &jetlenaktkt, "jetlenaktkt/D");
+
+	outTree->Branch("newjetcam_mass", &newjetcam_mass, "newjetcam_mass/D");
+	outTree->Branch("newjetcam_mass_2", &newjetcam_mass_2, "newjetcam_mass_2/D");
+
+	outTree->Branch("newjetkt_mass", &newjetkt_mass, "newjetkt_mass/D");
+	outTree->Branch("newjetkt_mass_2", &newjetkt_mass_2, "newjetkt_mass_2/D");
+	outTree->Branch("newjetakt_mass", &newjetakt_mass, "newjetakt_mass/D");
+	outTree->Branch("newjetakt_mass_2", &newjetakt_mass_2, "newjetakt_mass_2/D");
+	outTree->Branch("Default_E", &Default_E, "Default_E/D");
+	outTree->Branch("KT_Jets_E", &KT_Jets_E, "KT_Jets_E/D");
+	outTree->Branch("newjetcam_E", &newjetcam_E, "newjetcam_E/D");
+
+	outTree->Branch("newjetcam_px", &newjetcam_px, "newjetcam_px/D");
+	outTree->Branch("newjetcam_py", &newjetcam_py, "newjetcam_py/D");
+	outTree->Branch("newjetcam_px_2", &newjetcam_px_2, "newjetcam_px_2/D");
+	outTree->Branch("newjetcam_py_2", &newjetcam_py_2, "newjetcam_py_2/D");
+
 	outTree->Branch("BOX_NUM", &BOX_NUM, "BOX_NUM/I");
 	outTree->Branch("W_EFF", &W_EFF, "W_EFF/D");
 		
@@ -110,35 +184,55 @@ void CMSRazor::Loop(string outFileName) {
     if(verbose) cout << "new event" << endl;
 
     // clean physics-objects blocks
-    CleanEvent();
+      CleanEvent();
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+      Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
 	//if (jentry > 10000) continue; //use for gen level comparison coding
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-	
+  	
     // Build the event at generator level
     PFReco();
     vector<fastjet::PseudoJet> empty;
     vector<fastjet::PseudoJet> JetsConst = PFJetConstituents(empty,empty,empty);
+    
+    bool ttbar_no_all_had = false; //true if you want to filter out all-hadronic events (no leptons)
+    bool hasLepton = true;
+    if (ttbar_no_all_had){
+      hasLepton = false;
+    }
+    int particleID;
+    if (ttbar_no_all_had){
+      for (int k = 0; k < JetsConst.size(); k++){
+       particleID = JetsConst[k].user_info<ParticleInfo>().pdg_id;
+       if (abs(particleID) == 11 || abs(particleID) == 13 || abs(particleID) == 15) hasLepton = true;
+      }
+    }
+    if (!hasLepton) continue;
+
+    i = 0;
 	  
     // wide jets
+
+    /*
     fastjet::JetDefinition CA08_def(fastjet::cambridge_algorithm, 0.8);
     fastjet::ClusterSequence pfCA08ClusterSequence = JetMaker(JetsConst, CA08_def);
     vector<fastjet::PseudoJet> pfCA08 = SelectByAcceptance(fastjet::sorted_by_pt(pfCA08ClusterSequence.inclusive_jets()),40., 2.4);
     fastjet::Pruner pruner(CA08_def, 0.1, 0.25);
+    */
 
     // narrow jets
     fastjet::JetDefinition AK04_def(fastjet::antikt_algorithm, 0.4);
     fastjet::ClusterSequence pfAK04ClusterSequence = JetMaker(JetsConst, AK04_def);
     vector<fastjet::PseudoJet> pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),40., 2.4);
-	//vector<fastjet::PseudoJet> pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),18., 2.4);
+  	//vector<fastjet::PseudoJet> pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),18., 2.4);
+    i = 0;
 
     if(pfAK04.size()<2) continue;
 	event_counter = event_counter + 1 ;
-	  
+  
     GenMET();
     PFMET = genMET;
 
@@ -149,195 +243,285 @@ void CMSRazor::Loop(string outFileName) {
 
     // Mu reco: Tight and Loose
     MuReco();
-	  
-	  
     
     // 1a) cluster hemispheres using kT in exclusive mode, using jets as ingredients
     // some backward compatibility test will be needed here
-    
-	double cone_size = 7.0;  
-	  
-	fastjet::ClusterSequence cs1(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, cone_size));
-    vector<TLorentzVector> hem_KT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs1.exclusive_jets(2))); //this is from original, written correctly
-	//vector<TLorentzVector> hem_KT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs1.inclusive_jets()));
-	  
-    fastjet::ClusterSequence cs2(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, cone_size));
-	vector<TLorentzVector> hem_AKT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(improper_Exclusive_Jets(cs2)));
-	//vector<TLorentzVector> hem_AKT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs2.inclusive_jets())); 
-	  
-    fastjet::ClusterSequence cs3(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, cone_size));
-	vector<TLorentzVector> hem_CAM_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(improper_Exclusive_Jets(cs3)));
-	//vector<TLorentzVector> hem_CAM_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs3.inclusive_jets())); 
-	  
-    fastjet::ClusterSequence cs4(JetsConst, fastjet::JetDefinition(fastjet::kt_algorithm, cone_size));  
-	vector<TLorentzVector> hem_KT_Cons = ConvertTo4Vector(fastjet::sorted_by_pt(cs4.exclusive_jets(2)));
-	//vector<TLorentzVector> hem_KT_Cons = ConvertTo4Vector(fastjet::sorted_by_pt(cs4.inclusive_jets()));
-	  
-    fastjet::ClusterSequence cs5(JetsConst, fastjet::JetDefinition(fastjet::antikt_algorithm, cone_size));  
-	vector<TLorentzVector> hem_AKT_Cons = ConvertTo4Vector(fastjet::sorted_by_pt(improper_Exclusive_Jets(cs5)));
-	//vector<TLorentzVector> hem_AKT_Cons = ConvertTo4Vector(fastjet::sorted_by_pt(cs5.inclusive_jets()));
 
+    double cone_size = 1.57; //did 0.8, 1.0  
 	  
-    fastjet::ClusterSequence cs6(JetsConst, fastjet::JetDefinition(fastjet::cambridge_algorithm, cone_size));
-	vector<TLorentzVector> hem_CAM_Cons = ConvertTo4Vector(fastjet::sorted_by_pt(improper_Exclusive_Jets(cs6)));
-	//vector<TLorentzVector> hem_CAM_Cons =  ConvertTo4Vector(fastjet::sorted_by_pt(cs6.inclusive_jets())); 
-	  
-	  
-  
-	  
-	  
-	// 1b) traditional hemispheres
+    fastjet::ClusterSequence cs1(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, cone_size));
+    vector<TLorentzVector> hem_KT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs1.exclusive_jets(2))); //this is from original, written correctly
+    //vector<TLorentzVector> hem_KT_Jets = ConvertTo4Vector(fastjet::sorted_by_pt(cs1.inclusive_jets()));
+
+    	  
+    //----------------inclusive mode used to find jets thrown out---------------------
+    fastjet::ClusterSequence cs101(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, cone_size));
+    vector<TLorentzVector> hem_KT_Jets_inc = ConvertTo4Vector(fastjet::sorted_by_pt(cs101.inclusive_jets()));
+
+    jetlenaktkt = hem_KT_Jets_inc.size();
+
+
+    //---------------------------new clustering algorithms that run through cone size--------------------------------//
+
+    //New idea for clustering.  Re-run anti-kt inclusively and increase cone size to lower final jet numer
+    //Do the same for kt and cam also
+    double jetlen = pfAK04.size(); 
+    double conesize1 = 0.2;
+    double conestep = 0.05;
+    bool changed = false;
+    vector<TLorentzVector> newjetakt;
+    while (jetlen > 2){
+      fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1));
+      newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
+      jetlen = newjetakt.size();
+      if (jetlen > 2)
+	conesize1 = conesize1 + conestep;
+      changed = true;
+    }
+    if (changed) {
+      fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1 - conestep));
+      newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
+    }
+    else {newjetakt = ConvertTo4Vector(pfAK04);}
+
+    jetlen = pfAK04.size();
+    conesize1 = 0.2;
+    changed = false;
+    vector<TLorentzVector> newjetcam;
+    while (jetlen > 2){
+      fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1));
+      newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
+      jetlen = newjetcam.size();
+      if (jetlen > 2)
+        conesize1 = conesize1 + conestep;
+      changed = true;
+    }
+    if (changed) {
+      fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1 - conestep));
+      newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
+    }
+    else {newjetcam = ConvertTo4Vector(pfAK04);}
+
+    //kt
+    jetlen = pfAK04.size(); 
+    conesize1 = 0.2;
+    changed = false;
+    vector<TLorentzVector> newjetkt;
+    while (jetlen > 2){
+      fastjet::ClusterSequence cs12(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, conesize1));
+      newjetkt = ConvertTo4Vector(fastjet::sorted_by_pt(cs12.inclusive_jets()));
+      jetlen = newjetkt.size();
+      if (jetlen > 2)
+	conesize1 = conesize1 + conestep;
+      changed = true;
+    }
+    if (changed){
+      fastjet::ClusterSequence cs12(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, conesize1 - conestep));
+      newjetkt = ConvertTo4Vector(fastjet::sorted_by_pt(cs12.inclusive_jets()));
+    }
+    else newjetkt = ConvertTo4Vector(pfAK04);
+
+    //End of new idea of clustering
+    
+
+    //Clusters particles off of previous clustering
+    /*
+    jetlen = pfAK04.size();
+    conesize1 = 0.2;
+    changed = false;
+    vector<fastjet::PseudoJet> Continualjet = pfAK04;
+    while (jetlen > 2){
+      fastjet::ClusterSequence cs1000(Continualjet, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1));
+      Continualjet = fastjet::sorted_by_pt(cs1000.inclusive_jets()); 
+      jetlen = Continualjet.size();
+      conesize1 += 0.1;
+      cout << jetlen << " " << conesize1 << endl;
+    }
+    */
+
+    
+    // 1b) traditional hemispheres
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(pfAK04));
     myHem->CombineMinMass();
     vector<TLorentzVector> hem_Default = myHem->GetHemispheres();
-    delete myHem;
-	  
-		  
-	  
-	  
-	  
+    delete myHem; 
 	
-	//initialize  
+    //initialize  
     MR_KT_Jets = -9999. ;
     RSQ_KT_Jets = -9999. ;
-    MR_AKT_Jets = -9999. ;
-    RSQ_AKT_Jets = -9999. ;
-    MR_CAM_Jets = -9999. ;
-    RSQ_CAM_Jets = -9999. ;
-    MR_KT_Cons = -9999. ;
-    RSQ_KT_Cons = -9999. ;
-    MR_AKT_Cons = -9999. ;
-    RSQ_AKT_Cons = -9999. ;
-    MR_CAM_Cons = -9999. ;
-    RSQ_CAM_Cons = -9999. ;
     MR_Default = -9999. ;
     RSQ_Default = -9999. ;
-	MRz_KT_Jets = -9999. ;
-	MRz_AKT_Jets = -9999. ;
-	MRz_CAM_Jets = -9999. ;
-	MRz_KT_Cons = -9999. ;
-	MRz_AKT_Cons = -9999. ;
-	MRz_CAM_Cons = -9999. ;
-	MRz_Default = -9999. ;
-	RSQz_KT_Jets = -9999. ;
-	RSQz_AKT_Jets = -9999. ;
-	RSQz_CAM_Jets = -9999. ;
-	RSQz_KT_Cons = -9999. ;
-	RSQz_AKT_Cons = -9999. ;
-	RSQz_CAM_Cons = -9999. ;
-	RSQz_Default = -9999. ;
-	  
-	  
-	SizesList[0] = -9999.0;
-	SizesList[1] = -9999.0;
-	SizesList[2] = -9999.0;
-	SizesList[3] = -9999.0;
-	SizesList[4] = -9999.0;
-	SizesList[5] = -9999.0;
-	SizesList[6] = -9999.0;
-	SizesList[7] = -9999.0;
-	  
-	TLorentzVector j1;
-	TLorentzVector j2;
+    MRz_KT_Jets = -9999. ;
+    MRz_Default = -9999. ;
+    RSQz_KT_Jets = -9999. ;
+    RSQz_Default = -9999. ;
+
+ // Edward's new algorithm
+
+    MR_newjetakt = -9999. ;
+    MRz_newjetakt = -9999. ;
+    RSQ_newjetakt = -9999. ;
+    RSQz_newjetakt = -9999. ;
+    MR_newjetkt = -9999.;
+    MRz_newjetkt = -9999. ;
+    RSQ_newjetkt = -9999. ;
+    RSQz_newjetkt = -9999. ;   
+    MR_newjetcam = -9999.;
+    MRz_newjetcam = -9999. ;
+    RSQ_newjetcam = -9999. ;
+    RSQz_newjetcam = -9999. ;    
  
-
     
+    SizesList[0] = -9999.0;
+    SizesList[1] = -9999.0;
+    SizesList[2] = -9999.0;
+    SizesList[3] = -9999.0;
+    SizesList[4] = -9999.0;
+    SizesList[5] = -9999.0;
+    SizesList[6] = -9999.0;
+    SizesList[7] = -9999.0;
 
+    KT_Jets_mass = -9999.0;
+    KT_Jets_px = -9999.0;
+    KT_Jets_py = -9999.0;
+    KT_Jets_pz = -9999.0;
+    KT_Jets_phi = -9999.0;
+    KT_Jets_rapidity = -9999.0;
+
+    Default_mass = -9999.0;
+    Default_px = -9999.0;
+    Default_py = -9999.0;
+    Default_pz = -9999.0;
+    Default_phi = -9999.0;
+    Default_rapidity = -9999.0;
+
+    KT_Jets_mass_2 = -9999.0;
+    KT_Jets_px_2 = -9999.0;
+    KT_Jets_py_2 = -9999.0;
+    KT_Jets_pz_2 = -9999.0;
+    KT_Jets_phi_2 = -9999.0;
+    KT_Jets_rapidity_2 = -9999.0;
+
+    Default_mass_2 = -9999.0;
+    Default_px_2 = -9999.0;
+    Default_py_2 = -9999.0;
+    Default_pz_2 = -9999.0;
+    Default_phi_2 = -9999.0;
+    Default_rapidity_2 = -9999.0;
+
+    newjetcam_px = -9999.0;
+    newjetcam_py = -9999.0;
+    newjetcam_px_2 = -9999.0;
+    newjetcam_py_2 = -9999.0;
+
+
+    TLorentzVector j1;
+    TLorentzVector j2;
+ 
     // 2a) compute new RSQ and MR vals
+
     if (hem_KT_Jets.size() > 1){
       j1 = hem_KT_Jets[0];
-      j2 = hem_KT_Jets[1];  
+      j2 = hem_KT_Jets[1]; 
+      KT_Jets_E = j1.E();
+      KT_Jets_mass = j1.M();
+      KT_Jets_px = j1.Px();
+      KT_Jets_py = j1.Py();
+      KT_Jets_pz = j1.Pz();
+      KT_Jets_phi = j1.Phi();
+      KT_Jets_rapidity = j1.Rapidity();
+      KT_Jets_mass_2 = j2.M();
+      KT_Jets_px_2 = j2.Px();
+      KT_Jets_py_2 = j2.Py();
+      KT_Jets_pz_2 = j2.Pz();
+      KT_Jets_phi_2 = j2.Phi();
+      KT_Jets_rapidity_2 = j2.Rapidity();
       MR_KT_Jets = CalcMR(j1, j2);
+      MRt_KT_Jets = CalcMRT(j1, j2, PFMET);
       RSQ_KT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MR_KT_Jets/MR_KT_Jets;
-	  MRz_KT_Jets = CalcMR_zinvariant(j1, j2);
-	  RSQz_KT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_KT_Jets/MRz_KT_Jets;
+      MRz_KT_Jets = CalcMR_zinvariant(j1, j2);
+      RSQz_KT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_KT_Jets/MRz_KT_Jets;
 	  
     }
 	  
-    if (hem_AKT_Jets.size() > 1) {
-      j1 = hem_AKT_Jets[0];
-      j2 = hem_AKT_Jets[1];  
-      MR_AKT_Jets = CalcMR(j1, j2);
-      RSQ_AKT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MR_AKT_Jets/MR_AKT_Jets;
-	  MRz_AKT_Jets = CalcMR_zinvariant(j1, j2);
-	  RSQz_AKT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_AKT_Jets/MRz_AKT_Jets;
-    }
-    
-    if (hem_CAM_Jets.size() > 1) {
-      j1 = hem_CAM_Jets[0];
-      j2 = hem_CAM_Jets[1];  
-      MR_CAM_Jets = CalcMR(j1, j2);
-      RSQ_CAM_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MR_CAM_Jets/MR_CAM_Jets;
-	  MRz_CAM_Jets = CalcMR_zinvariant(j1, j2);
-      RSQz_CAM_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_CAM_Jets/MRz_CAM_Jets;
+    if (newjetakt.size() > 1) {
+      j1 = newjetakt[0];
+      j2 = newjetakt[1];  
+      MR_newjetakt = CalcMR(j1, j2);
+      MRt_newjetakt = CalcMRT(j1, j2, PFMET);
+      RSQ_newjetakt = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetakt/MR_newjetakt;
+      MRz_newjetakt = CalcMR_zinvariant(j1, j2);
+      RSQz_newjetakt = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_newjetakt/MRz_newjetakt;
     }
 
-    if (hem_KT_Cons.size() > 1) {
-      j1 = hem_KT_Cons[0];
-      j2 = hem_KT_Cons[1];  
-      MR_KT_Cons = CalcMR(j1, j2);
-      RSQ_KT_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MR_KT_Cons/MR_KT_Cons;
-	  MRz_KT_Cons = CalcMR_zinvariant(j1, j2);
-	  RSQz_KT_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_KT_Cons/MRz_KT_Cons;
+    if (newjetkt.size() > 1) {
+      j1 = newjetkt[0];
+      j2 = newjetkt[1];
+      newjetkt_mass = j1.M();
+      newjetkt_mass_2 = j2.M();
+      MR_newjetkt = CalcMR(j1, j2);
+      MRt_newjetkt = CalcMRT(j1, j2, PFMET);
+      RSQ_newjetkt = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetkt/MR_newjetkt;
+      MRz_newjetkt = CalcMR_zinvariant(j1, j2);
+      RSQz_newjetkt = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_newjetkt/MRz_newjetkt;
     }
-    
-    if (hem_AKT_Cons.size() > 1) {
-      j1 = hem_AKT_Cons[0];
-      j2 = hem_AKT_Cons[1];  
-      MR_AKT_Cons = CalcMR(j1, j2);
-      RSQ_AKT_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MR_AKT_Cons/MR_AKT_Cons;
-	  MRz_AKT_Cons = CalcMR_zinvariant(j1, j2);
-      RSQz_AKT_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_AKT_Cons/MRz_AKT_Cons;
-    }
-    
-    if (hem_CAM_Cons.size() > 1) {
-      j1 = hem_CAM_Cons[0];
-      j2 = hem_CAM_Cons[1];  
-      MR_CAM_Cons = CalcMR(j1, j2);
-      RSQ_CAM_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MR_CAM_Cons/MR_CAM_Cons;
-	  MRz_CAM_Cons = CalcMR_zinvariant(j1, j2);
-      RSQz_CAM_Cons = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_CAM_Cons/MRz_CAM_Cons;
-    }
-    
-    
+
+    if (newjetcam.size() > 1) {
+      j1 = newjetcam[0];
+      j2 = newjetcam[1];  
+      newjetcam_E = j1.E();
+      newjetcam_px = j1.Px();
+      newjetcam_py = j1.Py();
+      newjetkt_mass = j1.Px();
+      newjetcam_px_2 = j2.Px();
+      newjetcam_py_2 = j2.Py();
+      //cout << j1.Px() << " " << j1.Py() << " " << j2.Px() << " " << j2.Py() << endl;
+      newjetcam_mass = j1.M();
+      newjetcam_mass_2 = j2.M();
+      MR_newjetcam = CalcMR(j1, j2);      
+      MRt_newjetcam = CalcMRT(j1, j2, PFMET);
+      RSQ_newjetcam = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetcam/MR_newjetcam;
+      MRz_newjetcam = CalcMR_zinvariant(j1, j2);
+      RSQz_newjetcam = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_newjetcam/MRz_newjetcam;
+    } 
     
     // 2b) compute traditional RSQ and MR (DEFAULT)
     j1 = hem_Default[0];
-    j2 = hem_Default[1];  
+    j2 = hem_Default[1];
+    Default_E = j1.E();
+    Default_mass = j1.M();
+    Default_px = j1.Px();
+    Default_py = j1.Py();
+    Default_pz = j1.Pz();
+    Default_phi = j1.Phi();
+    Default_rapidity = j1.Rapidity();
+    Default_mass_2 = j2.M();
+    Default_px_2 = j2.Px();
+    Default_py_2 = j2.Py();
+    Default_pz_2 = j2.Pz();
+    Default_phi_2 = j2.Phi();
+    Default_rapidity_2 = j2.Rapidity();
     MR_Default = CalcMR(j1, j2);
+    MRt_Default = CalcMRT(j1, j2, PFMET);
     RSQ_Default = pow(CalcMRT(j1, j2, PFMET),2.)/MR_Default/MR_Default;
-	MRz_Default = CalcMR_zinvariant(j1, j2);
+    MRz_Default = CalcMR_zinvariant(j1, j2);
     RSQz_Default = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_Default/MRz_Default;
 	  
-	  
+
     //delete j1;
     //delete j2;
-	  
-	
-	SizesList[0] = hem_Default.size();
-	SizesList[1] = hem_KT_Jets.size();
-	SizesList[2] = hem_AKT_Jets.size();
-	SizesList[3] = hem_CAM_Jets.size();
-	SizesList[4] = hem_KT_Cons.size();
-	SizesList[5] = hem_AKT_Cons.size();
-	SizesList[6] = hem_CAM_Cons.size();
-	SizesList[7] = pfAK04.size(); //pre cluster pfak04 jet number
-	//cout <<endl << "Number of PFJets:" << pfAK04.size()<<endl;
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
+    
+    
+    SizesList[0] = hem_Default.size();
+    SizesList[1] = hem_KT_Jets.size();
+    // SizesList[2] = hem_AKT_Jets.size();
+    //SizesList[3] = hem_CAM_Jets.size();
+    //SizesList[4] = hem_KT_CAM.size();
+    //SizesList[5] = hem_AKT_CAM.size();
+    //SizesList[6] = hem_CAM_CAM.size();
+    SizesList[7] = pfAK04.size(); //pre cluster pfak04 jet number
+    //cout <<endl << "Number of PFJets:" << pfAK04.size()<<endl;
+    
 	  
     // Boxes
     BOX_NUM = 5; // Had by default
@@ -361,197 +545,178 @@ void CMSRazor::Loop(string outFileName) {
     if(BOX_NUM == 5 && fillBox) pdfHad->Fill(MR_Default, RSQ_Default);
 	  
 	  
-	continue;  
+    continue;  
 	  
 	  
+    //BEGIN GEN LEVEL ANALYSIS
+    //initialize
+	
 	  
+    int correct_clustering = -9999.0 ;
 	  
+    //initialize structures to store gen data pulled from cmsreco
+    int genParticle;
+    vector<double> genParticlePx;
+    vector<double> genParticlePy;
+    vector<double> genParticlePz;
+    vector<double> genParticleE;
+    vector<int> genParticlePdgId;
+    vector<int> genParticleM1PdgId;
+	
+    GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId);
+	
+    cout << ""<< endl;
+    for (int p = 0; p < genParticle; p++) {
+      cout << genParticlePdgId[p];
+      cout << "           ";
+      cout << genParticleM1PdgId[p]<<endl;
+    } 
+    cout << ""<< endl;
 	  
 	
 	  
-	//BEGIN GEN LEVEL ANALYSIS
-	//initialize
-	
+  	  
 	  
-	int correct_clustering = -9999.0 ;
-	  
-	//initialize structures to store gen data pulled from cmsreco
-	int genParticle;
-	vector<double> genParticlePx;
-	vector<double> genParticlePy;
-	vector<double> genParticlePz;
-	vector<double> genParticleE;
-	vector<int> genParticlePdgId;
-	vector<int> genParticleM1PdgId;
-	
-	GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId);
-	
-	cout << ""<< endl;
-	for (int p = 0; p < genParticle; p++) {
-		cout << genParticlePdgId[p];
-		cout << "           ";
-		cout << genParticleM1PdgId[p]<<endl;
-	} 
-	cout << ""<< endl;
-	  
-	
-	  
-	  
-	  
-	//begin gen level comparison
-	//find indices for final visible jets ,and their pair produced parent. 
-	vector<int> gen_final_ind ;
-	vector<int> gen_parent_ind ; 
-	
-	vector<TLorentzVector> gen_particles ;
+    //begin gen level comparison
+    //find indices for final visible jets ,and their pair produced parent. 
+    vector<int> gen_final_ind ;
+    vector<int> gen_parent_ind ; 
+    
+    vector<TLorentzVector> gen_particles ;
 
 	
-	for (int gp = 0; gp < genParticle; gp++) {
-		TLorentzVector v_dummy ;
-		gen_particles.push_back(v_dummy);
-		gen_particles[gp].SetPxPyPzE(genParticlePx[gp], genParticlePy[gp], genParticlePz[gp], genParticleE[gp]);
-	}
+    for (int gp = 0; gp < genParticle; gp++) {
+      TLorentzVector v_dummy ;
+      gen_particles.push_back(v_dummy);
+      gen_particles[gp].SetPxPyPzE(genParticlePx[gp], genParticlePy[gp], genParticlePz[gp], genParticleE[gp]);
+    }
 	
 	
 	  
-	vector<int> parent(genParticle, -1);
-	for (int gp = 0; gp < genParticle; gp++) {
-		
-		if (parent[gp] != -1) continue;      //skip if this particle parent value is filled already
-		
-		
-		//if its one of first 2 particles, it is considered one of colliding particles
-		if (gp == 0 || gp == 1){
-			parent[gp] = -2.0;
-			continue;
-		}
-		
-		//finds all indices of mothers where index is less than gp index, and also where more than 1 other daughter are not already assigned to the mother
-		vector<int> possible_mothers;
-		for (int ind = 0; ind < gp; ind++) {
-			if (genParticlePdgId[ind]==genParticleM1PdgId[gp]&&(count(parent.begin(), parent.end(), ind) < 2 )) possible_mothers.push_back(ind);
-		}
+    vector<int> parent(genParticle, -1);
+    for (int gp = 0; gp < genParticle; gp++) {
+      
+      if (parent[gp] != -1) continue;      //skip if this particle parent value is filled already
 		
 		
-		//if there arent any valid mothers, this should be one of initial 2 colliding particles
-		if (possible_mothers.size() == 0) {									
-			parent[gp] = -2.0;		
-			continue;
-		}
+      //if its one of first 2 particles, it is considered one of colliding particles
+      if (gp == 0 || gp == 1){
+	parent[gp] = -2.0;
+	continue;
+      }
+		
+      //finds all indices of mothers where index is less than gp index, and also where more than 1 other daughter are not already assigned to the mother
+      vector<int> possible_mothers;
+      for (int ind = 0; ind < gp; ind++) {
+	if (genParticlePdgId[ind]==genParticleM1PdgId[gp]&&(count(parent.begin(), parent.end(), ind) < 2 )) possible_mothers.push_back(ind);
+      }
 		
 		
-		//if there is one possible mother, that is assigned as the parent
-		if(possible_mothers.size() == 1){
-			parent[gp] = possible_mothers[0];   
-			continue;
-		}
+      //if there arent any valid mothers, this should be one of initial 2 colliding particles
+      if (possible_mothers.size() == 0) {									
+	parent[gp] = -2.0;		
+	continue;
+      }
 		
 		
-		//get list of indices of other possible daughter candidates for that mother particle type, which have not been assigned to a parent already
-		vector<int> others_with_same_mother; 
-		for (int ind = possible_mothers.back(); ind < genParticle; ind ++) {
-			if ((genParticleM1PdgId[ind] == genParticleM1PdgId[gp]) && (parent[ind] == -1)) others_with_same_mother.push_back(ind); 
-		}
-		others_with_same_mother.erase( remove(others_with_same_mother.begin(), others_with_same_mother.end(), gp), others_with_same_mother.end() ); //remove gp from this list
+      //if there is one possible mother, that is assigned as the parent
+      if(possible_mothers.size() == 1){
+	parent[gp] = possible_mothers[0];   
+	continue;
+      }
+		
+		
+      //get list of indices of other possible daughter candidates for that mother particle type, which have not been assigned to a parent already
+      vector<int> others_with_same_mother; 
+      for (int ind = possible_mothers.back(); ind < genParticle; ind ++) {
+	if ((genParticleM1PdgId[ind] == genParticleM1PdgId[gp]) && (parent[ind] == -1)) others_with_same_mother.push_back(ind); 
+      }
+      others_with_same_mother.erase( remove(others_with_same_mother.begin(), others_with_same_mother.end(), gp), others_with_same_mother.end() ); //remove gp from this list
 		
 		
 		
-		//now want to go through every partner to partner with gp, minimize [(gp+partner) distance from 1 mother candidate ] + [(all other daughter candidates) distance from (all other mother candidates)]
+      //now want to go through every partner to partner with gp, minimize [(gp+partner) distance from 1 mother candidate ] + [(all other daughter candidates) distance from (all other mother candidates)]
+		
+      
+      TLorentzVector total_with_same_mother;  //initialize then build a vector including all non-gp daughter candidates
+      for (int smi =0; smi < others_with_same_mother.size(); smi++) {
+	total_with_same_mother = total_with_same_mother + gen_particles[others_with_same_mother[smi]] ;
+      }
+      TLorentzVector total_mother_cand;
+      for (int mi = 0; mi < possible_mothers.size(); mi++) {
+	total_mother_cand = total_mother_cand + gen_particles[possible_mothers[mi]];
+      }
 		
 		
-		TLorentzVector total_with_same_mother;  //initialize then build a vector including all non-gp daughter candidates
-		for (int smi =0; smi < others_with_same_mother.size(); smi++) {
-			total_with_same_mother = total_with_same_mother + gen_particles[others_with_same_mother[smi]] ;
-		}
-		TLorentzVector total_mother_cand;
-		for (int mi = 0; mi < possible_mothers.size(); mi++) {
-			total_mother_cand = total_mother_cand + gen_particles[possible_mothers[mi]];
-		}
-		
-		
-		double minR = 100.0;
-		vector<int> op_pairing (2, -1) ;
-		for (int smi = 0; smi < others_with_same_mother.size(); smi++) {
-			TLorentzVector V1 = gen_particles[gp] + gen_particles[others_with_same_mother[smi]];
-			TLorentzVector V2 = total_with_same_mother - gen_particles[others_with_same_mother[smi]];
-			for (int mi = 0; mi < possible_mothers.size(); mi++) {
-				TLorentzVector M1 = gen_particles[possible_mothers[mi]];
-				TLorentzVector M2 = total_mother_cand - gen_particles[possible_mothers[mi]];
-				double currentR = D_between_vectors(V1, M1) + D_between_vectors(V2, M2); 
-				if (currentR < minR){
-					minR = currentR;
-					op_pairing[0] = others_with_same_mother[smi];
-					op_pairing[1] = possible_mothers[mi] ;
-				}
-			}
-		}
+      double minR = 100.0;
+      vector<int> op_pairing (2, -1) ;
+      for (int smi = 0; smi < others_with_same_mother.size(); smi++) {
+	TLorentzVector V1 = gen_particles[gp] + gen_particles[others_with_same_mother[smi]];
+	TLorentzVector V2 = total_with_same_mother - gen_particles[others_with_same_mother[smi]];
+	for (int mi = 0; mi < possible_mothers.size(); mi++) {
+	  TLorentzVector M1 = gen_particles[possible_mothers[mi]];
+	  TLorentzVector M2 = total_mother_cand - gen_particles[possible_mothers[mi]];
+	  double currentR = D_between_vectors(V1, M1) + D_between_vectors(V2, M2); 
+	  if (currentR < minR){
+	    minR = currentR;
+	    op_pairing[0] = others_with_same_mother[smi];
+	    op_pairing[1] = possible_mothers[mi] ;
+	  }
+	}
+      }
 		
 
 		
-		parent[gp] = op_pairing[1];
-		parent[op_pairing[0]] = op_pairing[1];
+      parent[gp] = op_pairing[1];
+      parent[op_pairing[0]] = op_pairing[1];
 		
 
 		
-		
-	}
+			
+    }
 	
-	for (int p = 0; p < parent.size(); p++) {
-		cout << parent[p];
-		cout << " ";
-	}
-	cout << "" <<endl;
+    for (int p = 0; p < parent.size(); p++) {
+      cout << parent[p];
+      cout << " ";
+    }
+    cout << "" <<endl;
 
 	  
 	 
 	  
-	//find hemisphere parent
-	vector<int> pp_parent(parent.size(), -1);
-	for (int ppi = 0; ppi < pp_parent.size(); ppi++) {
-		if (parent[ppi] == -2){
-			pp_parent[ppi] = -2;
-			continue;
-		}
+    //find hemisphere parent
+    vector<int> pp_parent(parent.size(), -1);
+    for (int ppi = 0; ppi < pp_parent.size(); ppi++) {
+      if (parent[ppi] == -2){
+	pp_parent[ppi] = -2;
+	continue;
+      }
+      
+      if (parent[parent[ppi]] == -2){
+	pp_parent[ppi] = ppi;
+	continue;
+      }
 		
-		if (parent[parent[ppi]] == -2){
-			pp_parent[ppi] = ppi;
-			continue;
-		}
-		
-		pp_parent[ppi] = pp_parent[parent[ppi]];
-		
-	}  
+      pp_parent[ppi] = pp_parent[parent[ppi]];
+      
+    }  
 	
 	  
 	
-	for (int p = 0; p < parent.size(); p++) {
-		cout << pp_parent[p];
-		cout << " ";
-	}
+    for (int p = 0; p < parent.size(); p++) {
+      cout << pp_parent[p];
+      cout << " ";
+    }
 	  
-	cout << "" <<endl;
-	cout << "" <<endl;
+    cout << "" <<endl;
+    cout << "" <<endl;
 	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
-	  
+       
 	  
 	  
 
   }
-
+      
   cout << event_counter << endl; ;
   cout << "test1" << endl; 	
 	
@@ -611,15 +776,8 @@ void CMSRazor::Loop(string outFileName) {
 
 	
   cout << "test5";	
+  //outfile.close();
 }
-
-
-
-
-
-
-
-
 
 
 bool CMSRazor::ELEELEBox() {
@@ -751,20 +909,3 @@ double CMSRazor::D_between_vectors(const TLorentzVector V1, const TLorentzVector
 };
 
 
-vector<fastjet::PseudoJet> CMSRazor::improper_Exclusive_Jets(const fastjet::ClusterSequence cs_E){
-	//vector<fastjet::PseudoJet> input_vecs ;
-	//cs_C_E.transfer_input_jets(input_vecs);
-	//vector<fastjet::PseudoJet> exc_jets;
-	double dcut = 0.02;
-	int jetN = 0;
-	vector<fastjet::PseudoJet> fin_jets;
-
-	while ((jetN != 2) && (dcut < 7.0)) {
-		fin_jets.clear();
-		fin_jets = cs_E.exclusive_jets(dcut);
-		jetN = cs_E.n_exclusive_jets(dcut);
-		dcut = dcut + 0.1;
-	}
-	
-	return fin_jets;
-};
