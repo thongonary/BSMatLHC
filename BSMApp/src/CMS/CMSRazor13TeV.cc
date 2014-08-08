@@ -220,6 +220,7 @@ void CMSRazor13TeV::Loop(string outFileName) {
     RSQz_Default = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_Default/MRz_Default;
 
     sqrtsR_Default = CalcSqrtsR(j1, j2, PFMET);
+    gammaRp1_Default = CalcGammaRp1(j1, j2, PFMET);
 	  
 	  
     //delete j1;

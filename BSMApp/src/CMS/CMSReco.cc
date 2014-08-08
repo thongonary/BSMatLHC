@@ -272,15 +272,61 @@ double CMSReco::CalcSqrtsR(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet
   double MR = CalcMR(j1,j2);
   double Einv = sqrt(met.perp2()+(ja+jb).M2());
 
-  //double sqrtsR = sqrt(2.)*sqrt( MR*MR + pTcm.Dot(ja+jb) + MR*sqrt(MR*MR + pTcm.Perp2() + 2.*pTcm.Dot(ja+jb)) );
+  double sqrtsR = sqrt(2.)*sqrt( MR*MR + pTcm.Dot(ja+jb) + MR*sqrt(MR*MR + pTcm.Perp2() + 2.*pTcm.Dot(ja+jb)) );
   //cout << "MR+Einv = " << MR+Einv << endl;
   //cout << "sqrtsR = " << sqrtsR << endl;
-  return MR+Einv;
+  return sqrtsR;
 }
 
 
-double CMSReco::CalcGammaRp1(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet::PseudoJet met){
-  return 1.;
+double CMSReco::CalcGammaRp1(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet::PseudoJet myMet){
+
+  //Reconstructed leptons and missing transverse energy
+  TLorentzVector L1,L2;
+  L1.SetPtEtaPhiE(j1.pt(), j1.eta(), j1.phi(), sqrt(j1.pz()*j1.pz()+j1.perp2()));
+  L2.SetPtEtaPhiE(j2.pt(), j2.eta(), j2.phi(), sqrt(j2.pz()*j2.pz()+j2.perp2()));
+  TVector3 MET;
+  MET.SetXYZ(myMet.px(),myMet.py(),0.);
+
+  TVector3 vBETA_z = (1./(L1.E()+L2.E()))*(L1+L2).Vect(); 
+  vBETA_z.SetX(0.0);         
+  vBETA_z.SetY(0.0);
+
+  //transformation from lab frame to approximate rest frame along beam-axis
+  L1.Boost(-vBETA_z);
+  L2.Boost(-vBETA_z);
+
+  TVector3 pT_CM = (L1+L2).Vect() + MET;
+  pT_CM.SetZ(0.0);     
+
+  TLorentzVector LL = L1+L2;
+  double SHATR = sqrt( 2.*(LL.E()*LL.E() - LL.Vect().Dot(pT_CM) + LL.E()*sqrt( LL.E()*LL.E() + pT_CM.Mag2() - 2.*LL.Vect().Dot(pT_CM) )));
+
+  TVector3 vBETA_R = (1./sqrt(pT_CM.Mag2() + SHATR*SHATR))*pT_CM;
+
+  double gamma_R = 1./sqrt(1.-vBETA_R.Mag2());
+
+  //transformation from lab frame to R frame
+  L1.Boost(-vBETA_R);
+  L2.Boost(-vBETA_R);
+  LL.Boost(-vBETA_R);  
+
+  /////////////
+  //
+  // R-frame
+  //
+  /////////////
+
+  double dphi_BETA_R = fabs((LL.Vect()).DeltaPhi(vBETA_R));
+
+  double dphi_L1_L2 = fabs(L1.Vect().DeltaPhi(L2.Vect()));
+
+  TVector3 vBETA_Rp1 = (1./(L1.E()+L2.E()))*(L1.Vect() - L2.Vect());
+
+  double gamma_Rp1 = 1./sqrt(1.-vBETA_Rp1.Mag2());
+
+
+  return gamma_Rp1;
 }
 
 double CMSReco::CalcMR_zinvariant(fastjet::PseudoJet j1, fastjet::PseudoJet j2){
