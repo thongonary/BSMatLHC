@@ -17,6 +17,7 @@
 
 // Supported Analyses
 #include "CMS/CMSRazor.hh"
+#include "CMS/CMSRazor13TeV.hh"
 #include "CMS/CMSSUSYVars.hh"
 //#include "CMS/CMSMonoJet.hh"
 //#include "CMS/CMSSSDilepBtag.hh"
@@ -56,6 +57,7 @@ int main(int argc, char* argv[]) {
   bool verbose  = false;
   bool writeOut = false;
   bool razor = false;
+  bool razor13 = false;
   bool susyvars = false;
   bool monojet = false;
   bool darkmatter = false;
@@ -78,7 +80,10 @@ int main(int argc, char* argv[]) {
     if (strncmp(argv[i],"--darkmatter",12)==0)  darkmatter = true;
     if (strncmp(argv[i],"--displaced",11)==0)   displaced = true;
     if (strncmp(argv[i],"--ssdilepbtag",13)==0) ssdilepbtag = true;
-    if (strncmp(argv[i],"--razor",7)==0)        razor = true;
+    if (strncmp(argv[i],"--razor",7)==0){
+      if (strncmp(argv[i],"--razor13",9)==0) razor13 = true;
+      else razor = true;
+    }
     if (strncmp(argv[i],"--susyvars",10)==0)        susyvars = true;
   }
   
@@ -94,6 +99,20 @@ int main(int argc, char* argv[]) {
       TFile *file = new TFile(outFileName,"RECREATE");
       file->Close();
     }
+
+
+    // Razor 13 TeV analysis                                                                                                                                                              
+    if(razor13) {
+      CMSRazor13TeV cmsRazor13(cmsChain, 0., "");
+      if(!writeOut) {
+        cout << "please specify output file" << endl;
+        return 0;
+      }
+      if(verbose) cmsRazor13.SetVerbose(true);
+      cmsRazor13.SetSqrts(sqrts);
+      cmsRazor13.Loop(outFileName);
+    }
+
 
     // SUS-12-005: Razor analysis
     if(razor) {
