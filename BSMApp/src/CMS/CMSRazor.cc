@@ -31,6 +31,12 @@ void CMSRazor::Loop(string outFileName) {
 
 	if(fChain == 0) return;
 
+	// saving info about the PFAK04 jets
+
+	double PFJets_phi[100];
+	double PFJets_eta[100];
+	double PFJets_pT[100];
+
 	double MR_Default, RSQ_Default, MR_KT_Jets, RSQ_KT_Jets;
 	double MRz_Default, MRz_KT_Jets, RSQz_Default, RSQz_KT_Jets;
 
@@ -60,7 +66,11 @@ void CMSRazor::Loop(string outFileName) {
 	double newjetcam_px, newjetcam_px_2;
 	double newjetcam_py, newjetcam_py_2;
 	double newjetcam_mass, newjetcam_mass_2;
+        double newjetkt_px, newjetkt_px_2;
+	double newjetkt_py, newjetkt_py_2;
 	double newjetkt_mass, newjetkt_mass_2;
+        double newjetakt_px, newjetakt_px_2;
+        double newjetakt_py, newjetakt_py_2;
 	double newjetakt_mass, newjetakt_mass_2;
 	double Default_E, KT_Jets_E, newjetcam_E;
 
@@ -109,6 +119,9 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("MRt_newjetcam", &MRt_newjetcam, "MRt_newjetcam/D");
 
 	outTree->Branch("SizesList", SizesList, "SizesList[8]/I");
+ 	outTree->Branch("PFJets_phi", PFJets_phi, "PFJets_phi[100]/D");
+ 	outTree->Branch("PFJets_eta", PFJets_eta, "PFJets_eta[100]/D");
+ 	outTree->Branch("PFJets_pT", PFJets_pT, "PFJets_pT[100]/D");
 
 	//Jet information
 	
@@ -157,6 +170,16 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("newjetcam_py", &newjetcam_py, "newjetcam_py/D");
 	outTree->Branch("newjetcam_px_2", &newjetcam_px_2, "newjetcam_px_2/D");
 	outTree->Branch("newjetcam_py_2", &newjetcam_py_2, "newjetcam_py_2/D");
+
+	outTree->Branch("newjetkt_px", &newjetkt_px, "newjetkt_px/D");
+	outTree->Branch("newjetkt_py", &newjetkt_py, "newjetkt_py/D");
+        outTree->Branch("newjetkt_px_2", &newjetkt_px_2, "newjetkt_px_2/D");
+	outTree->Branch("newjetkt_py_2", &newjetkt_py_2, "newjetkt_py_2/D");
+
+        outTree->Branch("newjetakt_px", &newjetakt_px, "newjetakt_px/D");
+        outTree->Branch("newjetakt_py", &newjetakt_py, "newjetakt_py/D");
+        outTree->Branch("newjetakt_px_2", &newjetakt_px_2, "newjetakt_px_2/D");
+        outTree->Branch("newjetakt_py_2", &newjetakt_py_2, "newjetakt_py_2/D");
 
 	outTree->Branch("BOX_NUM", &BOX_NUM, "BOX_NUM/I");
 	outTree->Branch("W_EFF", &W_EFF, "W_EFF/D");
@@ -231,8 +254,18 @@ void CMSRazor::Loop(string outFileName) {
     i = 0;
 
     if(pfAK04.size()<2) continue;
-	event_counter = event_counter + 1 ;
-  
+    event_counter = event_counter + 1 ;
+
+    //cout << "Event: " << event_counter << endl;
+
+    //saving variables for PFAK04 jets
+    for(unsigned k=0; k<pfAK04.size(); k++){
+      pfAK04[k].set_user_index(k); //label jet with index
+      PFJets_phi[k] = pfAK04[k].phi();
+      PFJets_eta[k] = pfAK04[k].eta();
+      PFJets_pT[k] = pfAK04[k].pt();
+    }
+
     GenMET();
     PFMET = genMET;
 
@@ -270,48 +303,74 @@ void CMSRazor::Loop(string outFileName) {
     double conestep = 0.05;
     bool changed = false;
     vector<TLorentzVector> newjetakt;
-    while (jetlen > 2){
+    vector<fastjet::PseudoJet> final_akt_jets;
+    while (jetlen > 1){
       fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1));
       newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
       jetlen = newjetakt.size();
-      if (jetlen > 2)
+      if (jetlen > 1)
 	conesize1 = conesize1 + conestep;
       changed = true;
     }
     if (changed) {
       fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1 - conestep));
       newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
+      final_akt_jets = fastjet::sorted_by_pt(cs11.inclusive_jets());
+      /*for (unsigned k=0; k<final_akt_jets.size();k++){                        
+	cout << "jet "<< k << ": pt "<<final_akt_jets[k].pt() <<", eta  " << final_akt_jets[i].eta() << ", phi " << final_akt_jets[k].phi() << endl;                            
+	vector<fastjet::PseudoJet> constituents = final_akt_jets[k].constituents();                                                                                             
+        for (unsigned l=0; l<constituents.size();l++){                                                                                                                             
+	cout <<" constituent" << l <<"'s index: "<< constituents[l].user_index() << endl;                                                                                 
+	}                                                                                                                                                                 
+	}*/
     }
-    else {newjetakt = ConvertTo4Vector(pfAK04);}
+    else {
+      newjetakt = ConvertTo4Vector(pfAK04);
+      final_akt_jets = pfAK04;
+    }
 
     jetlen = pfAK04.size();
     conesize1 = 0.2;
+    conestep = 0.05;
     changed = false;
     vector<TLorentzVector> newjetcam;
-    while (jetlen > 2){
+    vector<fastjet::PseudoJet> final_jets;
+
+    while (jetlen > 1){
       fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1));
       newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
       jetlen = newjetcam.size();
-      if (jetlen > 2)
+      if (jetlen > 1)
         conesize1 = conesize1 + conestep;
       changed = true;
     }
     if (changed) {
       fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1 - conestep));
       newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
+      final_jets = fastjet::sorted_by_pt(cs1101.inclusive_jets()); //save pseudojets
+      /*for (unsigned k=0; k<final_jets.size();k++){
+	cout << "jet "<< k << ": pt "<<final_jets[k].pt() <<", eta  " << final_jets[i].eta() << ", phi " << final_jets[k].phi() << endl;
+	vector<fastjet::PseudoJet> constituents = final_jets[k].constituents();
+	for (unsigned l=0; l<constituents.size();l++){
+		  cout <<" constituent" << l <<"'s index: "<< constituents[l].user_index() << endl;
+		  }
+	}*/
     }
-    else {newjetcam = ConvertTo4Vector(pfAK04);}
+    else {
+      newjetcam = ConvertTo4Vector(pfAK04);
+      final_jets = pfAK04;
+    }
 
     //kt
     jetlen = pfAK04.size(); 
     conesize1 = 0.2;
     changed = false;
     vector<TLorentzVector> newjetkt;
-    while (jetlen > 2){
+    while (jetlen > 1){
       fastjet::ClusterSequence cs12(pfAK04, fastjet::JetDefinition(fastjet::kt_algorithm, conesize1));
       newjetkt = ConvertTo4Vector(fastjet::sorted_by_pt(cs12.inclusive_jets()));
       jetlen = newjetkt.size();
-      if (jetlen > 2)
+      if (jetlen > 1)
 	conesize1 = conesize1 + conestep;
       changed = true;
     }
@@ -344,6 +403,10 @@ void CMSRazor::Loop(string outFileName) {
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(pfAK04));
     myHem->CombineMinMass();
     vector<TLorentzVector> hem_Default = myHem->GetHemispheres();
+    vector<int> Temporary = myHem->GetHem1Constituents();
+    for (int k=0; k < Temporary.size(); k++){
+      cout << "Megajet jet: " << Temporary[k] << endl;
+    }
     delete myHem; 
 	
     //initialize  
@@ -414,6 +477,15 @@ void CMSRazor::Loop(string outFileName) {
     newjetcam_px_2 = -9999.0;
     newjetcam_py_2 = -9999.0;
 
+    newjetakt_px = -9999.0;
+    newjetakt_py = -9999.0;
+    newjetakt_px_2 = -9999.0;
+    newjetakt_py_2 = -9999.0;
+
+    newjetkt_px = -9999.0;
+    newjetkt_py = -9999.0;
+    newjetkt_px_2 = -9999.0;
+    newjetkt_py_2 = -9999.0;
 
     TLorentzVector j1;
     TLorentzVector j2;
@@ -447,6 +519,12 @@ void CMSRazor::Loop(string outFileName) {
     if (newjetakt.size() > 1) {
       j1 = newjetakt[0];
       j2 = newjetakt[1];  
+      newjetakt_mass = j1.M();
+      newjetakt_mass_2 = j2.M();
+      newjetakt_px = j1.Px();
+      newjetakt_py = j1.Py();
+      newjetakt_px_2 = j2.Px();
+      newjetakt_py_2 = j2.Py();
       MR_newjetakt = CalcMR(j1, j2);
       MRt_newjetakt = CalcMRT(j1, j2, PFMET);
       RSQ_newjetakt = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetakt/MR_newjetakt;
@@ -459,6 +537,10 @@ void CMSRazor::Loop(string outFileName) {
       j2 = newjetkt[1];
       newjetkt_mass = j1.M();
       newjetkt_mass_2 = j2.M();
+      newjetkt_px = j1.Px();
+      newjetkt_py = j1.Py();
+      newjetkt_px_2 = j2.Px();
+      newjetkt_py_2 = j2.Py();
       MR_newjetkt = CalcMR(j1, j2);
       MRt_newjetkt = CalcMRT(j1, j2, PFMET);
       RSQ_newjetkt = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetkt/MR_newjetkt;
@@ -472,7 +554,6 @@ void CMSRazor::Loop(string outFileName) {
       newjetcam_E = j1.E();
       newjetcam_px = j1.Px();
       newjetcam_py = j1.Py();
-      newjetkt_mass = j1.Px();
       newjetcam_px_2 = j2.Px();
       newjetcam_py_2 = j2.Py();
       //cout << j1.Px() << " " << j1.Py() << " " << j2.Px() << " " << j2.Py() << endl;
@@ -484,6 +565,7 @@ void CMSRazor::Loop(string outFileName) {
       MRz_newjetcam = CalcMR_zinvariant(j1, j2);
       RSQz_newjetcam = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_newjetcam/MRz_newjetcam;
     } 
+    else cout<<"FAILED"<<endl;
     
     // 2b) compute traditional RSQ and MR (DEFAULT)
     j1 = hem_Default[0];
