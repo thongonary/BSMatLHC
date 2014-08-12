@@ -29,6 +29,9 @@ public:
   /// Return the hemisphere TLorentzVector;
   vector<TLorentzVector> GetHemispheres();
 
+  vector<int> GetHem1Constituents();
+  vector<int> GetHem2Constituents();
+
   /// Combining the jets in two hemispheres minimizing the 
   /// sum of the invariant masses of the two hemispheres
   void CombineMinMass();
@@ -36,17 +39,22 @@ public:
   /// Combining the jets in two hemispheres minimizing the 
   /// difference of HT for the two hemispheres
   void CombineMinHT();
-
+ 
 private:
 
   /// Combine the jets in all the possible pairs of hemispheres
   void Combine();
 
+  void CombineSaveConstituents();
+
   vector<TLorentzVector> jIN;
   vector<TLorentzVector> jOUT;
   vector<TLorentzVector> j1;
   vector<TLorentzVector> j2;
-
+  int hem[1000][40];
+  int hem2[1000][40];
+  int chosen_perm;
+  bool no_switch;
 };
 
 #endif
