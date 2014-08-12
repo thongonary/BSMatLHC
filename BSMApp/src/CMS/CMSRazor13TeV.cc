@@ -28,7 +28,7 @@ void CMSRazor13TeV::Loop(string outFileName) {
 	double MR_Default, RSQ_Default, MR_KT_Jets, RSQ_KT_Jets, MR_AKT_Jets, RSQ_AKT_Jets, MR_CAM_Jets, RSQ_CAM_Jets;
 	double MRz_Default, MRz_KT_Jets, MRz_AKT_Jets, MRz_CAM_Jets, MRz_CAM_Cons, RSQz_Default, RSQz_KT_Jets, RSQz_AKT_Jets, RSQz_CAM_Jets;
 
-	double sqrtsR_Default, gammaRp1_Default;
+	double sqrtsR_Default, gammaRp1_Default, pTCM_Default, gammaRp1Ana_Default;
 	double W_EFF;
 	int BOX_NUM;
 	int SizesList[5];
@@ -48,6 +48,8 @@ void CMSRazor13TeV::Loop(string outFileName) {
 
 	outTree->Branch("sqrtsR_Default", &sqrtsR_Default, "sqrtsR_Default/D");
 	outTree->Branch("gammaRp1_Default", &gammaRp1_Default, "gammaRp1_Default/D");
+	outTree->Branch("gammaRp1Ana_Default", &gammaRp1Ana_Default, "gammaRp1Ana_Default/D");
+	outTree->Branch("pTCM_Default", &pTCM_Default, "pTCM_Default/D");
 		
 	outTree->Branch("MR_KT_Jets", &MR_KT_Jets, "MR_KT_Jets/D");
 	outTree->Branch("MRz_KT_Jets", &MRz_KT_Jets, "MRz_KT_Jets/D");
@@ -167,7 +169,9 @@ void CMSRazor13TeV::Loop(string outFileName) {
 	  
 
     sqrtsR_Default = -9999. ;
+    pTCM_Default = -9999. ;
     gammaRp1_Default = -9999. ;
+    gammaRp1Ana_Default = -9999. ;
 	  
     SizesList[0] = -9999.0;
     SizesList[1] = -9999.0;
@@ -221,7 +225,9 @@ void CMSRazor13TeV::Loop(string outFileName) {
 
     sqrtsR_Default = CalcSqrtsR(j1, j2, PFMET);
     gammaRp1_Default = CalcGammaRp1(j1, j2, PFMET);
+    gammaRp1Ana_Default = CalcGammaRp1Ana(j1, j2, PFMET);
 	  
+    pTCM_Default = (j1+j2+PFMET).pt();
 	  
     //delete j1;
     //delete j2;

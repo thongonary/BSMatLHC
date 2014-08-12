@@ -278,6 +278,23 @@ double CMSReco::CalcSqrtsR(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet
   return sqrtsR;
 }
 
+double CMSReco::CalcGammaRp1Ana(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet::PseudoJet myMet){
+
+  //Reconstructed leptons and missing transverse energy
+  TLorentzVector L1,L2;
+  L1.SetPtEtaPhiE(j1.pt(), j1.eta(), j1.phi(), sqrt(j1.pz()*j1.pz()+j1.perp2()));
+  L2.SetPtEtaPhiE(j2.pt(), j2.eta(), j2.phi(), sqrt(j2.pz()*j2.pz()+j2.perp2()));
+  TVector3 MET;
+  MET.SetXYZ(myMet.px(),myMet.py(),0.);
+
+  // MR
+
+  double MR = CalcMR(L1,L2);
+  double gamma_Rp1_Ana = 1./sqrt(1. - (L1-L2).Perp2()/MR/MR - 4.*(L2.E()*L1.Pz() - L1.E()*L2.Pz())*(L2.E()*L1.Pz() - L1.E()*L2.Pz())/MR/MR/MR/MR );
+
+  return gamma_Rp1_Ana;
+
+}
 
 double CMSReco::CalcGammaRp1(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastjet::PseudoJet myMet){
 
@@ -324,7 +341,6 @@ double CMSReco::CalcGammaRp1(fastjet::PseudoJet j1, fastjet::PseudoJet j2, fastj
   TVector3 vBETA_Rp1 = (1./(L1.E()+L2.E()))*(L1.Vect() - L2.Vect());
 
   double gamma_Rp1 = 1./sqrt(1.-vBETA_Rp1.Mag2());
-
 
   return gamma_Rp1;
 }
