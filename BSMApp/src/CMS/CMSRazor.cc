@@ -256,7 +256,7 @@ void CMSRazor::Loop(string outFileName) {
     if(pfAK04.size()<2) continue;
     event_counter = event_counter + 1 ;
 
-    //cout << "Event: " << event_counter << endl;
+    cout << "Event: " << event_counter << endl;
 
     //saving variables for PFAK04 jets
     for(unsigned k=0; k<pfAK04.size(); k++){
@@ -403,10 +403,19 @@ void CMSRazor::Loop(string outFileName) {
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(pfAK04));
     myHem->CombineMinMass();
     vector<TLorentzVector> hem_Default = myHem->GetHemispheres();
-    vector<int> Temporary = myHem->GetHem1Constituents();
-    for (int k=0; k < Temporary.size(); k++){
-      cout << "Megajet jet: " << Temporary[k] << endl;
+    //vector<int> Temporary = myHem->GetHem1Constituents();
+    //vector<int> Temporary2 = myHem->GetHem2Constituents();
+    /*for (int k=0; k < Temporary.size(); k++){
+      if (Temporary[k]>-1) { 
+	cout << "Megajet jet constituent: " << Temporary[k] << endl;
+      }
     }
+    for (int k=0; k < Temporary2.size(); k++){
+   if (Temporary2[k]>-1) {
+     cout << "Megajet jet hem 2 constituent: " << Temporary2[k] << endl;
+       }
+      }
+    */
     delete myHem; 
 	
     //initialize  

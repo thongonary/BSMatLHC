@@ -8,6 +8,8 @@ using namespace std;
 CMSHemisphere::CMSHemisphere(vector<TLorentzVector> jets){ 
   if(jets.size() < 2) cout << "Error in CMSHemisphere: you should provide at least two jets to form Henispheres" << endl;
   jIN = jets;
+  cout << "Tried to combine" <<endl;
+  //CombineSaveConstituents();
   Combine();
 }
 
@@ -18,6 +20,37 @@ vector<TLorentzVector> CMSHemisphere::GetHemispheres() {
   return jOUT;
 }
 
+vector<int> CMSHemisphere::GetHem1Constituents() {
+  vector<int> hem_temp;
+  cout << "Passed when calling constituents" << endl;
+  if(no_switch) {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem[chosen_perm][i]);
+    }
+    return hem_temp;
+  }
+  else {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem2[chosen_perm][i]);
+    }
+    return hem_temp;
+  }
+}
+vector<int> CMSHemisphere::GetHem2Constituents() {
+  vector<int> hem_temp;
+  if(no_switch) {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem2[chosen_perm][i]);
+    }
+    return hem_temp;
+  }
+  else {
+    for(int i;i < 40;i++){
+      hem_temp.push_back(hem[chosen_perm][i]);
+    }   
+    return hem_temp;
+  }
+}
 void CMSHemisphere::Combine() {
   int N_JETS = jIN.size();
 
@@ -58,6 +91,7 @@ void CMSHemisphere::CombineMinMass() {
       M_min = M_temp;
       myJ1 = j1[i];
       myJ2 = j2[i];
+      chosen_perm = i;
     }
   }
   
@@ -66,11 +100,62 @@ void CMSHemisphere::CombineMinMass() {
 
   jOUT.clear();
   if(myJ1.Pt() > myJ2.Pt()){
+    no_switch = true;
     jOUT.push_back(myJ1);
     jOUT.push_back(myJ2);
   } else {
+    no_switch = false;
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
+  }
+}
+
+void CMSHemisphere::CombineSaveConstituents() {
+  int N_JETS = jIN.size();
+
+  // jets NEED to be ordered by pT
+  // saves 2D array, first index = # of combination of jets
+  // saved number = jet # that goes into hemisphere
+  cout << "set jets " << endl;
+  int N_comb = 1;
+  for(int i = 0; i < N_JETS; i++){
+    N_comb *= 2;
+  }
+  for (int i = 0; i < 1000; i++){
+    for (int j = 0; j < 40; j++){
+      hem[i][j] = -1;
+      hem2[i][j] = -1;
+    }
+  }
+  cout << "started combining" << endl;
+  int j_count;
+  int array_count=0;
+  for(int i = 1; i < N_comb-1; i++){
+    TLorentzVector j_temp1, j_temp2;
+    int itemp = i;
+    j_count = N_comb/2;
+    int count = 0;
+    int hem_count = 0; //loops through # of jets in first hem
+    int hem_count2 = 0; // loops through # of jets in second hem
+    while(j_count > 0){
+      if(itemp/j_count == 1){
+        j_temp1 += jIN[count];
+	cout << " before setting is working " << endl;
+	hem[array_count][hem_count] = count;
+	cout << "after setting is working" << endl;
+	hem_count++;
+      } else {
+        j_temp2 += jIN[count];
+	hem2[array_count][hem_count2]=count;
+	hem_count2++;
+      }
+      itemp -= j_count*(itemp/j_count);
+      j_count /= 2;
+      count++;
+    }
+    j1.push_back(j_temp1);
+    j2.push_back(j_temp2);
+    array_count++;
   }
 }
 
