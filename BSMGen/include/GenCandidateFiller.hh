@@ -28,7 +28,7 @@ struct GenCandidateFillerData {
   vector<float> *energy, *px, *py, *pz;
   vector<float> *x, *y, *z;  
   vector<float> *mass;
-  vector<int> *pdgId, *decayLenght;
+  vector<int> *pdgId, *decayLenght, *status;
   vector<int> *m1pdgId, *m2pdgId;
 
 public:
@@ -43,7 +43,7 @@ public:
   GenCandidateFiller(GenTree* genTree, string BlockName);
   ~GenCandidateFiller();
   void FillEvent(HepMC::GenEvent* hepmcevt);
-  void FillEventSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
+  void FillEventSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId, int status,
 		       double decayL, int m1, int m2, bool stable);
   void FillTree();
   void ClearEvent();
@@ -51,7 +51,7 @@ public:
 
 protected:
   void FillParticleBranch(HepMC::GenParticle* hepmcevt);
-  void FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
+  void FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId, int status,
 				double decayL, int m1, int m2);
   bool IsStable(HepMC::GenParticle* p);
   bool isElectron(HepMC::GenParticle* p);

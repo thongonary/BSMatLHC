@@ -68,26 +68,28 @@ TTree* STDHEP::Loop(){
 
     for(int i=0; i<GenParticle_; i++) {
       // only stable particles
-      if(GenParticle_Status[i] != 1) continue;
+      //if(GenParticle_Status[i] != 1) continue;
       TLorentzVector* p = new TLorentzVector(GenParticle_Px[i], GenParticle_Py[i], GenParticle_Pz[i], GenParticle_E[i]);
       TVector3* vtx = new TVector3(GenParticle_X[i], GenParticle_Y[i], GenParticle_Z[i]);
       // check if the particle has to be considered, and in case fill the tree
+    
+      //if(GenParticle_Status[i] == 3) 
+      susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
       if(GenParticle_Status[i] == 1) { // stable only
 	if(p->Pt() > _minMuonPt) 
-	  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
 	if(p->Pt() > _minElectronPt) 
-	  electronFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	  electronFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
 	if(p->Pt() > _minPhotonPt) 
-	  photonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	  photonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
 	if(p->Pt() > _minParticlePt && fabs(p->Eta()) < _maxParticleEta) 
-	  particleFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	  particleFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
 	// invisible
-	neutrinoFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);     
-	susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	neutrinoFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);  
 
       } else { // taus and b's decay 
-	if(p->Pt() > _minTauPt) tauFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
-	if(p->Pt() > _minBJetPt) bFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	if(p->Pt() > _minTauPt) tauFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
+	if(p->Pt() > _minBJetPt) bFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i],true);
       }
       delete p, vtx;
     }

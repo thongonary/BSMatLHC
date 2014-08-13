@@ -23,6 +23,7 @@ GenCandidateFiller::~GenCandidateFiller() {
   delete _privateData->z;
   delete _privateData->mass;
   delete _privateData->pdgId;
+  delete _privateData->status;
   delete _privateData->decayLenght;
   delete _privateData->m1pdgId;
   delete _privateData->m2pdgId;
@@ -152,7 +153,7 @@ void GenCandidateFiller::FillEvent(HepMC::GenEvent* hepmcevt) {
 }
 
 void GenCandidateFiller::FillEventSTDHEP(TLorentzVector* p, TVector3* v,
-					 double mass, int pdgId,
+					 double mass, int pdgId, int status,
 					 double decayL, int m1,
 					 int m2, bool stable = true) {
   bool writeParticle = false;
@@ -162,7 +163,7 @@ void GenCandidateFiller::FillEventSTDHEP(TLorentzVector* p, TVector3* v,
 	  !isParticle(pdgId,"Neutrino") and stable) writeParticle = true;
   
   if(writeParticle) {
-    FillParticleBranchSTDHEP(p,v,mass,pdgId,decayL,m1,m2);
+    FillParticleBranchSTDHEP(p,v,mass,pdgId,status,decayL,m1,m2);
     _blockSize += 1;
   }
 }
@@ -179,6 +180,7 @@ void GenCandidateFiller::FillTree() {
   _genTree->column((_name+"X").c_str(), *_privateData->z, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"Mass").c_str(), *_privateData->mass, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"PdgId").c_str(), *_privateData->pdgId, _name.c_str(), 0, "Reco");
+  _genTree->column((_name+"Status").c_str(), *_privateData->status, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"DecayLmm").c_str(), *_privateData->decayLenght, _name.c_str(), 0, "Reco"); 
   _genTree->column((_name+"M1PdgId").c_str(), *_privateData->m1pdgId, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"M2PdgId").c_str(), *_privateData->m2pdgId, _name.c_str(), 0, "Reco");  
@@ -193,8 +195,9 @@ void GenCandidateFiller::FillParticleBranch(HepMC::GenParticle* p) {
     _privateData->energy->push_back(momentum.e());
     _privateData->mass->push_back(momentum.m());
 
-    // PDG Id
+    // PDG Id and status
     _privateData->pdgId->push_back(p->pdg_id());
+    _privateData->status->push_back(p->status());
 
     HepMC::GenVertex* vtxIn = p->production_vertex();
     HepMC::GenVertex* vtxOut = p->end_vertex();
@@ -222,7 +225,7 @@ void GenCandidateFiller::FillParticleBranch(HepMC::GenParticle* p) {
 //////////////////
 
 void GenCandidateFiller::FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v,
-						  double mass, int pdgId, double decayL, int m1, int m2) {
+						  double mass, int pdgId, int status, double decayL, int m1, int m2) {
     // Get the 4-momentum
     _privateData->px->push_back(p->Px());
     _privateData->py->push_back(p->Py());
@@ -230,8 +233,9 @@ void GenCandidateFiller::FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v
     _privateData->energy->push_back(p->E());
     _privateData->mass->push_back(mass);
 
-    // PDG Id
+    // PDG Id and status
     _privateData->pdgId->push_back(pdgId);
+    _privateData->status->push_back(status);
 
     // get production vertex 
     _privateData->x->push_back(v->X());
@@ -256,6 +260,7 @@ void  GenCandidateFillerData::newEvent() {
   z = new vector<float>;
   mass = new vector<float>;
   pdgId = new vector<int>;
+  status = new vector<int>;
   decayLenght = new vector<int>;
   m1pdgId = new vector<int>;
   m2pdgId = new vector<int>;
@@ -271,6 +276,7 @@ void GenCandidateFillerData::clearEvent() {
   z->clear();
   mass->clear();
   pdgId->clear();
+  status->clear();
   decayLenght->clear();
   m1pdgId->clear();
   m2pdgId->clear();
