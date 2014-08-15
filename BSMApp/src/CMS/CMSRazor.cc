@@ -60,19 +60,33 @@ void CMSRazor::Loop(string outFileName) {
 	//hemisphere properties
 	double Default_mass, Default_px, Default_py, Default_pz, Default_rapidity, Default_phi;
 	double KT_Jets_mass, KT_Jets_px, KT_Jets_py, KT_Jets_pz, KT_Jets_rapidity, KT_Jets_phi;
-        double Default_mass_2, Default_px_2, Default_py_2, Default_pz_2, Default_rapidity_2, Default_phi_2;
+        double Default_mass_2, Default_px_2, Default_py_2, Default_pz_2, Default_rapidity_2, Default_phi_2, Default_R;
         double KT_Jets_mass_2, KT_Jets_px_2, KT_Jets_py_2, KT_Jets_pz_2, KT_Jets_rapidity_2, KT_Jets_phi_2;
+	
+	double Default_rapidity_diff, KT_Jets_rapidity_diff, newjetcam_rapidity_diff;
+	double Default_phi_diff, KT_Jets_phi_diff, newjetcam_phi_diff;
 
 	double newjetcam_px, newjetcam_px_2;
 	double newjetcam_py, newjetcam_py_2;
 	double newjetcam_mass, newjetcam_mass_2;
         double newjetkt_px, newjetkt_px_2;
 	double newjetkt_py, newjetkt_py_2;
+	double newjetcam_phi, newjetcam_phi_2;
+	double newjetcam_rapidity, newjetcam_rapidity_2;
+
+
 	double newjetkt_mass, newjetkt_mass_2;
         double newjetakt_px, newjetakt_px_2;
         double newjetakt_py, newjetakt_py_2;
 	double newjetakt_mass, newjetakt_mass_2;
 	double Default_E, KT_Jets_E, newjetcam_E;
+	double newjetcam_R;
+	double finalconesize;
+
+	double MR_Cont, MRz_Cont, RSQ_Cont, RSQz_Cont, MRT_Cont, Cont_px, Cont_py, Cont_pz, Cont_mass;
+	double Cont_px_2, Cont_py_2, Cont_pz_2, Cont_mass_2, Cont_phi_diff, Cont_rapidity_diff;
+	double pt_Gen_lead, pt_Gen_sub;
+
 
 	int BOX_NUM;
 	double W_EFF;
@@ -138,6 +152,10 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("Default_pz_2", &Default_pz_2, "Default_pz_2/D");
 	outTree->Branch("Default_rapidity_2", &Default_rapidity_2, "Default_rapidity_2/D");
 	outTree->Branch("Default_phi_2", &Default_phi_2, "Default_phi_2/D");
+	outTree->Branch("Default_phi_diff", &Default_phi_diff, "Default_phi_diff/D");
+	outTree->Branch("Default_rapidity_diff", &Default_rapidity_diff, "Default_rapidity_diff/D");
+	outTree->Branch("Default_R", &Default_R, "Default_R/D");
+
 	
 	outTree->Branch("KT_Jets_mass", &KT_Jets_mass, "KT_Jets_mass/D");
 	outTree->Branch("KT_Jets_px", &KT_Jets_px, "KT_Jets_px/D");
@@ -152,16 +170,22 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("KT_Jets_pz_2", &KT_Jets_pz_2, "KT_Jets_pz_2/D");
 	outTree->Branch("KT_Jets_rapidity_2", &KT_Jets_rapidity_2, "KT_Jets_rapidity_2/D");
 	outTree->Branch("KT_Jets_phi_2", &KT_Jets_phi_2, "KT_Jets_phi_2/D");
-	
+	outTree->Branch("KT_Jets_phi_diff", &KT_Jets_phi_diff, "KT_Jets_phi_diff/D");
+	outTree->Branch("KT_Jets_rapidity_diff", &KT_Jets_rapidity_diff, "KT_Jets_rapidity_diff/D");
+
 	outTree->Branch("jetlenaktkt", &jetlenaktkt, "jetlenaktkt/D");
 
 	outTree->Branch("newjetcam_mass", &newjetcam_mass, "newjetcam_mass/D");
 	outTree->Branch("newjetcam_mass_2", &newjetcam_mass_2, "newjetcam_mass_2/D");
+	outTree->Branch("newjetcam_phi_diff", &newjetcam_phi_diff, "newjetcam_phi_diff/D");
+	outTree->Branch("newjetcam_rapidity_diff", &newjetcam_rapidity_diff, "newjetcam_rapidity_diff/D");
+
 
 	outTree->Branch("newjetkt_mass", &newjetkt_mass, "newjetkt_mass/D");
 	outTree->Branch("newjetkt_mass_2", &newjetkt_mass_2, "newjetkt_mass_2/D");
 	outTree->Branch("newjetakt_mass", &newjetakt_mass, "newjetakt_mass/D");
 	outTree->Branch("newjetakt_mass_2", &newjetakt_mass_2, "newjetakt_mass_2/D");
+
 	outTree->Branch("Default_E", &Default_E, "Default_E/D");
 	outTree->Branch("KT_Jets_E", &KT_Jets_E, "KT_Jets_E/D");
 	outTree->Branch("newjetcam_E", &newjetcam_E, "newjetcam_E/D");
@@ -170,6 +194,22 @@ void CMSRazor::Loop(string outFileName) {
 	outTree->Branch("newjetcam_py", &newjetcam_py, "newjetcam_py/D");
 	outTree->Branch("newjetcam_px_2", &newjetcam_px_2, "newjetcam_px_2/D");
 	outTree->Branch("newjetcam_py_2", &newjetcam_py_2, "newjetcam_py_2/D");
+	outTree->Branch("newjetcam_R", &newjetcam_R, "newjetcam_R/D");
+	outTree->Branch("finalconesize", &finalconesize, "finalconesize/D");
+
+	outTree->Branch("MR_Cont", &MR_Cont, "MR_Cont/D");
+	outTree->Branch("MRz_Cont", &MRz_Cont, "MRz_Cont/D");
+	outTree->Branch("RSQ_Cont", &RSQ_Cont, "RSQ_Cont/D");
+	outTree->Branch("RSQz_Cont", &RSQz_Cont, "RSQz_Cont/D");
+	outTree->Branch("Cont_px", &Cont_px, "Cont_px/D");
+	outTree->Branch("Cont_px_2", &Cont_px_2, "Cont_px_2/D");
+	outTree->Branch("Cont_py", &Cont_py, "Cont_py/D");
+	outTree->Branch("Cont_py_2", &Cont_py_2, "Cont_py_2/D");
+	outTree->Branch("Cont_pz", &Cont_pz, "Cont_pz/D");
+	outTree->Branch("Cont_pz_2", &Cont_pz_2, "Cont_pz_2/D");
+	outTree->Branch("Cont_mass", &Cont_mass, "Cont_mass/D");
+	outTree->Branch("Cont_mass_2", &Cont_mass_2, "Cont_mass_2/D");
+
 
 	outTree->Branch("newjetkt_px", &newjetkt_px, "newjetkt_px/D");
 	outTree->Branch("newjetkt_py", &newjetkt_py, "newjetkt_py/D");
@@ -180,6 +220,9 @@ void CMSRazor::Loop(string outFileName) {
         outTree->Branch("newjetakt_py", &newjetakt_py, "newjetakt_py/D");
         outTree->Branch("newjetakt_px_2", &newjetakt_px_2, "newjetakt_px_2/D");
         outTree->Branch("newjetakt_py_2", &newjetakt_py_2, "newjetakt_py_2/D");
+
+	outTree->Branch("pt_Gen_lead", &pt_Gen_lead, "pt_Gen_lead/D");
+	outTree->Branch("pt_Gen_sub", &pt_Gen_sub, "pt_Gen_sub/D");
 
 	outTree->Branch("BOX_NUM", &BOX_NUM, "BOX_NUM/I");
 	outTree->Branch("W_EFF", &W_EFF, "W_EFF/D");
@@ -221,7 +264,7 @@ void CMSRazor::Loop(string outFileName) {
     vector<fastjet::PseudoJet> empty;
     vector<fastjet::PseudoJet> JetsConst = PFJetConstituents(empty,empty,empty);
     
-    bool ttbar_no_all_had = false; //true if you want to filter out all-hadronic events (no leptons)
+    bool ttbar_no_all_had = true; //true if you want to filter out all-hadronic events (no leptons)
     bool hasLepton = true;
     if (ttbar_no_all_had){
       hasLepton = false;
@@ -256,7 +299,7 @@ void CMSRazor::Loop(string outFileName) {
     if(pfAK04.size()<2) continue;
     event_counter = event_counter + 1 ;
 
-    cout << "Event: " << event_counter << endl;
+    //cout << "Event: " << event_counter << endl;
 
     //saving variables for PFAK04 jets
     for(unsigned k=0; k<pfAK04.size(); k++){
@@ -295,25 +338,36 @@ void CMSRazor::Loop(string outFileName) {
 
 
     //---------------------------new clustering algorithms that run through cone size--------------------------------//
-
+    
     //New idea for clustering.  Re-run anti-kt inclusively and increase cone size to lower final jet numer
     //Do the same for kt and cam also
+    //Need to fix incase jet length drops to 1
     double jetlen = pfAK04.size(); 
-    double conesize1 = 0.2;
+    double conesize1 = 0.4;
     double conestep = 0.05;
     bool changed = false;
+    bool slowdown = true;
     vector<TLorentzVector> newjetakt;
+    //<<<<<<< Updated upstream
     vector<fastjet::PseudoJet> final_akt_jets;
-    while (jetlen > 1){
+    while (jetlen > 1 && slowdown){
       fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1));
       newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
       jetlen = newjetakt.size();
-      if (jetlen > 1)
+
+      if (jetlen > 2){
 	conesize1 = conesize1 + conestep;
-      changed = true;
-    }
+	changed = true;
+      }
+      else if (jetlen == 2){
+	slowdown = false;
+      }
+      else if (jetlen ==1){
+	slowdown = false;
+      	conesize1 = conesize1 - conestep;
+    }}
     if (changed) {
-      fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1 - conestep));
+      fastjet::ClusterSequence cs11(pfAK04, fastjet::JetDefinition(fastjet::antikt_algorithm, conesize1));
       newjetakt = ConvertTo4Vector(fastjet::sorted_by_pt(cs11.inclusive_jets()));
       final_akt_jets = fastjet::sorted_by_pt(cs11.inclusive_jets());
       /*for (unsigned k=0; k<final_akt_jets.size();k++){                        
@@ -328,23 +382,32 @@ void CMSRazor::Loop(string outFileName) {
       newjetakt = ConvertTo4Vector(pfAK04);
       final_akt_jets = pfAK04;
     }
-
+    
     jetlen = pfAK04.size();
-    conesize1 = 0.2;
     conestep = 0.05;
+    conesize1 = 0.4;
     changed = false;
+    slowdown = true;
     vector<TLorentzVector> newjetcam;
     vector<fastjet::PseudoJet> final_jets;
 
-    while (jetlen > 1){
+    while (jetlen > 1 && slowdown){
       fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1));
       newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
       jetlen = newjetcam.size();
-      if (jetlen > 1)
+      if (jetlen > 2){
         conesize1 = conesize1 + conestep;
-      changed = true;
-    }
-    if (changed) {
+	changed = true;
+      }
+      else if (jetlen == 2){
+	slowdown = false;
+      }
+      else if (jetlen == 1){
+	slowdown = false;
+	conesize1 = conesize1-conestep;
+      }}
+    
+      if (changed) {
       fastjet::ClusterSequence cs1101(pfAK04, fastjet::JetDefinition(fastjet::cambridge_algorithm, conesize1 - conestep));
       newjetcam = ConvertTo4Vector(fastjet::sorted_by_pt(cs1101.inclusive_jets()));
       final_jets = fastjet::sorted_by_pt(cs1101.inclusive_jets()); //save pseudojets
@@ -355,15 +418,14 @@ void CMSRazor::Loop(string outFileName) {
 		  cout <<" constituent" << l <<"'s index: "<< constituents[l].user_index() << endl;
 		  }
 	}*/
-    }
-    else {
-      newjetcam = ConvertTo4Vector(pfAK04);
-      final_jets = pfAK04;
-    }
+      }
+      else {newjetcam = ConvertTo4Vector(pfAK04);}
+    finalconesize = conesize1;
+    //>>>>>>> Stashed changes
 
     //kt
     jetlen = pfAK04.size(); 
-    conesize1 = 0.2;
+    conesize1 = 0.4;
     changed = false;
     vector<TLorentzVector> newjetkt;
     while (jetlen > 1){
@@ -384,7 +446,7 @@ void CMSRazor::Loop(string outFileName) {
     
 
     //Clusters particles off of previous clustering
-    /*
+    
     jetlen = pfAK04.size();
     conesize1 = 0.2;
     changed = false;
@@ -394,9 +456,10 @@ void CMSRazor::Loop(string outFileName) {
       Continualjet = fastjet::sorted_by_pt(cs1000.inclusive_jets()); 
       jetlen = Continualjet.size();
       conesize1 += 0.1;
-      cout << jetlen << " " << conesize1 << endl;
+      //cout << jetlen << " " << conesize1 << endl;
     }
-    */
+    vector<TLorentzVector> Continual;
+    Continual = ConvertTo4Vector(Continualjet);
 
     
     // 1b) traditional hemispheres
@@ -417,7 +480,7 @@ void CMSRazor::Loop(string outFileName) {
       }
     */
     delete myHem; 
-	
+
     //initialize  
     MR_KT_Jets = -9999. ;
     RSQ_KT_Jets = -9999. ;
@@ -485,7 +548,6 @@ void CMSRazor::Loop(string outFileName) {
     newjetcam_py = -9999.0;
     newjetcam_px_2 = -9999.0;
     newjetcam_py_2 = -9999.0;
-
     newjetakt_px = -9999.0;
     newjetakt_py = -9999.0;
     newjetakt_px_2 = -9999.0;
@@ -517,14 +579,16 @@ void CMSRazor::Loop(string outFileName) {
       KT_Jets_pz_2 = j2.Pz();
       KT_Jets_phi_2 = j2.Phi();
       KT_Jets_rapidity_2 = j2.Rapidity();
+      KT_Jets_rapidity_diff = (KT_Jets_rapidity - KT_Jets_rapidity_2);
+      KT_Jets_phi_diff = (KT_Jets_phi - KT_Jets_phi_2);
       MR_KT_Jets = CalcMR(j1, j2);
       MRt_KT_Jets = CalcMRT(j1, j2, PFMET);
       RSQ_KT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MR_KT_Jets/MR_KT_Jets;
       MRz_KT_Jets = CalcMR_zinvariant(j1, j2);
       RSQz_KT_Jets = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_KT_Jets/MRz_KT_Jets;
-	  
+      	  
     }
-	  
+
     if (newjetakt.size() > 1) {
       j1 = newjetakt[0];
       j2 = newjetakt[1];  
@@ -534,6 +598,7 @@ void CMSRazor::Loop(string outFileName) {
       newjetakt_py = j1.Py();
       newjetakt_px_2 = j2.Px();
       newjetakt_py_2 = j2.Py();
+
       MR_newjetakt = CalcMR(j1, j2);
       MRt_newjetakt = CalcMRT(j1, j2, PFMET);
       RSQ_newjetakt = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetakt/MR_newjetakt;
@@ -565,9 +630,16 @@ void CMSRazor::Loop(string outFileName) {
       newjetcam_py = j1.Py();
       newjetcam_px_2 = j2.Px();
       newjetcam_py_2 = j2.Py();
-      //cout << j1.Px() << " " << j1.Py() << " " << j2.Px() << " " << j2.Py() << endl;
       newjetcam_mass = j1.M();
       newjetcam_mass_2 = j2.M();
+      newjetcam_phi = j1.Phi();
+      newjetcam_rapidity = j1.Rapidity();
+      newjetcam_phi_2 = j2.Phi();
+      newjetcam_rapidity_2 = j2.Rapidity();
+      newjetcam_phi_diff = newjetcam_phi - newjetcam_phi_2;
+      newjetcam_rapidity_diff = newjetcam_rapidity - newjetcam_rapidity_2;
+      newjetcam_R = pow(pow(newjetcam_rapidity_diff, 2) + pow(newjetcam_phi_diff, 2), 0.5);
+
       MR_newjetcam = CalcMR(j1, j2);      
       MRt_newjetcam = CalcMRT(j1, j2, PFMET);
       RSQ_newjetcam = pow(CalcMRT(j1, j2, PFMET),2.)/MR_newjetcam/MR_newjetcam;
@@ -576,6 +648,27 @@ void CMSRazor::Loop(string outFileName) {
     } 
     else cout<<"FAILED"<<endl;
     
+    if (Continual.size() > 1){
+      j1 = Continual[0];
+      j2 = Continual[1];
+      Cont_px = j1.Px();
+      Cont_py = j1.Py();
+      Cont_pz = j1.Pz();
+      Cont_mass = j1.M();
+      Cont_phi_diff = j1.Phi() - j2.Phi();
+      Cont_rapidity_diff = j1.Rapidity() - j2.Rapidity();
+      Cont_px_2 = j2.Px();
+      Cont_py_2 = j2.Py();
+      Cont_pz_2 = j2.Pz();
+      Cont_mass_2 = j2.M();
+      MR_Cont = CalcMR(j1, j2);
+      MRz_Cont = CalcMR_zinvariant(j1, j2);
+      RSQ_Cont = pow(CalcMRT(j1, j2, PFMET),2.)/MR_Cont/MR_Cont;
+      RSQz_Cont = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_Cont/MRz_Cont;
+
+
+    }
+
     // 2b) compute traditional RSQ and MR (DEFAULT)
     j1 = hem_Default[0];
     j2 = hem_Default[1];
@@ -592,13 +685,16 @@ void CMSRazor::Loop(string outFileName) {
     Default_pz_2 = j2.Pz();
     Default_phi_2 = j2.Phi();
     Default_rapidity_2 = j2.Rapidity();
+    Default_rapidity_diff = Default_rapidity - Default_rapidity_2;
+    Default_phi_diff = Default_phi - Default_phi_2;
+    Default_R = pow(pow(Default_rapidity_diff, 2) + pow(Default_phi_diff, 2), 0.5);
+
     MR_Default = CalcMR(j1, j2);
     MRt_Default = CalcMRT(j1, j2, PFMET);
     RSQ_Default = pow(CalcMRT(j1, j2, PFMET),2.)/MR_Default/MR_Default;
     MRz_Default = CalcMR_zinvariant(j1, j2);
     RSQz_Default = pow(CalcMRT(j1, j2, PFMET),2.)/MRz_Default/MRz_Default;
-	  
-
+	 
     //delete j1;
     //delete j2;
     
@@ -624,7 +720,6 @@ void CMSRazor::Loop(string outFileName) {
 
     // write event in the tree
     outTree->Fill();
-	
 
     // fill PDF histograms
     bool fillBox = SignalRegion(MR_Default, RSQ_Default, BOX_NUM);
@@ -636,16 +731,83 @@ void CMSRazor::Loop(string outFileName) {
     if(BOX_NUM == 5 && fillBox) pdfHad->Fill(MR_Default, RSQ_Default);
 	  
 	  
-    continue;  
+    //continue;  
 	  
-	  
+  
     //BEGIN GEN LEVEL ANALYSIS
     //initialize
-	
 	  
     int correct_clustering = -9999.0 ;
 	  
     //initialize structures to store gen data pulled from cmsreco
+
+    int SUSY;
+    vector<double> SUSYPx;
+    vector<double> SUSYPy;
+    vector<double> SUSYPz;
+    vector<double> SUSYE;
+    vector<int> SUSYPdgId;
+    vector<int> SUSYM1PdgId;
+    vector<int> SUSYStatus;
+    vector<double> SUSYm1px;
+    //Vector with index of LSP location
+    vector<int> SUSYLSP;
+    //Vector with index of first mother location
+    vector<int> SUSYLSP_Mother_Eve;
+    //Function used to return information about SUSY particles
+    SUSYReturn(SUSY, SUSYPx, SUSYPy, SUSYPz, SUSYE, SUSYPdgId, SUSYM1PdgId, SUSYStatus, SUSYm1px);
+    //Looks for the first mother of an LSP and finds the difference in their pt
+    if (SUSY > 0){
+
+    for (int p = 0; p < SUSY; p++){
+      //cout << "number " << p << " ID " << SUSYPdgId[p] << " Mother "  << SUSYM1PdgId[p] << " Status " << SUSYStatus[p] << endl;
+      //cout << SUSYE[p] << " Px " << SUSYPx[p] << " Py " << SUSYPy[p] << " Pz " << SUSYPz[p] << " motherpx " << SUSYm1px[p] <<endl;      
+      //Status = 1 is final state (LSP) and status = 22 is initial collision?
+      	//Looking to find the LSP's parent SUSY particle
+	if (SUSYStatus[p] == 1){
+	  SUSYLSP.push_back(p);
+	  //Continue running until the parent has been found.
+	  int mom_status = 1;
+	  int id = SUSYPdgId[p];
+	  int mom_id = SUSYM1PdgId[p];
+	  double mom_px = SUSYm1px[p];
+	  double final_momentum = 0;
+	  int finali = 0;
+	  while (mom_status != 22){
+	    //cout << "Number " << finali << " " << mom_px << "  " << mom_status << endl;
+	    for (int i = 0; i < SUSY; i++){
+	      //Finds the parent by matching px to the parent
+	      if (mom_id ==  SUSYPdgId[i] && mom_px == SUSYPx[i]){
+		id = SUSYPdgId[i];
+		mom_id = SUSYM1PdgId[i];
+		mom_px = SUSYm1px[i];
+		final_momentum = SUSYPx[i];
+		mom_status = SUSYStatus[i];
+		finali = i;
+		i = SUSY;
+	    }
+	    }
+	  }
+
+	  SUSYLSP_Mother_Eve.push_back(finali);
+	  //cout << SUSYLSP[0] <<" " << SUSYLSP[1] << " " << SUSYLSP_Mother_Eve[0] << " " << SUSYLSP_Mother_Eve[1] << endl;
+      }
+    }
+    double pt_diff1, pt_diff2;
+    pt_diff1 =  pow(pow(SUSYPx[SUSYLSP_Mother_Eve[0]], 2) + pow(SUSYPx[SUSYLSP_Mother_Eve[0]], 2)
+		    - pow(SUSYPx[SUSYLSP[0]], 2) + pow(SUSYPy[SUSYLSP[0]], 2), 0.5);
+    pt_diff2 =  pow(pow(SUSYPx[SUSYLSP_Mother_Eve[1]], 2) + pow(SUSYPx[SUSYLSP_Mother_Eve[1]], 2)
+      - pow(SUSYPx[SUSYLSP[1]], 2) + pow(SUSYPy[SUSYLSP[1]], 2), 0.5);
+    if (pt_diff1 > pt_diff2){
+      pt_Gen_lead = pt_diff1;
+      pt_Gen_sub = pt_diff2;
+    }
+    else
+      pt_Gen_lead = pt_diff2;
+      pt_Gen_sub = pt_diff1;
+}       
+    continue;
+    
     int genParticle;
     vector<double> genParticlePx;
     vector<double> genParticlePy;
@@ -653,18 +815,21 @@ void CMSRazor::Loop(string outFileName) {
     vector<double> genParticleE;
     vector<int> genParticlePdgId;
     vector<int> genParticleM1PdgId;
-	
+    
     GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId);
 	
-    cout << ""<< endl;
     for (int p = 0; p < genParticle; p++) {
-      cout << genParticlePdgId[p];
-      cout << "           ";
-      cout << genParticleM1PdgId[p]<<endl;
-    } 
-    cout << ""<< endl;
+      //if (genParticlePdgId[p] == 1000021 || genParticlePdgId[p] == 1000022)
+      {
+	/*
+      cout << "ID " << genParticlePdgId[p];
+      cout << " ?Number of particles? "<< genParticle << endl;
+      cout << "Mother? " << genParticleM1PdgId[p]<<endl << endl;
+      cout << "Px " << genParticlePx << "Py " << genParticlePy << "Pz " << genParticlePz << endl;
+	*/
+      }}
+    //cout << "------------end event-----------"<< endl;
 	  
-	
 	  
   	  
 	  
@@ -767,7 +932,7 @@ void CMSRazor::Loop(string outFileName) {
     }
 	
     for (int p = 0; p < parent.size(); p++) {
-      cout << parent[p];
+      cout <<"parent " << parent[p];
       cout << " ";
     }
     cout << "" <<endl;

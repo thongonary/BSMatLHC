@@ -8,7 +8,7 @@ using namespace std;
 CMSHemisphere::CMSHemisphere(vector<TLorentzVector> jets){ 
   if(jets.size() < 2) cout << "Error in CMSHemisphere: you should provide at least two jets to form Henispheres" << endl;
   jIN = jets;
-  cout << "Tried to combine" <<endl;
+  //cout << "Tried to combine" <<endl;
   //CombineSaveConstituents();
   Combine();
 }

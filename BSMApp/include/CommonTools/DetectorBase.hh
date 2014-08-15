@@ -34,6 +34,7 @@ public :
    Int_t           MuonDecayLmm[30];   //[Muon]
    Int_t           MuonM1PdgId[30];   //[Muon]
    Int_t           MuonM2PdgId[30];   //[Muon]
+   Float_t         Muonm1px[30];   //[Muon]
    Int_t           Electron;
    Float_t         ElectronE[30];   //[Electron]
    Float_t         ElectronPx[30];   //[Electron]
@@ -46,6 +47,7 @@ public :
    Int_t           ElectronDecayLmm[30];   //[Electron]
    Int_t           ElectronM1PdgId[30];   //[Electron]
    Int_t           ElectronM2PdgId[30];   //[Electron]
+   Float_t         Electronm1px[30];   //[Electron]
    Int_t           Tau;
    Float_t         TauE[30];   //[Tau]
    Float_t         TauPx[30];   //[Tau]
@@ -58,6 +60,7 @@ public :
    Int_t           TauDecayLmm[30];   //[Tau]
    Int_t           TauM1PdgId[30];   //[Tau]
    Int_t           TauM2PdgId[30];   //[Tau]
+   Float_t         Taum1px[30];   //[Tau]
    Int_t           b;
    Float_t         bE[100];   //[b]
    Float_t         bPx[100];   //[b]
@@ -70,6 +73,7 @@ public :
    Int_t           bDecayLmm[100];   //[b]
    Int_t           bM1PdgId[100];   //[b]
    Int_t           bM2PdgId[100];   //[b]
+   Float_t         bm1px[100];   //[b]
    Int_t           c;
    Float_t         cE[100];   //[c]
    Float_t         cPx[100];   //[c]
@@ -82,6 +86,7 @@ public :
    Int_t           cDecayLmm[100];   //[c]
    Int_t           cM1PdgId[100];   //[c]
    Int_t           cM2PdgId[100];   //[c]
+   Float_t         cm1px[100];   //[c]
    Int_t           Photon;
    Float_t         PhotonE[800];   //[Photon]
    Float_t         PhotonPx[800];   //[Photon]
@@ -94,6 +99,7 @@ public :
    Int_t           PhotonDecayLmm[800];   //[Photon]
    Int_t           PhotonM1PdgId[800];   //[Photon]
    Int_t           PhotonM2PdgId[800];   //[Photon]
+   Float_t         Photonm1px[800];   //[Photon]
    Int_t           Neutrino;
    Float_t         NeutrinoE[50];   //[Neutrino]
    Float_t         NeutrinoPx[50];   //[Neutrino]
@@ -106,18 +112,21 @@ public :
    Int_t           NeutrinoDecayLmm[50];   //[Neutrino]
    Int_t           NeutrinoM1PdgId[50];   //[Neutrino]
    Int_t           NeutrinoM2PdgId[50];   //[Neutrino]
+   Float_t         Neutrinom1px[50];   //[Neutrino]
    Int_t           SUSY;
-   Float_t         SUSYE[20];   //[SUSY]
-   Float_t         SUSYPx[20];   //[SUSY]
-   Float_t         SUSYPy[20];   //[SUSY]
-   Float_t         SUSYPz[20];   //[SUSY]
-   Float_t         SUSYX[20];   //[SUSY]
-   Float_t         SUSYY[20];   //[SUSY]
-   Float_t         SUSYMass[20];   //[SUSY]
-   Int_t           SUSYPdgId[20];   //[SUSY]
-   Int_t           SUSYDecayLmm[20];   //[SUSY]
-   Int_t           SUSYM1PdgId[20];   //[SUSY]
-   Int_t           SUSYM2PdgId[20];   //[SUSY]
+   Float_t         SUSYE[50];   //[SUSY]
+   Float_t         SUSYPx[50];   //[SUSY]
+   Float_t         SUSYPy[50];   //[SUSY]
+   Float_t         SUSYPz[50];   //[SUSY]
+   Float_t         SUSYX[50];   //[SUSY]
+   Float_t         SUSYY[50];   //[SUSY]
+   Float_t         SUSYMass[50];   //[SUSY]
+   Int_t           SUSYPdgId[50];   //[SUSY]
+   Int_t           SUSYDecayLmm[50];   //[SUSY]
+   Int_t           SUSYM1PdgId[50];   //[SUSY]
+   Int_t           SUSYM2PdgId[50];   //[SUSY]
+   Int_t           SUSYStatus[50];   //[SUSY]
+   Float_t         SUSYm1px[50];   //[SUSY]
    Int_t           GenTreeParticle;
    Float_t         GenTreeParticleE[50];   //[GenTreeParticle]
    Float_t         GenTreeParticlePx[50];   //[GenTreeParticle]
@@ -130,6 +139,7 @@ public :
    Int_t           GenTreeParticleDecayLmm[50];   //[GenTreeParticle]
    Int_t           GenTreeParticleM1PdgId[50];   //[GenTreeParticle]
    Int_t           GenTreeParticleM2PdgId[50];   //[GenTreeParticle]
+   Float_t         GenTreeParticlem1px[50];   //[GenTreeParticle]
    Int_t           Particle;
    Float_t         ParticleE[4000];   //[Particle]
    Float_t         ParticlePx[4000];   //[Particle]
@@ -142,6 +152,8 @@ public :
    Int_t           ParticleDecayLmm[4000];   //[Particle]
    Int_t           ParticleM1PdgId[4000];   //[Particle]
    Int_t           ParticleM2PdgId[4000];   //[Particle]
+   Float_t         Particlem1px[4000];   //[Particle]
+
 
    // List of branches
    TBranch        *b_Muon;   //!
@@ -156,6 +168,7 @@ public :
    TBranch        *b_MuonDecayLmm;   //!
    TBranch        *b_MuonM1PdgId;   //!
    TBranch        *b_MuonM2PdgId;   //!
+   TBranch        *b_Muonm1px;   //!
    TBranch        *b_Electron;   //!
    TBranch        *b_ElectronE;   //!
    TBranch        *b_ElectronPx;   //!
@@ -168,6 +181,7 @@ public :
    TBranch        *b_ElectronDecayLmm;   //!
    TBranch        *b_ElectronM1PdgId;   //!
    TBranch        *b_ElectronM2PdgId;   //!
+   TBranch        *b_Electronm1px;   //!
    TBranch        *b_Tau;   //!
    TBranch        *b_TauE;   //!
    TBranch        *b_TauPx;   //!
@@ -180,6 +194,7 @@ public :
    TBranch        *b_TauDecayLmm;   //!
    TBranch        *b_TauM1PdgId;   //!
    TBranch        *b_TauM2PdgId;   //!
+   TBranch        *b_Taum1px;   //!
    TBranch        *b_b;   //!
    TBranch        *b_bE;   //!
    TBranch        *b_bPx;   //!
@@ -192,6 +207,7 @@ public :
    TBranch        *b_bDecayLmm;   //!
    TBranch        *b_bM1PdgId;   //!
    TBranch        *b_bM2PdgId;   //!
+   TBranch        *b_bm1px;   //!
    TBranch        *b_c;   //!
    TBranch        *b_cE;   //!
    TBranch        *b_cPx;   //!
@@ -204,6 +220,7 @@ public :
    TBranch        *b_cDecayLmm;   //!
    TBranch        *b_cM1PdgId;   //!
    TBranch        *b_cM2PdgId;   //!
+   TBranch        *b_cm1px;   //!
    TBranch        *b_Photon;   //!
    TBranch        *b_PhotonE;   //!
    TBranch        *b_PhotonPx;   //!
@@ -216,6 +233,7 @@ public :
    TBranch        *b_PhotonDecayLmm;   //!
    TBranch        *b_PhotonM1PdgId;   //!
    TBranch        *b_PhotonM2PdgId;   //!
+   TBranch        *b_Photonm1px;   //!
    TBranch        *b_Neutrino;   //!
    TBranch        *b_NeutrinoE;   //!
    TBranch        *b_NeutrinoPx;   //!
@@ -228,6 +246,7 @@ public :
    TBranch        *b_NeutrinoDecayLmm;   //!
    TBranch        *b_NeutrinoM1PdgId;   //!
    TBranch        *b_NeutrinoM2PdgId;   //!
+   TBranch        *b_Neutrinom1px;   //!
    TBranch        *b_SUSY;   //!
    TBranch        *b_SUSYE;   //!
    TBranch        *b_SUSYPx;   //!
@@ -237,9 +256,11 @@ public :
    TBranch        *b_SUSYY;   //!
    TBranch        *b_SUSYMass;   //!
    TBranch        *b_SUSYPdgId;   //!
+   TBranch        *b_SUSYStatus;   //!
    TBranch        *b_SUSYDecayLmm;   //!
    TBranch        *b_SUSYM1PdgId;   //!
    TBranch        *b_SUSYM2PdgId;   //!
+   TBranch        *b_SUSYm1px;   //!
    TBranch        *b_GenTreeParticle;   //!
    TBranch        *b_GenTreeParticleE;   //!
    TBranch        *b_GenTreeParticlePx;   //!
@@ -252,6 +273,7 @@ public :
    TBranch        *b_GenTreeParticleDecayLmm;   //!
    TBranch        *b_GenTreeParticleM1PdgId;   //!
    TBranch        *b_GenTreeParticleM2PdgId;   //!
+   TBranch        *b_GenTreeParticlem1px;   //!
    TBranch        *b_Particle;   //!
    TBranch        *b_ParticleE;   //!
    TBranch        *b_ParticlePx;   //!
@@ -264,7 +286,7 @@ public :
    TBranch        *b_ParticleDecayLmm;   //!
    TBranch        *b_ParticleM1PdgId;   //!
    TBranch        *b_ParticleM2PdgId;   //!
-
+   TBranch        *b_Particlem1px;   //!
    DetectorBase(TTree *tree=0);
    virtual ~DetectorBase();
    virtual Int_t    Cut(Long64_t entry);
@@ -347,6 +369,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("MuonDecayLmm", MuonDecayLmm, &b_MuonDecayLmm);
    fChain->SetBranchAddress("MuonM1PdgId", MuonM1PdgId, &b_MuonM1PdgId);
    fChain->SetBranchAddress("MuonM2PdgId", MuonM2PdgId, &b_MuonM2PdgId);
+   fChain->SetBranchAddress("Muonm1px", Muonm1px, &b_Muonm1px);
    fChain->SetBranchAddress("Electron", &Electron, &b_Electron);
    fChain->SetBranchAddress("ElectronE", ElectronE, &b_ElectronE);
    fChain->SetBranchAddress("ElectronPx", ElectronPx, &b_ElectronPx);
@@ -359,6 +382,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("ElectronDecayLmm", ElectronDecayLmm, &b_ElectronDecayLmm);
    fChain->SetBranchAddress("ElectronM1PdgId", ElectronM1PdgId, &b_ElectronM1PdgId);
    fChain->SetBranchAddress("ElectronM2PdgId", ElectronM2PdgId, &b_ElectronM2PdgId);
+   fChain->SetBranchAddress("Electronm1px", Electronm1px, &b_Electronm1px);
    fChain->SetBranchAddress("Tau", &Tau, &b_Tau);
    fChain->SetBranchAddress("TauE", TauE, &b_TauE);
    fChain->SetBranchAddress("TauPx", TauPx, &b_TauPx);
@@ -371,6 +395,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("TauDecayLmm", TauDecayLmm, &b_TauDecayLmm);
    fChain->SetBranchAddress("TauM1PdgId", TauM1PdgId, &b_TauM1PdgId);
    fChain->SetBranchAddress("TauM2PdgId", TauM2PdgId, &b_TauM2PdgId);
+   fChain->SetBranchAddress("Taum1px", Taum1px, &b_Taum1px);
    fChain->SetBranchAddress("b", &b, &b_b);
    fChain->SetBranchAddress("bE", bE, &b_bE);
    fChain->SetBranchAddress("bPx", bPx, &b_bPx);
@@ -383,6 +408,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("bDecayLmm", bDecayLmm, &b_bDecayLmm);
    fChain->SetBranchAddress("bM1PdgId", bM1PdgId, &b_bM1PdgId);
    fChain->SetBranchAddress("bM2PdgId", bM2PdgId, &b_bM2PdgId);
+   fChain->SetBranchAddress("bm1px", bm1px, &b_bm1px);
    fChain->SetBranchAddress("c", &c, &b_c);
    fChain->SetBranchAddress("cE", cE, &b_cE);
    fChain->SetBranchAddress("cPx", cPx, &b_cPx);
@@ -395,6 +421,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("cDecayLmm", cDecayLmm, &b_cDecayLmm);
    fChain->SetBranchAddress("cM1PdgId", cM1PdgId, &b_cM1PdgId);
    fChain->SetBranchAddress("cM2PdgId", cM2PdgId, &b_cM2PdgId);
+   fChain->SetBranchAddress("cm1px", cm1px, &b_cm1px);
    fChain->SetBranchAddress("Photon", &Photon, &b_Photon);
    fChain->SetBranchAddress("PhotonE", PhotonE, &b_PhotonE);
    fChain->SetBranchAddress("PhotonPx", PhotonPx, &b_PhotonPx);
@@ -407,6 +434,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("PhotonDecayLmm", PhotonDecayLmm, &b_PhotonDecayLmm);
    fChain->SetBranchAddress("PhotonM1PdgId", PhotonM1PdgId, &b_PhotonM1PdgId);
    fChain->SetBranchAddress("PhotonM2PdgId", PhotonM2PdgId, &b_PhotonM2PdgId);
+   fChain->SetBranchAddress("Photonm1px", Photonm1px, &b_Photonm1px);
    fChain->SetBranchAddress("Neutrino", &Neutrino, &b_Neutrino);
    fChain->SetBranchAddress("NeutrinoE", NeutrinoE, &b_NeutrinoE);
    fChain->SetBranchAddress("NeutrinoPx", NeutrinoPx, &b_NeutrinoPx);
@@ -419,6 +447,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("NeutrinoDecayLmm", NeutrinoDecayLmm, &b_NeutrinoDecayLmm);
    fChain->SetBranchAddress("NeutrinoM1PdgId", NeutrinoM1PdgId, &b_NeutrinoM1PdgId);
    fChain->SetBranchAddress("NeutrinoM2PdgId", NeutrinoM2PdgId, &b_NeutrinoM2PdgId);
+   fChain->SetBranchAddress("Neutrinom1px", Neutrinom1px, &b_Neutrinom1px);
    fChain->SetBranchAddress("SUSY", &SUSY, &b_SUSY);
    fChain->SetBranchAddress("SUSYE", SUSYE, &b_SUSYE);
    fChain->SetBranchAddress("SUSYPx", SUSYPx, &b_SUSYPx);
@@ -426,11 +455,13 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("SUSYPz", SUSYPz, &b_SUSYPz);
    fChain->SetBranchAddress("SUSYX", SUSYX, &b_SUSYX);
    fChain->SetBranchAddress("SUSYY", SUSYY, &b_SUSYY);
+   fChain->SetBranchAddress("SUSYStatus", SUSYStatus, &b_SUSYStatus);
    fChain->SetBranchAddress("SUSYMass", SUSYMass, &b_SUSYMass);
    fChain->SetBranchAddress("SUSYPdgId", SUSYPdgId, &b_SUSYPdgId);
    fChain->SetBranchAddress("SUSYDecayLmm", SUSYDecayLmm, &b_SUSYDecayLmm);
    fChain->SetBranchAddress("SUSYM1PdgId", SUSYM1PdgId, &b_SUSYM1PdgId);
    fChain->SetBranchAddress("SUSYM2PdgId", SUSYM2PdgId, &b_SUSYM2PdgId);
+   fChain->SetBranchAddress("SUSYm1px", SUSYm1px, &b_SUSYm1px);
    fChain->SetBranchAddress("GenTreeParticle", &GenTreeParticle, &b_GenTreeParticle);
    fChain->SetBranchAddress("GenTreeParticleE", GenTreeParticleE, &b_GenTreeParticleE);
    fChain->SetBranchAddress("GenTreeParticlePx", GenTreeParticlePx, &b_GenTreeParticlePx);
@@ -443,6 +474,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("GenTreeParticleDecayLmm", GenTreeParticleDecayLmm, &b_GenTreeParticleDecayLmm);
    fChain->SetBranchAddress("GenTreeParticleM1PdgId", GenTreeParticleM1PdgId, &b_GenTreeParticleM1PdgId);
    fChain->SetBranchAddress("GenTreeParticleM2PdgId", GenTreeParticleM2PdgId, &b_GenTreeParticleM2PdgId);
+   fChain->SetBranchAddress("GenTreeParticlem1px", GenTreeParticlem1px, &b_GenTreeParticlem1px);
    fChain->SetBranchAddress("Particle", &Particle, &b_Particle);
    fChain->SetBranchAddress("ParticleE", ParticleE, &b_ParticleE);
    fChain->SetBranchAddress("ParticlePx", ParticlePx, &b_ParticlePx);
@@ -455,6 +487,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("ParticleDecayLmm", ParticleDecayLmm, &b_ParticleDecayLmm);
    fChain->SetBranchAddress("ParticleM1PdgId", ParticleM1PdgId, &b_ParticleM1PdgId);
    fChain->SetBranchAddress("ParticleM2PdgId", ParticleM2PdgId, &b_ParticleM2PdgId);
+   fChain->SetBranchAddress("Particlem1px", Particlem1px, &b_Particlem1px);
    Notify();
 }
 

@@ -161,6 +161,29 @@ vector<fastjet::PseudoJet> CMSReco::PFJetConstituents(vector<fastjet::PseudoJet>
 
 
 
+void CMSReco::SUSYReturn(int &susy1, vector<double> &susy2, vector<double> &susy3, vector<double> &susy4, vector<double> &susy5, vector<int> &susy6, vector<int> &susy7, vector<int> &susy8, vector<double> &susy9 ){
+  susy1 = SUSY;
+  susy2.reserve(SUSY);
+  susy3.reserve(SUSY);
+  susy4.reserve(SUSY);
+  susy5.reserve(SUSY);
+  susy6.reserve(SUSY);
+  susy7.reserve(SUSY);
+  susy8.reserve(SUSY);
+  susy9.reserve(SUSY);
+  
+  for (int ni = 0; ni < SUSY; ni++){
+    susy2[ni] = SUSYPx[ni];
+    susy3[ni] = SUSYPy[ni];
+    susy4[ni] = SUSYPz[ni];
+    susy5[ni] = SUSYE[ni];
+    susy6[ni] = SUSYPdgId[ni];
+    susy7[ni] = SUSYM1PdgId[ni];
+    susy8[ni] = SUSYStatus[ni];
+    susy9[ni] = SUSYm1px[ni];
+
+  }
+}
 
 void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7 ){
 	gen1 = GenTreeParticle; //this is fine
@@ -407,5 +430,4 @@ void CMSReco::CleanEvent() {
   _PFPhotons.clear();
   _PFChHadrons.clear();
   _PFNeuHadrons.clear();
-
 }

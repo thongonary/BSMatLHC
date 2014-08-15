@@ -63,6 +63,7 @@ protected:
 
   void GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7);
 	
+  void SUSYReturn(int &susy1, vector<double> &susy2, vector<double> &susy3, vector<double> &susy4, vector<double> &susy5, vector<int> &susy6, vector<int> &susy7, vector<int> &susy8, vector<double> &susy9 );
 
   /// Compute missing pixel hits for a give track
   /// due to detector inefficiency and/or track displacement
