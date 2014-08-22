@@ -286,8 +286,8 @@ void CMSRazor::Loop(string outFileName) {
     
     //--------------All-hadronic events filter---------------//
     
-    bool ttbar_no_all_had = false; //true if you want to filter out all-hadronic events (no leptons)
-    bool ttbar = false; //controls gen-level mothers
+    bool ttbar_no_all_had = true; //true if you want to filter out all-hadronic events (no leptons)
+    bool ttbar = true; //controls gen-level mothers
     bool hasLepton = true;
     if (ttbar_no_all_had){
       hasLepton = false;
@@ -300,7 +300,6 @@ void CMSRazor::Loop(string outFileName) {
       }
     }
     if (!hasLepton) {
-      cout << "skipped" << endl;
       continue;
     }
     //--------------End filter-----------------//
@@ -327,7 +326,6 @@ void CMSRazor::Loop(string outFileName) {
 
     if(pfAK04.size()<2) continue;
     event_counter = event_counter + 1 ;
-    cout << "Event: " << event_counter << endl;
     
     //setting arrays initially to -999
 
@@ -492,7 +490,6 @@ void CMSRazor::Loop(string outFileName) {
       newjetcam_hem1_csts[0] = 0;
       newjetcam_hem2_csts[0] = 1;
     }
-    cout <<"cam size: "<< newjetcam.size() << endl;
     finalconesize = conesize1;
     
     //kt
@@ -544,7 +541,7 @@ void CMSRazor::Loop(string outFileName) {
     
     // 1b) traditional hemispheres
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(pfAK04));
-    myHem->CombineMinMass();
+    myHem->CombineGeorgi();
     vector<TLorentzVector> hem_Default = myHem->GetHemispheres();
     vector<int> Temporary = myHem->GetHem1Constituents();
     vector<int> Temporary2 = myHem->GetHem2Constituents();
@@ -945,7 +942,6 @@ void CMSRazor::Loop(string outFileName) {
 	else {
 	  if (fabs(genParticlePdgId[p]) > 0 && fabs(genParticlePdgId[p]) < 9){ //if it is a quark                     
             if (fabs(genParticleM1PdgId[p]) == 6) {// if mother is a top quark
-	      cout << "found top" << endl;
               genParticleQuark.push_back(p); // push back index of quark
               TLorentzVector quark;
               quark.SetPxPyPzE(genParticlePx[p],genParticlePy[p],genParticlePz[p],genParticleE[p]);
@@ -961,7 +957,6 @@ void CMSRazor::Loop(string outFileName) {
 	    if (fabs(genParticleM1PdgId[p]) == 24) { // if mother is a W+/W- (accounts for hadronic decays)
 	      genParticleQuark.push_back(p); 
 	      TLorentzVector quark;
-	      cout << "found w" <<endl;
 	      quark.SetPxPyPzE(genParticlePx[p], genParticlePy[p], genParticlePx[p], genParticleE[p]);
 	      if (genParticleM1PdgId[p] == 24){ // if mother is W+
 		genParticleQuarkVector_hem1.push_back(quark);
@@ -983,7 +978,6 @@ void CMSRazor::Loop(string outFileName) {
     }
     
     if ((numQuarks_1+numQuarks_2) >= threshold){ // passed threshold for num of quarks
-      cout << "passed" << endl;
       int hem1_count = 0;
       int hem2_count = 0;
       for (int q=0; q<numQuarks_1; q++){ //loops through quarks from first pair-produced particle
