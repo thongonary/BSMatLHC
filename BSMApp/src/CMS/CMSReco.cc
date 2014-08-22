@@ -159,8 +159,6 @@ vector<fastjet::PseudoJet> CMSReco::PFJetConstituents(vector<fastjet::PseudoJet>
   return PFcands;
   }
 
-
-
 void CMSReco::SUSYReturn(int &susy1, vector<double> &susy2, vector<double> &susy3, vector<double> &susy4, vector<double> &susy5, vector<int> &susy6, vector<int> &susy7, vector<int> &susy8, vector<double> &susy9 ){
   susy1 = SUSY;
   susy2.reserve(SUSY);
@@ -185,7 +183,31 @@ void CMSReco::SUSYReturn(int &susy1, vector<double> &susy2, vector<double> &susy
   }
 }
 
-void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7 ){
+void CMSReco::ParticleReturn(int &particle1, vector<double> &particle2, vector<double> &particle3, vector<double> &particle4, vector<double> &particle5, vector<int> &particle6, vector<int> &particle7, vector<int> &particle8, vector<double> &particle9 ){
+  particle1 = Particle;
+  particle2.reserve(Particle);
+  particle3.reserve(Particle);
+  particle4.reserve(Particle);
+  particle5.reserve(Particle);
+  particle6.reserve(Particle);
+  particle7.reserve(Particle);
+  particle8.reserve(Particle);
+  particle9.reserve(Particle);
+  
+  for (int ni = 0; ni < Particle; ni++){
+    particle2[ni] = ParticlePx[ni];
+    particle3[ni] = ParticlePy[ni];
+    particle4[ni] = ParticlePz[ni];
+    particle5[ni] = ParticleE[ni];
+    particle6[ni] = ParticlePdgId[ni];
+    particle7[ni] = ParticleM1PdgId[ni];
+    particle8[ni] = ParticleStatus[ni];
+    particle9[ni] = Particlem1px[ni];
+
+  }
+}
+
+void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7, vector<double> &gen8 ){
 	gen1 = GenTreeParticle; //this is fine
 	
 	gen2.reserve(GenTreeParticle);
@@ -194,6 +216,7 @@ void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, v
 	gen5.reserve(GenTreeParticle);
 	gen6.reserve(GenTreeParticle);
 	gen7.reserve(GenTreeParticle);
+	gen8.reserve(GenTreeParticle);
 	
 	for (int ni = 0; ni < GenTreeParticle; ni++) {
 		gen2[ni] = GenTreeParticlePx[ni];
@@ -202,6 +225,7 @@ void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, v
 		gen5[ni] = GenTreeParticleE[ni];
 		gen6[ni] = GenTreeParticlePdgId[ni];
 		gen7[ni] = GenTreeParticleM1PdgId[ni];
+		gen8[ni] = GenTreeParticlem1px[ni];
 	}
 }
 

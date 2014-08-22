@@ -264,8 +264,10 @@ void CMSRazor13TeV::Loop(string outFileName) {
     vector<double> genParticleE;
     vector<int> genParticlePdgId;
     vector<int> genParticleM1PdgId;
-	
-    GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId);
+    vector<double> genParticlem1px;
+    // edited this because function changed
+    //GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId);
+    GenReturn(genParticle, genParticlePx, genParticlePy, genParticlePz, genParticleE, genParticlePdgId, genParticleM1PdgId, genParticlem1px);
 	
     cout << ""<< endl;
     for (int p = 0; p < genParticle; p++) {
