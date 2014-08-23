@@ -152,6 +152,7 @@ public :
    Int_t           ParticleDecayLmm[4000];   //[Particle]
    Int_t           ParticleM1PdgId[4000];   //[Particle]
    Int_t           ParticleM2PdgId[4000];   //[Particle]
+   Int_t           ParticleStatus[4000];   //[Particle]
    Float_t         Particlem1px[4000];   //[Particle]
 
 
