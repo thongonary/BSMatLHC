@@ -232,7 +232,8 @@ if __name__ == '__main__':
                 
             
         emptyEtaPhi.Draw()
-        emptyEtaPhi.SetTitle("%i : %i : %i, M_{R} = %2.1f, R^{2} = %2.3f, m_{#gamma#gamma} = %2.1f"%(tree.run,tree.lumi,tree.evNum,tree.MR,tree.RSQ,tree.mGG))
+        #emptyEtaPhi.SetTitle("%i : %i : %i, M_{R} = %2.1f, R^{2} = %2.3f, m_{#gamma#gamma} = %2.1f"%(tree.run,tree.lumi,tree.evNum,tree.MR,tree.RSQ,tree.mGG))
+        emptyEtaPhi.SetTitle("Run %i, M_{R} = %2.1f, R^{2} = %2.3f, m_{#gamma#gamma} = %2.1f"%(tree.run,tree.MR,tree.RSQ,tree.mGG))
         if len(pTJetHem1)>0:
             graphJetHem1.Draw("psame")
         if len(pTGGHem1)>0:
@@ -245,5 +246,6 @@ if __name__ == '__main__':
         for tlatex in tlatexList: tlatex.Draw("same")
 
         c.Print("etaPhi/etaPhi_%i.pdf"%tree.run)
+        c.Print("etaPhi/etaPhi_%i.C"%tree.run)
     
     
