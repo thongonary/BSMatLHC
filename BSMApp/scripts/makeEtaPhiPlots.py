@@ -141,9 +141,8 @@ if __name__ == '__main__':
 
         tlatexList = []
         
-
-        for i in range(0,10):
-            if tree.constPFHem1[i]>-1 and tree.pTPFJet[tree.constPFHem1[i]]>-1:
+        for i in range(0,tree.NPFJets-1):
+            if tree.constPFHem1[i]>-1 and tree.constPFHem1[i]<tree.NPFJets:
                 pTJetHem1.append(tree.pTPFJet[tree.constPFHem1[i]])
                 etaJetHem1.append(tree.etaPFJet[tree.constPFHem1[i]])
                 phiJetHem1.append(tree.phiPFJet[tree.constPFHem1[i]])
@@ -152,7 +151,7 @@ if __name__ == '__main__':
                 tlatex.SetTextFont(42)
                 tlatex.SetTextColor(rt.kBlue)
                 tlatexList.append(tlatex)
-            elif tree.constPFHem1[i]>-1 and tree.pTPFJet[tree.constPFHem1[i]]<0:
+            elif tree.constPFHem1[i]>-1 and tree.constPFHem1[i]<tree.NPFJets:
                 pTGGHem1.append(tree.pTGG)
                 etaGGHem1.append(tree.etaGG)
                 phiGGHem1.append(tree.phiGG)
@@ -162,8 +161,8 @@ if __name__ == '__main__':
                 tlatex.SetTextColor(rt.kBlue)
                 tlatexList.append(tlatex)
 
-        for i in range(0,10):
-            if tree.constPFHem2[i]>-1 and tree.pTPFJet[tree.constPFHem2[i]]>-1:
+        for i in range(0,tree.NPFJets-1):
+            if tree.constPFHem2[i]>-1 and tree.constPFHem2[i]<tree.NPFJets:
                 pTJetHem2.append(tree.pTPFJet[tree.constPFHem2[i]])
                 etaJetHem2.append(tree.etaPFJet[tree.constPFHem2[i]])
                 phiJetHem2.append(tree.phiPFJet[tree.constPFHem2[i]])
@@ -172,7 +171,7 @@ if __name__ == '__main__':
                 tlatex.SetTextFont(42)
                 tlatex.SetTextColor(rt.kRed)
                 tlatexList.append(tlatex)
-            elif tree.constPFHem2[i]>-1 and tree.pTPFJet[tree.constPFHem2[i]]<0:
+            elif tree.constPFHem2[i]>-1 and tree.constPFHem2[i]<tree.NPFJets:
                 pTGGHem2.append(tree.pTGG)
                 etaGGHem2.append(tree.etaGG)
                 phiGGHem2.append(tree.phiGG)
