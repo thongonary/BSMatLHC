@@ -99,6 +99,7 @@ if __name__ == '__main__':
     rt.gStyle.SetTextFont(42)
     rt.gStyle.SetNumberContours(999)
     fileName = sys.argv[1]
+    outdir = sys.argv[2]
 
     #rt.gStyle.SetOptTitle(0)
     rt.gStyle.SetOptStat(0)
@@ -141,7 +142,7 @@ if __name__ == '__main__':
 
         tlatexList = []
         
-        for i in range(0,tree.NPFJets-1):
+        for i in range(0,tree.NPFJets):
             if tree.constPFHem1[i]>-1 and tree.constPFHem1[i]<tree.NPFJets:
                 pTJetHem1.append(tree.pTPFJet[tree.constPFHem1[i]])
                 etaJetHem1.append(tree.etaPFJet[tree.constPFHem1[i]])
@@ -151,7 +152,7 @@ if __name__ == '__main__':
                 tlatex.SetTextFont(42)
                 tlatex.SetTextColor(rt.kBlue)
                 tlatexList.append(tlatex)
-            elif tree.constPFHem1[i]>-1 and tree.constPFHem1[i]<tree.NPFJets:
+            elif tree.constPFHem1[i]>-1 and tree.constPFHem1[i]==tree.NPFJets:
                 pTGGHem1.append(tree.pTGG)
                 etaGGHem1.append(tree.etaGG)
                 phiGGHem1.append(tree.phiGG)
@@ -161,7 +162,7 @@ if __name__ == '__main__':
                 tlatex.SetTextColor(rt.kBlue)
                 tlatexList.append(tlatex)
 
-        for i in range(0,tree.NPFJets-1):
+        for i in range(0,tree.NPFJets):
             if tree.constPFHem2[i]>-1 and tree.constPFHem2[i]<tree.NPFJets:
                 pTJetHem2.append(tree.pTPFJet[tree.constPFHem2[i]])
                 etaJetHem2.append(tree.etaPFJet[tree.constPFHem2[i]])
@@ -171,7 +172,7 @@ if __name__ == '__main__':
                 tlatex.SetTextFont(42)
                 tlatex.SetTextColor(rt.kRed)
                 tlatexList.append(tlatex)
-            elif tree.constPFHem2[i]>-1 and tree.constPFHem2[i]<tree.NPFJets:
+            elif tree.constPFHem2[i]>-1 and tree.constPFHem2[i]==tree.NPFJets:
                 pTGGHem2.append(tree.pTGG)
                 etaGGHem2.append(tree.etaGG)
                 phiGGHem2.append(tree.phiGG)
@@ -244,7 +245,7 @@ if __name__ == '__main__':
         graphG.Draw("psame")
         for tlatex in tlatexList: tlatex.Draw("same")
 
-        c.Print("etaPhi/etaPhi_%i.pdf"%tree.run)
-        c.Print("etaPhi/etaPhi_%i.C"%tree.run)
+        c.Print("%s/etaPhi_%i.pdf"%(outdir,tree.run))
+        c.Print("%s/etaPhi_%i.C"%(outdir,tree.run))
     
     
