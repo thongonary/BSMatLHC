@@ -24,6 +24,7 @@
 // 
 #include "CMS/CMSDarkMatter.hh"
 #include "CMS/CMSSubstructure.hh"
+#include "CMS/CMSRazorHgg.hh"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ int main(int argc, char* argv[]) {
     cout << "OPTIONS:        " << endl;
     cout << "--verbose       Increase verbosity level for debug" << endl;
     cout << "--razor         Run Razor Analysis" << endl;
+    cout << "--hggrazor      Razor Hgg" << endl;
     cout << "--susyvars      Razor, alpha_T, MT2, etc" << endl;
     cout << "--monojet       Run MonoJet Analysis" << endl;
     cout << "--darkmatter    Run Dark Matter future study" << endl;
@@ -62,6 +64,7 @@ int main(int argc, char* argv[]) {
   bool substructure = false;
   bool ssdilepbtag = false;
   bool displaced = false;
+  bool razorhgg = false;
   double sqrts = 13000.;
 
   for (int i=1;i<argc;i++){
@@ -80,6 +83,7 @@ int main(int argc, char* argv[]) {
     if (strncmp(argv[i],"--ssdilepbtag",13)==0) ssdilepbtag = true;
     if (strncmp(argv[i],"--razor",7)==0)        razor = true;
     if (strncmp(argv[i],"--susyvars",10)==0)        susyvars = true;
+    if (strncmp(argv[i],"--hggrazor",10)==0)        razorhgg = true;
   }
   
   if(strncmp(inputCMS,"none",4)!=0) {
@@ -118,6 +122,17 @@ int main(int argc, char* argv[]) {
         if(verbose) cmssusyvars.SetVerbose(true);
         cmssusyvars.SetSqrts(sqrts);
         cmssusyvars.Loop(outFileName);
+    }
+
+    if(razorhgg){
+        CMSRazorHgg cmsrazorhgg(cmsChain, 0., "");
+        if(!writeOut){
+            cout << "please specify output file" << endl;
+            return 0;
+        }
+        if(verbose) cmsrazorhgg.SetVerbose(true);
+        cmsrazorhgg.SetSqrts(sqrts);
+        cmsrazorhgg.Loop(outFileName);
     }
 
     /*    
