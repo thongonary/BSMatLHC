@@ -2,7 +2,7 @@
 ! Lines not beginning with a letter or digit are comments.
 
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 100000
+Main:numberOfEvents = 10000
 Main:numberToList = 0              ! number of events to print
 Main:timesToShow = 20              ! show how far along run is
 Main:timesAllowErrors = 30         ! max number of allowed errors
@@ -12,11 +12,11 @@ Main:showChangedParticleData = on  ! print changed particle and decay data
 ! 2) LHC beams parameter settings. 
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
 Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
-Beams:eCM = 13000
+Beams:eCM = 8000
 
 ! 3) Settings for SUSY and the hard-process generation
 SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
-SLHA:file = /home/djanders/CMSSW_5_3_9/src/mcStudies/BSMatLHC/BSMGen/data/pythiaCards/dustin/testCompressed.slha
+SLHA:file = /Users/jduarte/BSMatLHC/BSMGen/data/pythiaCards/dustin/testCompressed.slha
 SLHA:verbose = 1                  ! verbosity 
 SLHA:readFrom = 2                  ! read in from the SLHA:file
 SLHA:keepSM   = on                 ! SM particles setting in SLHA file ignored [change for full scan]

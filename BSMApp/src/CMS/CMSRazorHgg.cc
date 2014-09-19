@@ -36,6 +36,8 @@ void CMSRazorHgg::Loop(string outFileName) {
   int numJets;
   double MET;
 
+  int genNumHiggs;
+
   // Open Output file
   TFile *file = new TFile(outFileName.c_str(),"UPDATE");
 
@@ -57,6 +59,8 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("higgsEta", &higgsEta, "higgsEta/D");
   outTree->Branch("higgsPhi", &higgsPhi, "higgsPhi/D");
   outTree->Branch("higgsMass", &higgsMass, "higgsMass/D");
+
+  outTree->Branch("genNumHiggs", &genNumHiggs, "genNumHiggs/I");
 
   outTree->Branch("MET", &MET, "MET/D");
 
@@ -90,6 +94,13 @@ void CMSRazorHgg::Loop(string outFileName) {
     pho2Pt = 0; pho2Eta = -999; pho2Phi = -999;
     higgsPt = 0; higgsEta = -999; higgsPhi = -999;
     higgsMass = -999;
+
+
+    genNumHiggs = 0;
+    for(int iGenTreeParticle = 0; iGenTreeParticle < GenTreeParticle; iGenTreeParticle++){
+      if (GenTreeParticlePdgId[iGenTreeParticle]==25) genNumHiggs++;
+    }
+
 
     // Build the event at generator level
     PFReco();

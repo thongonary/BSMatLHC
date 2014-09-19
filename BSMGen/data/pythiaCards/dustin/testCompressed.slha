@@ -180,7 +180,9 @@ BLOCK MSOFT Q=  2.90528802E+02  # The soft SUSY breaking masses at the scale Q
 
 # DECAY TABLE
 #         PDG            Width
-DECAY   25       0.00000000E+00   # higgs decay
+DECAY   25       9.2796E-06   # higgs decay
+#           BR          NDA     ID1       ID2
+     1.00000000E+00     2       22      22
 DECAY   1000001     0.00000000E+00   # sdown_L decays
 DECAY   2000001     0.00000000E+00   # sdown_R decays
 DECAY   1000002     0.00000000E+00   # sup_L decays
