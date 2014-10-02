@@ -43,6 +43,8 @@ public:
   /// Combining the jets in two hemispheres by minimizing m1^2/E1 + m2^2/E2
   void CombineMinEnergyMass();
 
+  void Find_All_MR();
+
   /// Combining the jets in two hemispheres by maximizing (E1-Beta*m1^2/E1 + E2-Beta*m1^2/E2)
   void CombineGeorgi();
 

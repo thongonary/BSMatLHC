@@ -207,7 +207,7 @@ void CMSReco::ParticleReturn(int &particle1, vector<double> &particle2, vector<d
   }
 }
 
-void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7, vector<double> &gen8 ){
+void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7, vector<int> &gen8, vector<double> &gen9 ){
 	gen1 = GenTreeParticle; //this is fine
 	
 	gen2.reserve(GenTreeParticle);
@@ -217,6 +217,7 @@ void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, v
 	gen6.reserve(GenTreeParticle);
 	gen7.reserve(GenTreeParticle);
 	gen8.reserve(GenTreeParticle);
+	gen9.reserve(GenTreeParticle);
 	
 	for (int ni = 0; ni < GenTreeParticle; ni++) {
 		gen2[ni] = GenTreeParticlePx[ni];
@@ -225,7 +226,8 @@ void CMSReco::GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, v
 		gen5[ni] = GenTreeParticleE[ni];
 		gen6[ni] = GenTreeParticlePdgId[ni];
 		gen7[ni] = GenTreeParticleM1PdgId[ni];
-		gen8[ni] = GenTreeParticlem1px[ni];
+		gen8[ni] = GenTreeParticleStatus[ni];
+		gen9[ni] = GenTreeParticlem1px[ni];
 	}
 }
 

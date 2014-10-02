@@ -61,7 +61,7 @@ protected:
 					     vector<fastjet::PseudoJet> eleToRemove,
 					       vector<fastjet::PseudoJet> photonToRemove);
 
-  void GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7, vector<double> &gen8);
+  void GenReturn(int &gen1, vector<double> &gen2, vector<double> &gen3, vector<double> &gen4, vector<double> &gen5, vector<int> &gen6, vector<int> &gen7, vector<int> &gen8, vector<double> &gen9);
 
   void ParticleReturn(int &particle1, vector<double> &particle2, vector<double> &particle3, vector<double> &particle4, vector<double> &particle5, vector<int> &particle6, vector<int> &particle7, vector<int> &particle8, vector<double> &particle9 );	
   void SUSYReturn(int &susy1, vector<double> &susy2, vector<double> &susy3, vector<double> &susy4, vector<double> &susy5, vector<int> &susy6, vector<int> &susy7, vector<int> &susy8, vector<double> &susy9 );

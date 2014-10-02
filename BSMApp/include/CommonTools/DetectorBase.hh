@@ -139,6 +139,7 @@ public :
    Int_t           GenTreeParticleDecayLmm[50];   //[GenTreeParticle]
    Int_t           GenTreeParticleM1PdgId[50];   //[GenTreeParticle]
    Int_t           GenTreeParticleM2PdgId[50];   //[GenTreeParticle]
+   Int_t           GenTreeParticleStatus[50];   //[GenTreeParticle]
    Float_t         GenTreeParticlem1px[50];   //[GenTreeParticle]
    Int_t           Particle;
    Float_t         ParticleE[4000];   //[Particle]

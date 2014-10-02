@@ -2,7 +2,7 @@
 #include <math.h>
 #include <TLorentzVector.h>
 #include "CMS/CMSHemisphere.hh"
-
+#include "CMS/CMSReco.hh"
 using namespace std;
 
 CMSHemisphere::CMSHemisphere(vector<TLorentzVector> jets){ 
@@ -142,21 +142,25 @@ void CMSHemisphere::CombineMinEnergyMass() {
 }
 
 void CMSHemisphere::CombineGeorgi(){
-  double M_max = -10000;
+  double M_max = -100000000;
   // default value (in case none is found)
   TLorentzVector myJ1 = j1[0];
   TLorentzVector myJ2 = j2[0];
   for(int i=0; i< j1.size(); i++) {
-    int myBeta = 2;
-    double M_temp = (j1[i].E()-myBeta*j1[i].M2()/j1[i].E())+(j2[i].E()-myBeta*j2[i].M2()/j2[i].E());
-    if(M_max < -9999 || M_temp > M_max){
+    double myBeta = 100;
+    double n = 1;
+    double M_temp = pow(j1[i].E(), n)*(1 - myBeta * j1[i].M2()/pow(j1[i].E(), 2)) + 
+		     pow(j2[i].E(), n)*(1 - myBeta * j2[i].M2()/pow(j2[i].E(), 2));
+    //changed to exclude or statement present in every other algorithm
+    //fixed the bug.  Performs
+    if(M_temp > M_max){
       M_max = M_temp;
       myJ1 = j1[i];
       myJ2 = j2[i];
       chosen_perm = i;
     }
   }
-  
+  //cout << M_max << endl;
   //  myJ1.SetPtEtaPhiM(myJ1.Pt(),myJ1.Eta(),myJ1.Phi(),0.0);
   //  myJ2.SetPtEtaPhiM(myJ2.Pt(),myJ2.Eta(),myJ2.Phi(),0.0);
 
@@ -173,7 +177,12 @@ void CMSHemisphere::CombineGeorgi(){
 }
 
 void CMSHemisphere::CombineSaveConstituents() {
+  //Currently goes through each combination twice because each
+  //hemisphere is indistinguishable.  Symmetric around mid point, 
+  //so it should be able to be fixed by going up to (N_comb + 1)/2
+
   int N_JETS = jIN.size();
+  int counter = 0;
   // jets NEED to be ordered by pT
   // saves 2D array, first index = # of combination of jets
   // saved number = jet # that goes into hemisphere
@@ -212,6 +221,9 @@ void CMSHemisphere::CombineSaveConstituents() {
     }
     j1.push_back(j_temp1);
     j2.push_back(j_temp2);
+    //cout <<counter << " Mass of combination: Hem1 " << j_temp1.M() << " Hem 2 " << j_temp2.M() << " Sum of mass " << j_temp1.M() + j_temp2.M() << endl;
+    counter += 1;
+    
     array_count++;
   }
 }
@@ -238,4 +250,17 @@ void CMSHemisphere::CombineMinHT() {
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }
+}
+
+void CMSHemisphere::Find_All_MR() {
+  //Simply returns the hemispheres of all
+  //permutations
+  TLorentzVector myJ1 = j1[0];
+  TLorentzVector myJ2 = j2[0];
+  for(int i=0; i< j1.size(); i++) {
+      myJ1 = j1[i];
+      myJ2 = j2[i];  
+jOUT.push_back(myJ1);
+jOUT.push_back(myJ2);
+}
 }
