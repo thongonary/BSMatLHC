@@ -8,7 +8,8 @@ using namespace std;
 CMSHemisphere::CMSHemisphere(vector<TLorentzVector> jets){ 
   if(jets.size() < 2) cout << "Error in CMSHemisphere: you should provide at least two jets to form Henispheres" << endl;
   jIN = jets;
-  Combine();
+  CombineSaveConstituents();
+  //Combine();
 }
 
 CMSHemisphere::~CMSHemisphere() {
@@ -16,6 +17,42 @@ CMSHemisphere::~CMSHemisphere() {
 
 vector<TLorentzVector> CMSHemisphere::GetHemispheres() {
   return jOUT;
+}
+
+vector<int> CMSHemisphere::GetHem1Constituents() { //saves indices of jets chosen for leading hem
+  vector<int> hem_temp;
+  if(no_switch) {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem[chosen_perm][i]);
+    }
+    return hem_temp;
+    delete hem;
+  }
+  else {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem2[chosen_perm][i]);
+    }
+    return hem_temp;
+    delete hem2;
+  }
+}
+
+vector<int> CMSHemisphere::GetHem2Constituents() {
+  vector<int> hem_temp;
+  if(no_switch) {
+    for (int i; i < 40; i++){
+      hem_temp.push_back(hem2[chosen_perm][i]);
+    }
+    return hem_temp;
+    delete hem2;
+  }
+  else {
+    for(int i;i < 40;i++){
+      hem_temp.push_back(hem[chosen_perm][i]);
+    }   
+    return hem_temp;
+    delete hem;
+  }
 }
 
 void CMSHemisphere::Combine() {
@@ -58,6 +95,7 @@ void CMSHemisphere::CombineMinMass() {
       M_min = M_temp;
       myJ1 = j1[i];
       myJ2 = j2[i];
+      chosen_perm = i; //added in order to save hem constituents
     }
   }
   
@@ -66,13 +104,68 @@ void CMSHemisphere::CombineMinMass() {
 
   jOUT.clear();
   if(myJ1.Pt() > myJ2.Pt()){
+    no_switch = true; // means that megajets were sorted in pt already
     jOUT.push_back(myJ1);
     jOUT.push_back(myJ2);
   } else {
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }
 }
+
+void CMSHemisphere::CombineSaveConstituents() {
+  //Currently goes through each combination twice because each
+  //hemisphere is indistinguishable.  Symmetric around mid point, 
+  //so it should be able to be fixed by going up to (N_comb + 1)/2
+
+  int N_JETS = jIN.size();
+  int counter = 0;
+  // jets NEED to be ordered by pT
+  // saves 2D array, first index = # of combination of jets
+  // saved number = jet # that goes into hemisphere
+  int N_comb = 1;
+  for(int i = 0; i < N_JETS; i++){
+    N_comb *= 2;
+  }
+  for (int i = 0; i < 20000; i++){
+    for (int j = 0; j < 40; j++){
+      hem[i][j] = -1;
+      hem2[i][j] = -1;
+    }
+  }
+  int j_count;
+  int array_count=0;
+  for(int i = 1; i < N_comb-1; i++){
+    TLorentzVector j_temp1, j_temp2;
+    int itemp = i;
+    j_count = N_comb/2;
+    int count = 0;
+    int hem_count = 0; //loops through # of jets in first hem
+    int hem_count2 = 0; // loops through # of jets in second hem
+    while(j_count > 0){
+      if(itemp/j_count == 1){
+        j_temp1 += jIN[count];
+	hem[array_count][hem_count] = count;
+	hem_count++;
+      } else {
+        j_temp2 += jIN[count];
+	hem2[array_count][hem_count2]=count;
+	hem_count2++; 
+      }
+      itemp -= j_count*(itemp/j_count);
+      j_count /= 2;
+      count++;
+    }
+    j1.push_back(j_temp1);
+    j2.push_back(j_temp2);
+    //cout <<counter << " Mass of combination: Hem1 " << j_temp1.M() << " Hem 2 " << j_temp2.M() << " Sum of mass " << j_temp1.M() + j_temp2.M() << endl;
+    counter += 1;
+    
+    array_count++;
+  }
+}
+
 
 void CMSHemisphere::CombineMinHT() {
   double dHT_min = 999999999999999.0;

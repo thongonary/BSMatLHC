@@ -32,7 +32,7 @@ public:
   //! loop over events
   void Loop(string outFileName);
   void SetSqrts(double sqrts);
-
+  double DeltaPhi(TLorentzVector jet1, TLorentzVector jet2);
 private:
   /// Luminosity
   double _Lumi;
