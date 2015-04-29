@@ -91,6 +91,12 @@ int main(int argc, char* argv[]) {
   GenCandidateFiller* gentreeparticleFiller = new GenCandidateFiller(myTree,"GenTreeParticle");
   GenCandidateFiller* particleFiller = new GenCandidateFiller(myTree,"Particle");
 
+
+  double pTHat = -1;
+
+  TTree* outTree = new TTree("FinalParticles", "FinalParticles");
+  outTree->Branch("pTHat", &pTHat, "pTHat/D");
+
   // Begin event loop.
   int nPace = max(1, nEvent / max(1, nShow) ); 
   int iAbort = 0;
@@ -111,6 +117,47 @@ int main(int argc, char* argv[]) {
       pythia.info.list();
       pythia.event.list();
     }
+    for (int j = 0; j<pythia.event.size(); j++){
+      if (fabs(pythia.event.at(j).id())==1000005){ //for looking at all of the sbottoms in the event
+	cout << "Event: " << iEvent  << " Mother: " << pythia.event.at(pythia.event.at(j).mother1()).id() << " Mother 2: " << pythia.event.at(pythia.event.at(j).mother2()).id() << " pdg: " << pythia.event.at(j).id() << " Status: " << pythia.event.at(j).status() << " Px: " << pythia.event.at(j).px() << " Py: " << pythia.event.at(j).py() << " Daughter: " << pythia.event.at(pythia.event.at(j).daughter1()).id() << " Daughter 2: "<< pythia.event.at(pythia.event.at(j).daughter2()).id()<< endl;
+	}
+    }
+    
+
+    int numSbottoms = 0;
+    TLorentzVector sbottom_1;
+    TLorentzVector sbottom_2;
+
+   // recursive mother 
+    for (int j = 0; j<pythia.event.size(); j++){ //loop through particles
+
+      int motherIndex = pythia.event.at(j).mother1();
+      if (pythia.event.statusHepMC(j)==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
+	//      cout << "Event: " << iEvent << endl;
+      //      cout << "Initial particle: " << pythia.event.at(j).id() <<" index: " << j<< endl;
+	}
+      if (pythia.event.statusHepMC(j)==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
+	//	cout << "Mother Chain: " << endl;
+	int motherStatus = pythia.event.at(motherIndex).status();
+	while (fabs(pythia.event.at(motherIndex).id()) != 1000005){ //loop while the mother isn't a sbottom
+	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<< endl;
+	  motherIndex = pythia.event.at(motherIndex).mother1();
+	  motherStatus = pythia.event.at(motherIndex).status();
+	  if (motherStatus == -11) break; 
+	  numSbottoms++;
+	}
+	if (numSbottoms == 1) { //note: only works if there are two final state chi1s found, otherwise might save misc things
+	  sbottom_1.SetPxPyPzE(pythia.event.at(motherIndex).px(), pythia.event.at(motherIndex).py(), pythia.event.at(motherIndex).pz(), pythia.event.at(motherIndex).e());
+	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<<endl;
+	}
+	else {
+	  sbottom_2.SetPxPyPzE(pythia.event.at(motherIndex).px(), pythia.event.at(motherIndex).py(), pythia.event.at(motherIndex).pz(), pythia.event.at(motherIndex).e());
+	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<<endl;
+	}	    
+      }
+    }
+    pTHat = (sbottom_1 + sbottom_2).Pt();
+    //    cout << "pTHat: " << pTHat << endl;
 
     // Construct new empty HepMC event. 
     HepMC::GenEvent* hepmcevt = new HepMC::GenEvent();
@@ -131,6 +178,7 @@ int main(int argc, char* argv[]) {
 
     // write data in TTree
     myTree->dumpData();
+    outTree->Fill();
 
     // Clear the event from memory
     muonFiller->ClearEvent();
@@ -150,9 +198,11 @@ int main(int argc, char* argv[]) {
   
   // Write output file
   infoTree->Fill();
+
   TTree* roottree = myTree->getTree();
   roottree->Write();
   infoTree->Write();
+  outTree->Write();
   treeOut->Close();
 
   // Give statistics. 
