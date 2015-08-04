@@ -30,6 +30,8 @@ struct GenCandidateFillerData {
   vector<float> *mass;
   vector<int> *pdgId, *decayLenght;
   vector<int> *m1pdgId, *m2pdgId;
+  vector<int> *d1pdgId;
+  vector<int> *status;
 
 public:
   void newEvent();
@@ -44,7 +46,9 @@ public:
   ~GenCandidateFiller();
   void FillEvent(HepMC::GenEvent* hepmcevt);
   void FillEventSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
-		       double decayL, int m1, int m2, bool stable);
+  		       double decayL, int m1, int m2, int d1, int status, bool stable);
+  //void FillEventSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
+  //		       double decayL, int m1, int m2, int status, bool stable);
   void FillTree();
   void ClearEvent();
   void NewEvent();
@@ -52,7 +56,9 @@ public:
 protected:
   void FillParticleBranch(HepMC::GenParticle* hepmcevt);
   void FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
-				double decayL, int m1, int m2);
+				double decayL, int m1, int m2, int d1, int status);
+  //void FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v, double mass, int pdgId,
+  //				double decayL, int m1, int m2, int status);
   bool IsStable(HepMC::GenParticle* p);
   bool isElectron(HepMC::GenParticle* p);
   bool isMuon(HepMC::GenParticle* p);
