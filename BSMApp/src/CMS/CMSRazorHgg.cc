@@ -1,5 +1,8 @@
 #include <string>
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <TTree.h>
 #include "CMS/CMSRazorHgg.hh"
 #include <fastjet/tools/Pruner.hh>
@@ -32,18 +35,24 @@ void CMSRazorHgg::Loop(string outFileName) {
   double pho1Eta, pho2Eta;
   double pho1Phi, pho2Phi;
 
+  double bjet1Pt = -1, bjet2Pt = -1;
+  double bjet1Eta = 999., bjet2Eta = 999.;
+  double bjet1Phi = -999., bjet2Phi = -999.;
+
   double higgsPt, higgsEta, higgsPhi, higgsMass;
   int numJets;
   double MET;
 
-  int genNumHiggs;
 
   //new variables
   int numBJets;
+  int numPhotons;
+  int numBox = -1;
   int jetLen = 100;
   int Hem1_csts[jetLen], Hem2_csts[jetLen];
   double dPhi, dPhiHiggsJ1, dPhiHiggsJ2;
   int leadingHemContents, subleadingHemContents;
+  double pthat;
 
   // Open Output file
   TFile *file = new TFile(outFileName.c_str(),"UPDATE");
@@ -52,6 +61,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("MR", &MR, "MR/D");
   outTree->Branch("RSQ", &RSQ, "RSQ/D");
   outTree->Branch("numJets", &numJets, "numJets/I");
+  outTree->Branch("numPhotons", &numPhotons, "numPhotons/I");
   outTree->Branch("jetPt", jetPt, "jetPt[numJets]/D");
   outTree->Branch("jetEta", jetEta, "jetEta[numJets]/D");
   outTree->Branch("jetPhi", jetPhi, "jetPhi[numJets]/D");
@@ -67,8 +77,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("higgsPhi", &higgsPhi, "higgsPhi/D");
   outTree->Branch("higgsMass", &higgsMass, "higgsMass/D");
 
-  outTree->Branch("genNumHiggs", &genNumHiggs, "genNumHiggs/I");
-
+  outTree->Branch("numBox", &numBox, "numBox/I");
   outTree->Branch("MET", &MET, "MET/D");
 
   // added branches
@@ -78,7 +87,8 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("numBJets", &numBJets, "numBJets/I");
   outTree->Branch("leadingHemContents", &leadingHemContents, "leadingHemContents/I");
   outTree->Branch("subleadingHemContents", &subleadingHemContents, "subleadingHemContents/I"); //0 if higgs only, //1 if jets only, //2 if higgs and jets
-  //outTree->Branch("MT", &MT, "MT/D");
+  outTree->Branch("pthat", &pthat, "pthat/D");
+
   
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
@@ -102,6 +112,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     //reset jet variables
     numJets = 0;
     numBJets = 0;
+    numPhotons = 0;
     for(int i = 0; i < 50; i++){
         jetPt[i] = -1;
         jetEta[i] = -999;
@@ -113,11 +124,30 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsMass = -999;
 
 
-    genNumHiggs = 0;
+    TLorentzVector sbottomvector1;
+    TLorentzVector sbottomvector2;
+
+
+    int numHgg = 0;
     for(int iGenTreeParticle = 0; iGenTreeParticle < GenTreeParticle; iGenTreeParticle++){
       if (GenTreeParticlePdgId[iGenTreeParticle]==25) genNumHiggs++;
+      if (GenTreeParticlePdgId[iGenTreeParticle]==25 && GenTreeParticleD1PdgId[iGenTreeParticle]==22) numHgg++;
+      if (GenTreeParticlePdgId[iGenTreeParticle]==1000005){
+	sbottomvector1.SetPxPyPzE(GenTreeParticlePx[iGenTreeParticle], GenTreeParticlePy[iGenTreeParticle], GenTreeParticlePz[iGenTreeParticle], GenTreeParticleE[iGenTreeParticle]);
+      }
+      if (GenTreeParticlePdgId[iGenTreeParticle]==-1000005){
+	sbottomvector2.SetPxPyPzE(GenTreeParticlePx[iGenTreeParticle], GenTreeParticlePy[iGenTreeParticle], GenTreeParticlePz[iGenTreeParticle], GenTreeParticleE[iGenTreeParticle]);
+      }
     }
+    
+    cout << "numHgg: " << numHgg << endl;
 
+    if (numHgg > 1) {
+      cout << "Only want events with one hgg!"<<numHgg << endl;
+      continue;
+    }
+    TLorentzVector sbottoms = sbottomvector1 + sbottomvector2;
+    pthat = (sbottoms).Pt(); //pthat of the event
 
     // Build the event at generator level
     PFReco();
@@ -128,36 +158,60 @@ void CMSRazorHgg::Loop(string outFileName) {
     double bestSumPt = -1;
     int bestPhotIndex1 = -1;
     int bestPhotIndex2 = -1;
+    double bestMass = -1;
+    int numHiggs = 0;
+    double secondBestSumPt = -1;
+    int secondBestPhotIndex1 = -1;
+    int secondBestPhotIndex2 = -1;
+    double secondBestMass = -1; 
+    numBox = -1;
+
     //loop over all pairs of gen photons and find the pair closest to Higgs mass
     for(int iPhot = 0; iPhot < _PFPhotons.size(); iPhot++){
-        if(_PFPhotons[iPhot].pt() < 25 || abs(_PFPhotons[iPhot].eta()) > 1.48) continue;
-        for(int jPhot = 0; jPhot < _PFPhotons.size(); jPhot++){
-            if(iPhot == jPhot) continue;
-            if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.48) continue;
-            fastjet::PseudoJet higgsCandidate = _PFPhotons[iPhot] + _PFPhotons[jPhot];
-            cout << higgsCandidate.pt() << " " << higgsCandidate.m() << endl;
-            //check if this pair is in the correct mass range
-            if(higgsCandidate.m() > 100 && higgsCandidate.m() < 180){
-                cout << "Checking!" << endl;
-                if(_PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt() > bestSumPt){
-                    cout << "Made it!" << endl;
-                        bestSumPt = _PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt();
-                        bestPhotIndex1 = iPhot;
-                        bestPhotIndex2 = jPhot;
-                }
-            }
-        }
+      if(_PFPhotons[iPhot].pt() < 25) continue; //only count photons that are > 25 GeV
+      numPhotons++;
+      if(_PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
+      for(int jPhot = 0; jPhot < _PFPhotons.size(); jPhot++){
+	if(iPhot == jPhot) continue;
+	//if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.44) continue;
+	fastjet::PseudoJet higgsCandidate = _PFPhotons[iPhot] + _PFPhotons[jPhot];
+	//cout << higgsCandidate.pt() << " " << higgsCandidate.m() << endl;
+	//check if this pair is in the correct mass range
+	if(higgsCandidate.m() > 100){
+	  if(higgsCandidate.m() > 120 && higgsCandidate.m() < 130){
+	    numHiggs++;
+	  }
+	  if(_PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt() > bestSumPt){
+	    secondBestMass = bestMass;
+	    secondBestSumPt = bestSumPt;
+	    secondBestPhotIndex1 = bestPhotIndex1;
+	    secondBestPhotIndex2 = bestPhotIndex2;
+	    bestMass = higgsCandidate.m();
+	    bestSumPt = _PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt();
+	    bestPhotIndex1 = iPhot;
+	    bestPhotIndex2 = jPhot;
+	  }
+	}
+      }
     }
-    if(bestPhotIndex1 == -1){
-        cout << "Didn't find a higgs candidate" << endl;
-        continue; ///continue if we didn't find a higgs candidate
+    cout << "numHiggs: " <<numHiggs<<endl;
+    /*    if (numHiggs > 1) {
+      cout << "Only want events with one hgg!"<<numHgg << endl;
+      continue;
+      }*/
+    srand(time(NULL));
+
+    if (bestPhotIndex1 == -1){
+      cout << "Didn't find a higgs candidate" << endl;
+      continue; ///continue if we didn't find a higgs candidate
     }
-    cout << "Found higgs candidate!!!!" << endl;
+
     fastjet::PseudoJet bestDiphoton = _PFPhotons[bestPhotIndex1] + _PFPhotons[bestPhotIndex2];
-    if(bestDiphoton.pt() < 20){
-        cout << "Diphoton system has pT too small" << endl; 
+    if(bestDiphoton.pt() < 20 || fabs(_PFPhotons[bestPhotIndex1].eta()) > 1.44 || fabs(_PFPhotons[bestPhotIndex2].eta()) > 1.44){
+        cout << "Diphoton system has pT too small or one of the photons is in ECAL barrel" << endl; 
         continue;
     }
+
     //fill photon variables
     pho1Pt = _PFPhotons[bestPhotIndex1].pt();
     pho1Eta = _PFPhotons[bestPhotIndex1].eta();
@@ -166,6 +220,10 @@ void CMSRazorHgg::Loop(string outFileName) {
     pho2Eta = _PFPhotons[bestPhotIndex2].eta();
     pho2Phi = _PFPhotons[bestPhotIndex2].phi();
     higgsPt = bestDiphoton.pt();
+    if (higgsPt > 110){
+      //cout << "higgsPt: "<<higgsPt<<endl;
+      numBox = 0;
+    }
     higgsEta = bestDiphoton.eta();
     higgsPhi = bestDiphoton.phi();
     higgsMass = bestDiphoton.m();
@@ -173,7 +231,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     // AK5 jets
     fastjet::JetDefinition AK05_def(fastjet::antikt_algorithm, 0.5);
     fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
-    vector<fastjet::PseudoJet> pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0);
+    vector<fastjet::PseudoJet> pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
 
     if(pfAK05.size()<1){
         cout << "No jets..." << endl;
@@ -192,13 +250,32 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsvector.SetPtEtaPhiE(higgsPt, higgsEta, higgsPhi, higgsEnergy);
       
     jetsForHemispheres.push_back(higgs);
+
+    double bJetEffList[pfAK05.size()];
+    for(int i =0; i < pfAK05.size(); i++){
+      bJetEffList[i] = ((double)rand()/(RAND_MAX));
+    }
     for(int i = 0; i < pfAK05.size(); i++){
         //check if within DR < 0.5 of a selected photon
         double thisDR = min(pfAK05[i].delta_R(pho1), pfAK05[i].delta_R(pho2));
         if(thisDR < 0.5) continue;
+	numJets++;
 	//check if bjet
-	if(IsBJet(pfAK05[i],0.5,30)) numBJets++;
-        numJets++;
+	if(IsBJet(pfAK05[i],0.5,30) && bJetEffList[i] < 0.6) {
+	  numBJets++;
+	  for(int j = 0; j < pfAK05.size(); j++){ //check if in Hbb box
+	    double thisDR2 = min(pfAK05[j].delta_R(pho1), pfAK05[j].delta_R(pho2));
+	    if (i==j || (thisDR2 < 0.5)) continue;
+	    if(!IsBJet(pfAK05[j],0.5,30) && bJetEffList[j] > 0.6) continue;
+	    double massTemp = (pfAK05[i] + pfAK05[j]).m();
+	    if (numBox !=0 && massTemp > 110 && massTemp < 140){
+	      numBox = 1;
+	    }
+	    if (numBox <0 && massTemp > 76 && massTemp < 106){
+	      numBox = 2;
+	    }
+	  }
+	}
         jetPt[i] = pfAK05[i].pt();
         jetEta[i] = pfAK05[i].eta();
         jetPhi[i] = pfAK05[i].phi();
@@ -281,7 +358,8 @@ void CMSRazorHgg::Loop(string outFileName) {
     dPhiHiggsJ2 = DeltaPhi(higgsvector,j2);
     MR = CalcMR(j1, j2);
     RSQ = pow(CalcMRT(j1, j2, PFMET),2.)/MR/MR;
-    
+    cout << "numBox: "<<numBox<<endl;
+    cout << "numHgg: "<<numHgg<<endl;
     // write event in the tree
     outTree->Fill();
 
@@ -293,6 +371,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   file->cd();
 
   file->Close();
+
 
 }
 
