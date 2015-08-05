@@ -135,7 +135,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     nb = fChain->GetEntry(jentry);   nbytes += nb;
-    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+    if (jentry%1 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     //reset jet variables
     numJets = 0;
@@ -171,10 +171,10 @@ void CMSRazorHggHbb::Loop(string outFileName) {
 
     // THIS PART SAVES SBOTTOM + LSP INFORMATION
 
-    //    cout << "SUSY: " << SUSY << " GenTreeParticle: " << GenTreeParticle <<  endl;
+    cout << "SUSY: " << SUSY << " GenTreeParticle: " << GenTreeParticle <<  endl;
     for(int iSUSY = 0; iSUSY < SUSY; iSUSY++){
-      //      cout << "SUSYId: " << SUSYPdgId[iSUSY] << endl;
-      //      cout << "SUSYD1Id: " << SUSYD1PdgId[iSUSY] << endl;
+      cout << "SUSYId: " << SUSYPdgId[iSUSY] << endl;
+      cout << "SUSYD1Id: " << SUSYD1PdgId[iSUSY] << endl;
       if (fabs(SUSYPdgId[iSUSY])==1000005 && (SUSYD1PdgId[iSUSY]==1000023 || SUSYD1PdgId[iSUSY]==1000022)) {
 	numSbottoms++;
 	if (numSbottoms == 1){
@@ -208,7 +208,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     neutMET = LSPs.Pt();
 
     for(int iGenTreeParticle = 0; iGenTreeParticle < GenTreeParticle; iGenTreeParticle++){
-      if (GenTreeParticlePdgId[iGenTreeParticle]==25) genNumHiggs++;
+      //if (GenTreeParticlePdgId[iGenTreeParticle]==25) genNumHiggs++;
       /*if (GenTreeParticlePdgId[iGenTreeParticle]==22 && GenTreeParticleM1PdgId[iGenTreeParticle]==25) numHgg++;
       if (GenTreeParticlePdgId[iGenTreeParticle]==1000005){
         sbottomvector1.SetPxPyPzE(GenTreeParticlePx[iGenTreeParticle], GenTreeParticlePy[iGenTreeParticle], GenTreeParticlePz[iGenTreeParticle], GenTreeParticleE[iGenTreeParticle]);
@@ -316,6 +316,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
       }
     }
 
+    std::cout << "-->pass1" << std::endl;
     //fill photon and bjet variables
     if (firstPhot && twoHiggs){
       pho1Pt = _PFPhotons[bestPhotIndex1].pt();
@@ -366,7 +367,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     fastjet::JetDefinition AK05_def(fastjet::antikt_algorithm, 0.5);
     fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
     vector<fastjet::PseudoJet> pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
-
+    std::cout << "--> pass ak5" << std::endl;
     if(pfAK05.size()<1){
         cout << "No jets..." << endl;
 	       continue;
@@ -386,6 +387,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     higgsvector.SetPtEtaPhiE(higgsPt, higgsEta, higgsPhi, higgsEnergy);
       
     jetsForHemispheres.push_back(higgs);
+    std::cout << "--> pass hem" << std::endl;
     bool useHbb1 = false; //this says whether or not bjets are recognized
     bool useHbb2 = false;
     double thisDRB = -1;
@@ -477,13 +479,14 @@ void CMSRazorHggHbb::Loop(string outFileName) {
         cout << "Not enough objects for razor computation" << endl;
         continue;
     }
-    
+    std::cout << "--> before CMSHEM" << std::endl;
     CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(jetsForHemispheres));
     myHem->CombineMinMass();
     vector<TLorentzVector> hem = myHem->GetHemispheres();
     vector<int> Temporary = myHem->GetHem1Constituents();
     vector<int> Temporary2 = myHem->GetHem2Constituents();
-
+    std::cout << "--> pass CMSHEM" << std::endl;
+    
     // SAVES HEM CONSTITUENTS
     int count1 = 0;
     int count2 = 0;
@@ -500,6 +503,8 @@ void CMSRazorHggHbb::Loop(string outFileName) {
       }
     }
     int j = 0;
+    std::cout << "pass SAVE" << std::endl;
+    /*
     while (Temporary[j] > -1) {
       cout << "What'S going on: "<< Temporary[j] << endl;
       if (Temporary[j]==0 && count1==1) {
@@ -517,7 +522,10 @@ void CMSRazorHggHbb::Loop(string outFileName) {
       }
       j++;
     }
+    */
     j = 0;
+    std::cout << "pass SAVE 1" << std::endl;
+    /*
     while (Temporary2[j] > -1){
       if (Temporary2[j]==0 && count2==1) {
 	// higgs only
@@ -536,9 +544,11 @@ void CMSRazorHggHbb::Loop(string outFileName) {
       }
       j++;
     }
+    */
+    std::cout << "before delete Hem" << std::endl;
     delete myHem;
 
-
+    std::cout << "delete Hem" << std::endl;
     //compute traditional RSQ and MR
     TLorentzVector j1 = hem[0];
     TLorentzVector j2 = hem[1];  

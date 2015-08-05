@@ -129,9 +129,10 @@ void CMSRazorHgg::Loop(string outFileName) {
 
 
     int numHgg = 0;
+    int genNumHiggs = 0;
     for(int iGenTreeParticle = 0; iGenTreeParticle < GenTreeParticle; iGenTreeParticle++){
       if (GenTreeParticlePdgId[iGenTreeParticle]==25) genNumHiggs++;
-      if (GenTreeParticlePdgId[iGenTreeParticle]==25 && GenTreeParticleD1PdgId[iGenTreeParticle]==22) numHgg++;
+      //if (GenTreeParticlePdgId[iGenTreeParticle]==25 && GenTreeParticleD1PdgId[iGenTreeParticle]==22) numHgg++;
       if (GenTreeParticlePdgId[iGenTreeParticle]==1000005){
 	sbottomvector1.SetPxPyPzE(GenTreeParticlePx[iGenTreeParticle], GenTreeParticlePy[iGenTreeParticle], GenTreeParticlePz[iGenTreeParticle], GenTreeParticleE[iGenTreeParticle]);
       }

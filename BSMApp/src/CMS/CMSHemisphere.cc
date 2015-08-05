@@ -26,14 +26,14 @@ vector<int> CMSHemisphere::GetHem1Constituents() { //saves indices of jets chose
       hem_temp.push_back(hem[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem;
+    //delete hem;
   }
   else {
     for (int i; i < 40; i++){
       hem_temp.push_back(hem2[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem2;
+    //delete hem2;
   }
 }
 
@@ -44,14 +44,14 @@ vector<int> CMSHemisphere::GetHem2Constituents() {
       hem_temp.push_back(hem2[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem2;
+    //delete hem2;
   }
   else {
     for(int i;i < 40;i++){
       hem_temp.push_back(hem[chosen_perm][i]);
     }   
     return hem_temp;
-    delete hem;
+    //delete hem;
   }
 }
 
