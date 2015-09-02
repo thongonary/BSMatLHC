@@ -2,7 +2,7 @@
 ! Lines not beginning with a letter or digit are comments.
 
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 100000       ! number of events to generate
+Main:numberOfEvents = 100000         ! number of events to generate
 Main:numberToList = 0              ! number of events to print
 Main:timesToShow = 20              ! show how far along run is
 Main:timesAllowErrors = 30         ! max number of allowed errors
@@ -15,12 +15,12 @@ Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 13000.                 ! CM energy of collision
 
 ! 3) Settings for the hard-process generation
-WeakBosonAndParton:qqbar2Wg = on
-WeakBosonAndParton:qg2Wq = on
+WeakBosonAndParton:qqbar2gmZg = on          ! Switches on Z/gamma* production processes
+WeakBosonAndParton:qg2gmZq = on
 
-! Restrict to W -> l nu
-24:onMode = off  ! switch off all decays
-24:onIfAny = 12 14 16 11 13 15
+! Restrict to Z -> nu nu
+23:onMode = off  ! switch off all decays
+23:onIfAny = 12 14 16
 
 ! 4) Settings for the event generation process in the Pythia8 library.
 PartonLevel:MI = on                ! no multiple interactions

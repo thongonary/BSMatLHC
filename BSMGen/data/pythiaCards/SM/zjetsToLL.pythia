@@ -15,12 +15,11 @@ Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 13000.                 ! CM energy of collision
 
 ! 3) Settings for the hard-process generation
-WeakBosonAndParton:qqbar2Wg = on
-WeakBosonAndParton:qg2Wq = on
+WeakSingleBoson:ffbar2gmZ = on          ! Switches on Z/gamma* production processes (inclusing singletop)
 
-! Restrict to W -> l nu
-24:onMode = off  ! switch off all decays
-24:onIfAny = 12 14 16 11 13 15
+! Restrict to Z -> nu nu or Z -> ll
+23:onMode = off  ! switch off all decays
+23:onIfAny = 12 14 16 11 13 15
 
 ! 4) Settings for the event generation process in the Pythia8 library.
 PartonLevel:MI = on                ! no multiple interactions

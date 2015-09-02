@@ -52,6 +52,7 @@ private:
 
   /// Combine the jets in all the possible pairs of hemispheres
   void Combine();
+  void CombineSaveConstituents();
 
   void CombineSaveConstituents();
 

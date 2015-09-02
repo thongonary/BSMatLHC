@@ -18,22 +18,21 @@ CMSHemisphere::~CMSHemisphere() {
 vector<TLorentzVector> CMSHemisphere::GetHemispheres() {
   return jOUT;
 }
-
-vector<int> CMSHemisphere::GetHem1Constituents() {
+vector<int> CMSHemisphere::GetHem1Constituents() { //saves indices of jets chosen for leading hem
   vector<int> hem_temp;
   if(no_switch) {
     for (int i; i < 40; i++){
       hem_temp.push_back(hem[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem;
+    //delete hem;
   }
   else {
     for (int i; i < 40; i++){
       hem_temp.push_back(hem2[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem2;
+    //delete hem2;
   }
 }
 vector<int> CMSHemisphere::GetHem2Constituents() {
@@ -43,14 +42,14 @@ vector<int> CMSHemisphere::GetHem2Constituents() {
       hem_temp.push_back(hem2[chosen_perm][i]);
     }
     return hem_temp;
-    delete hem2;
+    //delete hem2;
   }
   else {
     for(int i;i < 40;i++){
       hem_temp.push_back(hem[chosen_perm][i]);
     }   
     return hem_temp;
-    delete hem;
+    //delete hem;
   }
 }
 void CMSHemisphere::Combine() {
@@ -101,11 +100,11 @@ void CMSHemisphere::CombineMinMass() {
 
   jOUT.clear();
   if(myJ1.Pt() > myJ2.Pt()){
-    no_switch = true;
+    no_switch = true; // means that megajets were sorted in pt already
     jOUT.push_back(myJ1);
     jOUT.push_back(myJ2);
   } else {
-    no_switch = false;
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }
@@ -131,11 +130,11 @@ void CMSHemisphere::CombineMinEnergyMass() {
 
   jOUT.clear();
   if(myJ1.Pt() > myJ2.Pt()){
-    no_switch = true;
+    no_switch = true; // means that megajets were sorted in pt already
     jOUT.push_back(myJ1);
     jOUT.push_back(myJ2);
   } else {
-    no_switch = false;
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }
@@ -166,11 +165,11 @@ void CMSHemisphere::CombineGeorgi(){
 
   jOUT.clear();
   if(myJ1.Pt() > myJ2.Pt()){
-    no_switch = true;
+    no_switch = true; // means that megajets were sorted in pt already
     jOUT.push_back(myJ1);
     jOUT.push_back(myJ2);
   } else {
-    no_switch = false;
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }

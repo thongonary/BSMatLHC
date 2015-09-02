@@ -1,9 +1,8 @@
 #define GenCandidateFiller_cxx
-#include <GenCandidateFiller.hh>
-#include <TLorentzVector.h>
 #include <math.h>
 #include <iostream>
-
+#include <TLorentzVector.h>
+#include <GenCandidateFiller.hh>
 using namespace std;
 
 GenCandidateFiller::GenCandidateFiller(GenTree* genTree, string BlockName) {
@@ -27,9 +26,10 @@ GenCandidateFiller::~GenCandidateFiller() {
   delete _privateData->decayLenght;
   delete _privateData->m1pdgId;
   delete _privateData->m2pdgId;
+  delete _privateData->status;
+  delete _privateData->d1pdgId;
   //m1px is the x momentum of the mother
   delete _privateData->m1px;
-
 }
 
 void GenCandidateFiller::ClearEvent() {
@@ -136,6 +136,7 @@ void GenCandidateFiller::FillEvent(HepMC::GenEvent* hepmcevt) {
       else if(_name == "Neutrino" && isNeutrino(*p)) writeParticle = true;
       // SUSY: all SUSY particles
       else if(_name == "SUSY" && isSUSY(*p)) writeParticle = true;
+
       // write hard-process incoming/intermediate/outgoing particles
       else if(_name == "GenTreeParticle" && (*p)->status() >= 20 && (*p)->status() < 30) writeParticle = true;
       // whatever else is stable and visbile
@@ -159,15 +160,17 @@ void GenCandidateFiller::FillEvent(HepMC::GenEvent* hepmcevt) {
 void GenCandidateFiller::FillEventSTDHEP(TLorentzVector* p, TVector3* v,
 					 double mass, int pdgId, int status,
 					 double decayL, int m1,
-					 int m2, double m1px, bool stable = true) {
+					 int m2, int status, 
+					 int d1, double m1px,
+					 bool stable = true) {
   bool writeParticle = false;
   if(isParticle(pdgId,_name)) writeParticle = true;
   // whatever else is visible
   else if(_name == "Particle" && !isParticle(pdgId,"SUSY") &&
 	  !isParticle(pdgId,"Neutrino") and stable) writeParticle = true;
   if(writeParticle) {
-    FillParticleBranchSTDHEP(p,v,mass,pdgId,status,decayL,m1,m2, m1px);
-    _blockSize += 1;
+      FillParticleBranchSTDHEP(p,v,mass,pdgId,decayL,m1,m2,d1,status,m1px);
+      _blockSize += 1;
   }
 }
 
@@ -186,68 +189,96 @@ void GenCandidateFiller::FillTree() {
   _genTree->column((_name+"Status").c_str(), *_privateData->status, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"DecayLmm").c_str(), *_privateData->decayLenght, _name.c_str(), 0, "Reco");
   _genTree->column((_name+"M1PdgId").c_str(), *_privateData->m1pdgId, _name.c_str(), 0, "Reco");
-  _genTree->column((_name+"M2PdgId").c_str(), *_privateData->m2pdgId, _name.c_str(), 0, "Reco");
+  _genTree->column((_name+"M2PdgId").c_str(), *_privateData->m2pdgId, _name.c_str(), 0, "Reco");  
+  _genTree->column((_name+"Status").c_str(), *_privateData->status, _name.c_str(), 0 , "Reco");
+  _genTree->column((_name+"D1PdgId").c_str(), *_privateData->d1pdgId, _name.c_str(), 0 , "Reco");
   _genTree->column((_name+"m1px").c_str(), *_privateData->m1px, _name.c_str(), 0, "Reco");
 }
 
 void GenCandidateFiller::FillParticleBranch(HepMC::GenParticle* p) {
-  // Get the 4-momentum
-  HepMC::FourVector momentum = p->momentum();
-  _privateData->px->push_back(momentum.px());
-  _privateData->py->push_back(momentum.py());
-  _privateData->pz->push_back(momentum.pz());
-  _privateData->energy->push_back(momentum.e());
-  _privateData->mass->push_back(momentum.m());
-  // PDG Id and status
-  _privateData->pdgId->push_back(p->pdg_id());
-  _privateData->status->push_back(p->status());
-  HepMC::GenVertex* vtxIn = p->production_vertex();
-  HepMC::GenVertex* vtxOut = p->end_vertex();
-  HepMC::ThreeVector vIn = vtxIn->point3d();
-  HepMC::ThreeVector vOut = vtxIn->point3d();
-  // get production vertex
-  _privateData->x->push_back(vIn.x());
-  _privateData->y->push_back(vIn.y());
-  _privateData->z->push_back(vIn.z());
-  _privateData->decayLenght->push_back(sqrt(pow(vIn.x()-vOut.x(),2.)+
-					    pow(vIn.y()-vOut.y(),2.)+
-					    pow(vIn.z()-vOut.z(),2.)));
-  // first mother info
-  HepMC::GenVertex::particles_in_const_iterator ipi = vtxIn->particles_in_const_begin();
-  //Changed the m2ID from second mother's ID to px! Was set at -99 before
-  HepMC::FourVector mother_momentum = (*ipi)->momentum();
-  _privateData->m1pdgId->push_back((*ipi)->pdg_id());
-  //if(ipi != vtxIn->particles_in_const_end()) {
-  // ++ipi;
-  // _privateData->m2pdgId->push_back((*ipi)->pdg_id());
-  // } else {
-  _privateData->m2pdgId->push_back(-99);
-  _privateData->m1px->push_back(mother_momentum.px());
-  //}
+    // Get the 4-momentum
+    HepMC::FourVector momentum = p->momentum();
+    _privateData->px->push_back(momentum.px());
+    _privateData->py->push_back(momentum.py());
+    _privateData->pz->push_back(momentum.pz());
+    _privateData->energy->push_back(momentum.e());
+    _privateData->mass->push_back(momentum.m());
+
+    // PDG Id
+    _privateData->pdgId->push_back(p->pdg_id());
+    _privateData->status->push_back(p->status());
+    HepMC::GenVertex* vtxIn = p->production_vertex();
+    HepMC::GenVertex* vtxOut = p->end_vertex();
+    HepMC::ThreeVector vIn = vtxIn->point3d();
+    HepMC::ThreeVector vOut = vtxIn->point3d(); //bugfix??
+    //HepMC::ThreeVector vOut = vtxOut->point3d(); //bugfix
+    // get production vertex 
+    _privateData->x->push_back(vIn.x());
+    _privateData->y->push_back(vIn.y());
+    _privateData->z->push_back(vIn.z());
+    _privateData->decayLenght->push_back(sqrt(pow(vIn.x()-vOut.x(),2.)+
+					      pow(vIn.y()-vOut.y(),2.)+
+					      pow(vIn.z()-vOut.z(),2.)));
+    // first mother info 
+    HepMC::GenVertex::particles_in_const_iterator ipi = vtxIn->particles_in_const_begin();  
+    _privateData->m1pdgId->push_back((*ipi)->pdg_id());
+    /*if(ipi != vtxIn->particles_in_const_end()) {
+      ++ipi;
+      _privateData->m2pdgId->push_back((*ipi)->pdg_id());
+      } else {*/
+    _privateData->m2pdgId->push_back(-99);
+    _privateData->m1px->push_back(mother_momentum.px());
+    
+    //    HepMC::GenVertex::particles_in_const_iterator ipioutend = vtxOut->particles_in_const_end();  
+    //HepMC::GenVertex::particles_in_const_iterator ipioutin = vtxOut->particles_in_const_begin();  
+    if ( vtxOut != NULL){
+      HepMC::GenVertex::particles_in_const_iterator ipiout = vtxOut->particles_out_const_begin();  
+      _privateData->d1pdgId->push_back((*ipiout)->pdg_id());
+      /*if (fabs(p->pdg_id()) == 1000005) {
+	cout << "id: " << p->pdg_id()<< " px: " << momentum.px() <<  endl;
+	cout << "daughter: " << (*ipiout)->pdg_id()<< endl;
+	}*/
+    }
+    else {
+      _privateData->d1pdgId->push_back(-99);
+      }
 }
 
 //////////////////
 
 void GenCandidateFiller::FillParticleBranchSTDHEP(TLorentzVector* p, TVector3* v,
-						  double mass, int pdgId, int status, double decayL, int m1, int m2, double m1px) {
-  // Get the 4-momentum
-  _privateData->px->push_back(p->Px());
-  _privateData->py->push_back(p->Py());
-  _privateData->pz->push_back(p->Pz());
-  _privateData->energy->push_back(p->E());
-  _privateData->mass->push_back(mass);
-  // PDG Id and status
-  _privateData->pdgId->push_back(pdgId);
-  _privateData->status->push_back(status);
-  // get production vertex
-  _privateData->x->push_back(v->X());
-  _privateData->y->push_back(v->Y());
-  _privateData->z->push_back(v->Z());
-  _privateData->decayLenght->push_back(decayL);
-  // first mother info
-  _privateData->m1pdgId->push_back(m1);
-  _privateData->m2pdgId->push_back(m2);
-  _privateData->m1px->push_back(m1px);
+						  double mass, int pdgId, double decayL, int m1, int m2, int d1, int status, double m1px) {
+    // Get the 4-momentum
+    _privateData->px->push_back(p->Px());
+    _privateData->py->push_back(p->Py());
+    _privateData->pz->push_back(p->Pz());
+    _privateData->energy->push_back(p->E());
+    _privateData->mass->push_back(mass);
+
+    // PDG Id
+    _privateData->pdgId->push_back(pdgId);
+
+    // get production vertex 
+    _privateData->x->push_back(v->X());
+    _privateData->y->push_back(v->Y());
+    _privateData->z->push_back(v->Z());
+    _privateData->decayLenght->push_back(decayL);
+
+    // first mother info 
+    _privateData->m1pdgId->push_back(m1);
+    _privateData->m2pdgId->push_back(m2);
+    _privateData->m1px->push_back(m1px);
+
+    // first daughter info
+    _privateData->d1pdgId->push_back(d1);
+    if (fabs(pdgId) == 1000005) {
+      cout << "STUDHEP" << endl;
+      cout << "id: " << pdgId<< " px: " << p->Px() <<  endl;
+      cout << "daughter: " << d1 << endl;
+    }      
+
+    // status
+    _privateData->status->push_back(status);
 }
 
 ///////////////
@@ -265,6 +296,8 @@ void GenCandidateFillerData::newEvent() {
   decayLenght = new vector<int>;
   m1pdgId = new vector<int>;
   m2pdgId = new vector<int>;
+  d1pdgId = new vector<int>;
+  status = new vector<int>;
   m1px = new vector<float>;
 }
 
@@ -282,5 +315,7 @@ void GenCandidateFillerData::clearEvent() {
   decayLenght->clear();
   m1pdgId->clear();
   m2pdgId->clear();
+  d1pdgId->clear();
+  status->clear();
   m1px->clear();
 }

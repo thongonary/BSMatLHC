@@ -125,6 +125,7 @@ public :
    Int_t           SUSYDecayLmm[50];   //[SUSY]
    Int_t           SUSYM1PdgId[50];   //[SUSY]
    Int_t           SUSYM2PdgId[50];   //[SUSY]
+   Int_t           SUSYD1PdgId[50];   //[SUSY]
    Int_t           SUSYStatus[50];   //[SUSY]
    Float_t         SUSYm1px[50];   //[SUSY]
    Int_t           GenTreeParticle;
@@ -262,6 +263,7 @@ public :
    TBranch        *b_SUSYDecayLmm;   //!
    TBranch        *b_SUSYM1PdgId;   //!
    TBranch        *b_SUSYM2PdgId;   //!
+   TBranch        *b_SUSYD1PdgId;   //!
    TBranch        *b_SUSYm1px;   //!
    TBranch        *b_GenTreeParticle;   //!
    TBranch        *b_GenTreeParticleE;   //!
@@ -289,7 +291,10 @@ public :
    TBranch        *b_ParticleM1PdgId;   //!
    TBranch        *b_ParticleM2PdgId;   //!
    TBranch        *b_Particlem1px;   //!
-   DetectorBase(TTree *tree=0);
+  
+   // DetectorBase(TTree *tree=0);
+   DetectorBase(TTree *tree=0, TTree *tree2=0);
+  
    virtual ~DetectorBase();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -303,7 +308,7 @@ public :
 #endif
 
 #ifdef DetectorBase_cxx
-DetectorBase::DetectorBase(TTree *tree) : fChain(0) 
+DetectorBase::DetectorBase(TTree *tree, TTree *tree2) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -313,7 +318,6 @@ DetectorBase::DetectorBase(TTree *tree) : fChain(0)
          f = new TFile("pippo.root_GenTree.root");
       }
       f->GetObject("GenEvent",tree);
-
    }
    Init(tree);
 }
@@ -463,6 +467,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("SUSYDecayLmm", SUSYDecayLmm, &b_SUSYDecayLmm);
    fChain->SetBranchAddress("SUSYM1PdgId", SUSYM1PdgId, &b_SUSYM1PdgId);
    fChain->SetBranchAddress("SUSYM2PdgId", SUSYM2PdgId, &b_SUSYM2PdgId);
+   fChain->SetBranchAddress("SUSYD1PdgId", SUSYD1PdgId, &b_SUSYD1PdgId);
    fChain->SetBranchAddress("SUSYm1px", SUSYm1px, &b_SUSYm1px);
    fChain->SetBranchAddress("GenTreeParticle", &GenTreeParticle, &b_GenTreeParticle);
    fChain->SetBranchAddress("GenTreeParticleE", GenTreeParticleE, &b_GenTreeParticleE);
@@ -492,6 +497,7 @@ void DetectorBase::Init(TTree *tree)
    fChain->SetBranchAddress("Particlem1px", Particlem1px, &b_Particlem1px);
    Notify();
 }
+
 
 Bool_t DetectorBase::Notify()
 {

@@ -1,6 +1,6 @@
 #ROOT
 ROOTCFLAGS    = $(shell $(ROOTSYS)/bin/root-config --cflags)
-ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs) -lGui -lCore -lCint -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lpthread -lm -ldl
+ROOTLIBS      = $(shell $(ROOTSYS)/bin/root-config --libs) -lGui -lCore -lRIO -lNet -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lMathCore -lThread -lpthread -lm -ldl
 ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #PYTHIA

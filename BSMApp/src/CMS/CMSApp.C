@@ -25,6 +25,8 @@
 // 
 #include "CMS/CMSDarkMatter.hh"
 #include "CMS/CMSSubstructure.hh"
+#include "CMS/CMSRazorHgg.hh"
+#include "CMS/CMSRazorHggHbb.hh"
 
 using namespace std;
 
@@ -38,6 +40,8 @@ int main(int argc, char* argv[]) {
     cout << "OPTIONS:        " << endl;
     cout << "--verbose       Increase verbosity level for debug" << endl;
     cout << "--razor         Run Razor Analysis" << endl;
+    cout << "--hggrazor      Razor Hgg" << endl;
+    cout << "--hgghbbrazor   Razor Hgg with Hbb converstion" << endl;
     cout << "--susyvars      Razor, alpha_T, MT2, etc" << endl;
     cout << "--monojet       Run MonoJet Analysis" << endl;
     cout << "--darkmatter    Run Dark Matter future study" << endl;
@@ -64,6 +68,8 @@ int main(int argc, char* argv[]) {
   bool substructure = false;
   bool ssdilepbtag = false;
   bool displaced = false;
+  bool razorhgg = false;
+  bool razorhgghbb = false;
   double sqrts = 13000.;
 
   for (int i=1;i<argc;i++){
@@ -85,6 +91,8 @@ int main(int argc, char* argv[]) {
       else razor = true;
     }
     if (strncmp(argv[i],"--susyvars",10)==0)        susyvars = true;
+    if (strncmp(argv[i],"--hggrazor",10)==0)        razorhgg = true;
+    if (strncmp(argv[i],"--hgghbbrazor",13)==0)        razorhgghbb = true;
   }
   
   if(strncmp(inputCMS,"none",4)!=0) {
@@ -93,7 +101,7 @@ int main(int argc, char* argv[]) {
     TChain *cmsChain;
     cmsChain = new TChain("GenEvent");
     cmsChain->Add(inputCMS);
-    
+
     // Open Output file
     if(writeOut) {
       TFile *file = new TFile(outFileName,"RECREATE");
@@ -137,6 +145,28 @@ int main(int argc, char* argv[]) {
         if(verbose) cmssusyvars.SetVerbose(true);
         cmssusyvars.SetSqrts(sqrts);
         cmssusyvars.Loop(outFileName);
+    }
+
+    if(razorhgg){
+        CMSRazorHgg cmsrazorhgg(cmsChain, 0., "");
+        if(!writeOut){
+            cout << "please specify output file" << endl;
+            return 0;
+        }
+        if(verbose) cmsrazorhgg.SetVerbose(true);
+        cmsrazorhgg.SetSqrts(sqrts);
+        cmsrazorhgg.Loop(outFileName);
+    }
+
+    if(razorhgghbb){
+        CMSRazorHggHbb cmsrazorhgghbb(cmsChain, 0., "");
+        if(!writeOut){
+            cout << "please specify output file" << endl;
+            return 0;
+        }
+        if(verbose) cmsrazorhgghbb.SetVerbose(true);
+        cmsrazorhgghbb.SetSqrts(sqrts);
+        cmsrazorhgghbb.Loop(outFileName);
     }
 
     /*    
