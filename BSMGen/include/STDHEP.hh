@@ -52,6 +52,8 @@ public :
    Double_t        GenParticle_X[kMaxGenParticle];   //[GenParticle_]
    Double_t        GenParticle_Y[kMaxGenParticle];   //[GenParticle_]
    Double_t        GenParticle_Z[kMaxGenParticle];   //[GenParticle_]
+   Double_t        GenParticle_m1px[kMaxGenParticle];   //[GenParticle_]
+
    Int_t           GenParticle_size;
 
    // List of branches
@@ -82,6 +84,7 @@ public :
    TBranch        *b_GenParticle_Y;   //!
    TBranch        *b_GenParticle_Z;   //!
    TBranch        *b_GenParticle_size;   //!
+   TBranch        *b_GenParticle_m1px;   //!
 
    STDHEP(TTree *tree=0);
    virtual ~STDHEP();
@@ -197,6 +200,8 @@ void STDHEP::Init(TTree *tree)
    fChain->SetBranchAddress("GenParticle.Y", GenParticle_Y, &b_GenParticle_Y);
    fChain->SetBranchAddress("GenParticle.Z", GenParticle_Z, &b_GenParticle_Z);
    fChain->SetBranchAddress("GenParticle_size", &GenParticle_size, &b_GenParticle_size);
+   fChain->SetBranchAddress("GenParticle.m1px", GenParticle_m1px, &b_GenParticle_m1px);
+
    Notify();
 }
 

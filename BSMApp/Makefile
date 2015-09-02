@@ -52,6 +52,7 @@ CMSApp:$(SRCDIR)CMS/CMSApp.C \
 	$(OUTLIB)CMSRazorHgg.o \
 	$(OUTLIB)CMSRazorHggHbb.o \
 	$(OUTLIB)CMSSUSYVars.o \
+	$(OUTLIB)CMSRazor13TeV.o \
 	$(OUTLIB)CMSSubstructure.o 
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -o CMSApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
 
@@ -81,6 +82,7 @@ lib:	$(OUTLIB)StatTools.o \
 	$(OUTLIB)CMSRazorHgg.o \
 	$(OUTLIB)CMSRazorHggHbb.o \
         $(OUTLIB)CMSSUSYVars.o \
+	$(OUTLIB)CMSRazor13TeV.o \
 	$(OUTLIB)CMSSubstructure.o 
 #	$(OUTLIB)CMSMonoJet.o 
 #	$(OUTLIB)CMSSSDilepBtag.o 
@@ -126,6 +128,9 @@ $(OUTLIB)CMSRazorHgg.o: $(SRCDIR)CMS/CMSRazorHgg.cc $(OUTLIB)CMSReco.o $(OUTLIB)
 
 $(OUTLIB)CMSRazorHggHbb.o: $(SRCDIR)CMS/CMSRazorHggHbb.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorHggHbb.o $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHggHbb.o $<
+
+$(OUTLIB)CMSRazor13TeV.o: $(SRCDIR)CMS/CMSRazor13TeV.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor13TeV.o $<
 
 $(OUTLIB)CMSSUSYVars.o: $(SRCDIR)CMS/CMSSUSYVars.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSSUSYVars.o $<

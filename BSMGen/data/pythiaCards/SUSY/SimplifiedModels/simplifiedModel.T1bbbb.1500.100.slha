@@ -5,11 +5,11 @@
 #
 #   DESCRIPTION:
 #   This file should be used as a template for the simplified model 
-#   T2bb (sbottom-sbottom production)
+#   T1 (gluino-gluino production)
 #
 #   PRODUCTION MECHANISMS:
 #
-#   FREE PARAMETERS: m(~chi_10), m(~b) 
+#   FREE PARAMETERS: m(~chi_10), m(~g) 
 ##########################################################################################
 
 Block MODSEL  # Model selection
@@ -40,7 +40,7 @@ Block MASS  # Mass spectrum
    2000003     10.0E+4  # ~s_R
    1000004     10.0E+4  # ~c_L
    2000004     10.0E+4  # ~c_R
-   1000005     SQUARK   # ~b_1
+   1000005     10.0E+4  # ~b_1
    2000005     10.0E+4  # ~b_2
    1000006     10.0E+4  # ~t_1 
    2000006     10.0E+4  # ~t_2
@@ -53,8 +53,8 @@ Block MASS  # Mass spectrum
    1000015     10.0E+4  # ~tau_1-
    2000015     10.0E+4  # ~tau_2-
    1000016     10.0E+4  # ~nu_tauL
-   1000021     10.0E+4  # ~g 
-   1000022     LSP      # ~chi_10 
+   1000021     1500  # ~g 
+   1000022     100       # ~chi_10 
    1000023     10.0E+4  # ~chi_20 
    1000025     10.0E+4  # ~chi_30
    1000035     10.0E+4  # ~chi_40
@@ -98,10 +98,10 @@ BLOCK STOPMIX  # Stop Mixing Matrix
   2  2     1.0   # cos(theta_t)
 #
 BLOCK SBOTMIX  # Sbottom Mixing Matrix
-  1  1     1.0  # cos(theta_b)
-  1  2     0.0  # sin(theta_b)
-  2  1     0.0  # -sin(theta_b)
-  2  2     1.0  # cos(theta_b)
+  1  1     1.0   # cos(theta_b)
+  1  2     0.0   # sin(theta_b)
+  2  1     0.0   # -sin(theta_b)
+  2  2     1.0   # cos(theta_b)
 #
 BLOCK STAUMIX  # Stau Mixing Matrix
   1  1     4.51419848E-01   # cos(theta_tau)
@@ -174,6 +174,82 @@ BLOCK MSOFT Q=  2.90528802E+02  # The soft SUSY breaking masses at the scale Q
 #
 #
 #         PDG            Width
-DECAY   1000005     1.00000000E+00   # sbottom1 decays
+DECAY   1000021     1.00000000E+00   # gluino decays
 #          BR         NDA      ID1       ID2
-     1.00000000E+00    2     1000022         5   # BR(~b_1 -> ~chi_10 b)
+     0.000000E+00    3     1000022       1       -1
+     0.000000E+00    3     1000022       2       -2
+     0.000000E+00    3     1000022       3       -3
+     0.000000E+00    3     1000022       4       -4
+     1.000000E+00    3     1000022       5       -5
+     0.000000E+00    3     1000022       6       -6
+#
+#         PDG            Width
+DECAY   1000006     0.00000000E+00   # stop1 decays
+DECAY   2000006     0.00000000E+00   # stop2 decays
+DECAY   1000005     0.00000000E+00   # sbottom1 decays
+DECAY   2000005     0.00000000E+00   # sbottom2 decays
+#
+#         PDG            Width
+DECAY   1000002     1.00000000E+00   # sup_L decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         2   # BR(~u_L -> ~chi_10 u)
+#
+#         PDG            Width
+DECAY   2000002     1.00000000E+00   # sup_R decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         2   # BR(~u_R -> ~chi_10 u)
+#
+#         PDG            Width
+DECAY   1000001     1.00000000E+00   # sdown_L decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         1   # BR(~d_L -> ~chi_10 d)
+#
+#         PDG            Width
+DECAY   2000001     1.00000000E+00   # sdown_R decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         1   # BR(~d_R -> ~chi_10 d)
+#
+#         PDG            Width
+DECAY   1000004     1.00000000E+00   # scharm_L decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         4   # BR(~c_L -> ~chi_10 c)
+#
+#         PDG            Width
+DECAY   2000004     1.00000000E+00   # scharm_R decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         4   # BR(~c_R -> ~chi_10 c)
+#
+#         PDG            Width
+DECAY   1000003     1.00000000E+00   # sstrange_L decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         3   # BR(~s_L -> ~chi_10 s)
+#
+#         PDG            Width
+DECAY   2000003     1.00000000E+00   # sstrange_R decays
+#          BR         NDA      ID1       ID2
+     1.00000000E+00    2     1000022         3   # BR(~s_R -> ~chi_10 s)
+#
+#         PDG            Width
+DECAY   1000011     0.00000000E+00   # selectron_L decays
+DECAY   2000011     0.00000000E+00   # selectron_R decays
+DECAY   1000013     0.00000000E+00   # smuon_L decays
+DECAY   2000013     0.00000000E+00   # smuon_R decays
+DECAY   1000015     0.00000000E+00   # stau_1 decays
+DECAY   2000015     0.00000000E+00   # stau_2 decays
+#
+#         PDG            Width
+DECAY   1000012     0.00000000E+00   # snu_elL decays
+DECAY   1000014     0.00000000E+00   # snu_muL decays
+DECAY   1000016     0.00000000E+00   # snu_tauL decays
+#         PDG            Width
+DECAY   1000024     2.02592183E-05   # chargino1+ decays
+#           BR         NDA      ID1       ID2       ID3
+     0.33333333E+00    3     1000022       -11        12   # BR(~chi_1+ -> ~chi_10 e+   nu_e)
+     0.33333333E+00    3     1000022       -13        14   # BR(~chi_1+ -> ~chi_10 mu+  nu_mu)
+     0.33333333E+00    3     1000022       -15        16   # BR(~chi_1+ -> ~chi_10 tau+ nu_tau)
+#         PDG            Width
+DECAY   1000037     0.00000000E+00   # chargino2+ decays
+DECAY   1000022     0.00000000E+00   # neutralino1 decays
+DECAY   1000023     0.00000000E+00   # neutralino2 decays
+DECAY   1000025     0.00000000E+00   # neutralino3 decays
+DECAY   1000035     0.00000000E+00   # neutralino4 decays

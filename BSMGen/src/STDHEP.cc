@@ -74,6 +74,9 @@ TTree* STDHEP::Loop(){
       TLorentzVector* p = new TLorentzVector(GenParticle_Px[i], GenParticle_Py[i], GenParticle_Pz[i], GenParticle_E[i]);
       TVector3* vtx = new TVector3(GenParticle_X[i], GenParticle_Y[i], GenParticle_Z[i]);
       // check if the particle has to be considered, and in case fill the tree
+    
+      //if(GenParticle_Status[i] == 3) 
+      susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_m1px[i],true);
       if(GenParticle_Status[i] == 1) { // stable only
 	if(p->Pt() > _minMuonPt) 
 	  //  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);

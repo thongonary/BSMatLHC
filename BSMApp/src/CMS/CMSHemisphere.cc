@@ -2,7 +2,7 @@
 #include <math.h>
 #include <TLorentzVector.h>
 #include "CMS/CMSHemisphere.hh"
-
+#include "CMS/CMSReco.hh"
 using namespace std;
 
 CMSHemisphere::CMSHemisphere(vector<TLorentzVector> jets){ 
@@ -18,7 +18,6 @@ CMSHemisphere::~CMSHemisphere() {
 vector<TLorentzVector> CMSHemisphere::GetHemispheres() {
   return jOUT;
 }
-
 vector<int> CMSHemisphere::GetHem1Constituents() { //saves indices of jets chosen for leading hem
   vector<int> hem_temp;
   if(no_switch) {
@@ -36,7 +35,6 @@ vector<int> CMSHemisphere::GetHem1Constituents() { //saves indices of jets chose
     //delete hem2;
   }
 }
-
 vector<int> CMSHemisphere::GetHem2Constituents() {
   vector<int> hem_temp;
   if(no_switch) {
@@ -54,7 +52,6 @@ vector<int> CMSHemisphere::GetHem2Constituents() {
     //delete hem;
   }
 }
-
 void CMSHemisphere::Combine() {
   int N_JETS = jIN.size();
 
@@ -95,10 +92,74 @@ void CMSHemisphere::CombineMinMass() {
       M_min = M_temp;
       myJ1 = j1[i];
       myJ2 = j2[i];
-      chosen_perm = i; //added in order to save hem constituents
+      chosen_perm = i;
+    }
+  }
+  //  myJ1.SetPtEtaPhiM(myJ1.Pt(),myJ1.Eta(),myJ1.Phi(),0.0);
+  //  myJ2.SetPtEtaPhiM(myJ2.Pt(),myJ2.Eta(),myJ2.Phi(),0.0);
+
+  jOUT.clear();
+  if(myJ1.Pt() > myJ2.Pt()){
+    no_switch = true; // means that megajets were sorted in pt already
+    jOUT.push_back(myJ1);
+    jOUT.push_back(myJ2);
+  } else {
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
+    jOUT.push_back(myJ2);
+    jOUT.push_back(myJ1);
+  }
+}
+
+void CMSHemisphere::CombineMinEnergyMass() {
+  double M_min = -1;
+  // default value (in case none is found)
+  TLorentzVector myJ1 = j1[0];
+  TLorentzVector myJ2 = j2[0];
+  for(int i=0; i< j1.size(); i++) {
+    double M_temp = j1[i].M2()/j1[i].E()+j2[i].M2()/j2[i].E();
+    if(M_min < 0 || M_temp < M_min){
+      M_min = M_temp;
+      myJ1 = j1[i];
+      myJ2 = j2[i];
+      chosen_perm = i;
     }
   }
   
+  //  myJ1.SetPtEtaPhiM(myJ1.Pt(),myJ1.Eta(),myJ1.Phi(),0.0);
+  //  myJ2.SetPtEtaPhiM(myJ2.Pt(),myJ2.Eta(),myJ2.Phi(),0.0);
+
+  jOUT.clear();
+  if(myJ1.Pt() > myJ2.Pt()){
+    no_switch = true; // means that megajets were sorted in pt already
+    jOUT.push_back(myJ1);
+    jOUT.push_back(myJ2);
+  } else {
+    no_switch = false; //means that megajets weren't sorted and had to be flipped
+    jOUT.push_back(myJ2);
+    jOUT.push_back(myJ1);
+  }
+}
+
+void CMSHemisphere::CombineGeorgi(){
+  double M_max = -100000000;
+  // default value (in case none is found)
+  TLorentzVector myJ1 = j1[0];
+  TLorentzVector myJ2 = j2[0];
+  for(int i=0; i< j1.size(); i++) {
+    double myBeta = 100;
+    double n = 1;
+    double M_temp = pow(j1[i].E(), n)*(1 - myBeta * j1[i].M2()/pow(j1[i].E(), 2)) + 
+		     pow(j2[i].E(), n)*(1 - myBeta * j2[i].M2()/pow(j2[i].E(), 2));
+    //changed to exclude or statement present in every other algorithm
+    //fixed the bug.  Performs
+    if(M_temp > M_max){
+      M_max = M_temp;
+      myJ1 = j1[i];
+      myJ2 = j2[i];
+      chosen_perm = i;
+    }
+  }
+  //cout << M_max << endl;
   //  myJ1.SetPtEtaPhiM(myJ1.Pt(),myJ1.Eta(),myJ1.Phi(),0.0);
   //  myJ2.SetPtEtaPhiM(myJ2.Pt(),myJ2.Eta(),myJ2.Phi(),0.0);
 
@@ -166,7 +227,6 @@ void CMSHemisphere::CombineSaveConstituents() {
   }
 }
 
-
 void CMSHemisphere::CombineMinHT() {
   double dHT_min = 999999999999999.0;
   // default value (in case none is found)
@@ -189,4 +249,17 @@ void CMSHemisphere::CombineMinHT() {
     jOUT.push_back(myJ2);
     jOUT.push_back(myJ1);
   }
+}
+
+void CMSHemisphere::Find_All_MR() {
+  //Simply returns the hemispheres of all
+  //permutations
+  TLorentzVector myJ1 = j1[0];
+  TLorentzVector myJ2 = j2[0];
+  for(int i=0; i< j1.size(); i++) {
+      myJ1 = j1[i];
+      myJ2 = j2[i];  
+jOUT.push_back(myJ1);
+jOUT.push_back(myJ2);
+}
 }
