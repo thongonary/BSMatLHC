@@ -2,7 +2,8 @@
 // a sample of LHE and write the output in a ROOT file
 
 #include "Pythia8/Pythia.h"
-#include "Pythia8/Pythia8ToHepMC.h"
+//#include "Pythia8/Pythia8ToHepMC.h"
+#include "Pythia8Plugins/HepMC2.h"
 
 #include "HepMC/GenEvent.h"
 #include "HepMC/IO_GenEvent.h"
@@ -44,6 +45,13 @@ int main(int argc, char* argv[]) {
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
+  
+  std::string cfg = argv[1];
+  std::string infilename = argv[2]; 
+  std::string outfilename = argv[3]; 
+
+  std::cout << "Using config " << cfg << std::endl;
+  std::cout << "Will write decayed file to " << outfilename << std::endl;
 
   // Interface for conversion from Pythia8::Event to HepMC one. 
   HepMC::Pythia8ToHepMC ToHepMC;
@@ -55,10 +63,19 @@ int main(int argc, char* argv[]) {
   Pythia pythia;
 
   // Read in commands from external file.
-  pythia.readFile(argv[1]);    
+  pythia.readFile(cfg);    
 
   // Initialize Les Houches Event File run. List initialization information.
-  pythia.init(argv[2]);
+  LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
+
+  // Open a file on which LHEF events should be stored, and write header.  
+  char lhename[256];
+  sprintf(lhename,"%s.lhe", outfilename.c_str());
+  myLHA.openLHEF(lhename);
+  
+  pythia.init();
+  
+  //pythia.init(infilename);
 
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
@@ -81,7 +98,7 @@ int main(int argc, char* argv[]) {
 
   // the output file 
   char name[256];
-  sprintf(name,"%s_GenTree.root", argv[3]);
+  sprintf(name,"%s_GenTree.root", outfilename.c_str());
   TFile* treeOut = new TFile(name,"recreate");
 
   // the output TTree with information on the model
@@ -152,6 +169,13 @@ int main(int argc, char* argv[]) {
     susyFiller->ClearEvent();
     particleFiller->ClearEvent();
     delete hepmcevt;
+    
+    // Store event info in the LHAup object.
+    myLHA.setEvent();
+
+    // Write out this event info on the file.
+    // With optional argument (verbose =) false the file is smaller.
+    myLHA.eventLHEF();
 
     // End of event loop.
   }
@@ -164,8 +188,14 @@ int main(int argc, char* argv[]) {
   treeOut->Close();
 
   // Give statistics. 
-  pythia.statistics();
- 
+  pythia.stat();
+  
+  // Update the cross section info based on Monte Carlo integration during run.
+  myLHA.updateSigma();
+
+  // Write endtag. Overwrite initialization info with new cross sections.
+  myLHA.closeLHEF(true);
+  
   // Done.
   return 0;
 }

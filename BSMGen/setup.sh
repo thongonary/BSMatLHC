@@ -1,2 +1,2 @@
-export PYTHIA8DATA=../pythia/xmldoc/
-source ../pythia/examples/config.sh
+export PYTHIA8DATA=../pythia/share/Pythia8/xmldoc/
+#source ../pythia/examples/config.sh

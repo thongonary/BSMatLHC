@@ -1,5 +1,6 @@
 #include "Pythia8/Pythia.h"
-#include "Pythia8/Pythia8ToHepMC.h"
+//#include "Pythia8/Pythia8ToHepMC.h"
+#include "Pythia8Plugins/HepMC2.h"
 
 #include "HepMC/GenEvent.h"
 #include "HepMC/IO_GenEvent.h"
@@ -156,7 +157,7 @@ int main(int argc, char* argv[]) {
   treeOut->Close();
 
   // Give statistics. 
-  pythia.statistics();
+  pythia.stat();
   
   // Done.
   return 0;
