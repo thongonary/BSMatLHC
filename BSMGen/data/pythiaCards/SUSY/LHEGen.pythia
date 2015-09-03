@@ -8,4 +8,10 @@ Main:timesAllowErrors = 30         !
 Main:showChangedSettings = on      ! print changed flags/modes/parameters
 Main:showAllSettings = off         ! print all flags/modes/parameters
 Main:showChangedParticleData = on  ! print changed particle and decay data
-Main:showAllParticleData = on      ! print all particle and decay data
+
+PartonLevel:ISR = on
+PartonLevel:FSR = on
+PartonLevel:MPI = on
+HadronLevel:Hadronize = on 
+Beams:frameType = 4
+Beams:LHEF = unweighted_events.lhe
