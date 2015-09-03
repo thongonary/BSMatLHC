@@ -133,11 +133,11 @@ int main(int argc, char* argv[]) {
     for (int j = 0; j<pythia.event.size(); j++){ //loop through particles
 
       int motherIndex = pythia.event.at(j).mother1();
-      if (pythia.event.statusHepMC(j)==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
+      if (pythia.event.at(j).statusHepMC()==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
 	//      cout << "Event: " << iEvent << endl;
       //      cout << "Initial particle: " << pythia.event.at(j).id() <<" index: " << j<< endl;
 	}
-      if (pythia.event.statusHepMC(j)==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
+      if (pythia.event.at(j).statusHepMC()==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
 	//	cout << "Mother Chain: " << endl;
 	int motherStatus = pythia.event.at(motherIndex).status();
 	while (fabs(pythia.event.at(motherIndex).id()) != 1000005){ //loop while the mother isn't a sbottom

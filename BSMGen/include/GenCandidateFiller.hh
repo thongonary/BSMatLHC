@@ -31,7 +31,6 @@ struct GenCandidateFillerData {
   vector<int> *pdgId, *decayLenght, *status;
   vector<int> *m1pdgId, *m2pdgId;
   vector<int> *d1pdgId;
-  vector<int> *status;
 
 public:
   void newEvent();

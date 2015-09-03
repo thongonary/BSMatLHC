@@ -158,10 +158,9 @@ void GenCandidateFiller::FillEvent(HepMC::GenEvent* hepmcevt) {
 }
 
 void GenCandidateFiller::FillEventSTDHEP(TLorentzVector* p, TVector3* v,
-					 double mass, int pdgId, int status,
+					 double mass, int pdgId,
 					 double decayL, int m1,
-					 int m2, int status, 
-					 int d1, double m1px,
+					 int m2, int d1, int status, double m1px,
 					 bool stable = true) {
   bool writeParticle = false;
   if(isParticle(pdgId,_name)) writeParticle = true;
@@ -221,6 +220,7 @@ void GenCandidateFiller::FillParticleBranch(HepMC::GenParticle* p) {
 					      pow(vIn.z()-vOut.z(),2.)));
     // first mother info 
     HepMC::GenVertex::particles_in_const_iterator ipi = vtxIn->particles_in_const_begin();  
+    HepMC::FourVector mother_momentum = (*ipi)->momentum();
     _privateData->m1pdgId->push_back((*ipi)->pdg_id());
     /*if(ipi != vtxIn->particles_in_const_end()) {
       ++ipi;

@@ -76,31 +76,31 @@ TTree* STDHEP::Loop(){
       // check if the particle has to be considered, and in case fill the tree
     
       //if(GenParticle_Status[i] == 3) 
-      susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],GenParticle_Status[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_m1px[i],true);
+      susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
       if(GenParticle_Status[i] == 1) { // stable only
 	if(p->Pt() > _minMuonPt) 
 	  //  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	  muonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 	if(p->Pt() > _minElectronPt) 
 	  //electronFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	  electronFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	  electronFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 	if(p->Pt() > _minPhotonPt) 
 	  //photonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	  photonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	  photonFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 	if(p->Pt() > _minParticlePt && fabs(p->Eta()) < _maxParticleEta) 
 	  //particleFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	  particleFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	  particleFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 	// invisible
 	//neutrinoFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);     
-	neutrinoFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);     
+	neutrinoFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);     
 	//susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	susyFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 
       } else { // taus and b's decay 
 	//if(p->Pt() > _minTauPt) tauFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	if(p->Pt() > _minTauPt) tauFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	if(p->Pt() > _minTauPt) tauFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
 	//if(p->Pt() > _minBJetPt) bFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],true,GenParticle_Status[i]);
-	if(p->Pt() > _minBJetPt) bFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i],GenParticle_D1[i],true,GenParticle_Status[i]);
+	if(p->Pt() > _minBJetPt) bFiller->FillEventSTDHEP(p,vtx,p->M(),GenParticle_PID[i],0.,GenParticle_M1[i],GenParticle_M2[i], GenParticle_D1[i], GenParticle_Status[i], GenParticle_m1px[i],true);
       }
       delete p, vtx;
     }
