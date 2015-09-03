@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
   // Begin event loop.
   int nPace = max(1, nEvent / max(1, nShow) ); 
   int iAbort = 0;
-  for (int iEvent = 0; ; ++iEvent) {
+  for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
     if (nShow > 0 && iEvent%nPace == 0) 
       cout << " Now begin event " << iEvent << endl;
     
