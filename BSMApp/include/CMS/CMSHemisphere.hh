@@ -54,8 +54,6 @@ private:
   void Combine();
   void CombineSaveConstituents();
 
-  void CombineSaveConstituents();
-
   vector<TLorentzVector> jIN;
   vector<TLorentzVector> jOUT;
   vector<TLorentzVector> j1;
