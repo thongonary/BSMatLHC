@@ -54,8 +54,13 @@ int main(int argc, char* argv[]) {
   }
   if(verbose) pythia.readString(" SLHA:verbose = 3");
   if(verbose) cout << "ciaoooo" << endl;
-  // Initialize. Beam parameters set in .pythia file.
-  pythia.init(2212, 2212, energy);
+  // Initialize. Beam parameters set in .pythia file.  
+  pythia.readString("Beams:idA = 2212");
+  pythia.readString("Beams:idB = 2212");  
+  char beamString[512];
+  sprintf(beamString, "Beams:eCM = %f", energy);
+  pythia.readString(beamString);
+  pythia.init();
 
   // List settings.
   pythia.settings.listChanged();

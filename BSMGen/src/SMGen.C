@@ -2,7 +2,8 @@
 // following example manin02.cc  and main17.cc from pythia8
 
 #include "Pythia8/Pythia.h"
-#include "Pythia8/Pythia8ToHepMC.h"
+//#include "Pythia8/Pythia8ToHepMC.h"
+#include "Pythia8Plugins/HepMC2.h"
 
 #include "HepMC/GenEvent.h"
 #include "HepMC/IO_GenEvent.h"
@@ -88,7 +89,14 @@ int main(int argc, char* argv[]) {
     if(process[i] != string("none")) pythia.readString(process[i].c_str()); 
   }
   // setup beams
-  pythia.init(2212, 2212, energy);
+  //pythia.init(2212, 2212, energy);
+  
+  pythia.readString("Beams:idA = 2212");
+  pythia.readString("Beams:idB = 2212");  
+  char beamString[512];
+  sprintf(beamString, "Beams:eCM = %f", energy);
+  pythia.readString(beamString);
+  pythia.init();
   // Random Seed
   int jobpid = getpid();
   TDatime *now = new TDatime();
@@ -179,7 +187,7 @@ int main(int argc, char* argv[]) {
   treeOut->Close();
 
   // Give statistics. 
-  pythia.statistics();
+  pythia.stat();
 
   // Done.
   return 0;

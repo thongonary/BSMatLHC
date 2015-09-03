@@ -2,7 +2,9 @@
 import os
 import sys
 # IMPORTANT: SET ROOTSYS FIRST!!!!
-# FOR MACOSX gfortran is needed to compile softsusy
+# FOR MACOSX gfortran is needed to compile softsusy, and for MadGraph5
+# C++ boost libraries are also needed for LHAPDF-6, can be gotten with MacPorts:
+# sudo port install boost
 
 # CURRENT DIRECTORY
 BSMDIR =  os.environ['PWD']
@@ -33,18 +35,22 @@ os.system("cmake -m64 -DCMAKE_INSTALL_PREFIX=%s %s -Dmomentum:STRING=GEV -Dlengt
 os.system("make; make install")
 os.chdir(BSMDIR)
 
-#get external code: PYTHIA 8.180
-os.system("cp extraCode/pythia8180.tgz .; tar -xzf pythia8180.tgz; rm pythia8180.tgz")
-os.system("mv pythia8180 pythia; cd pythia;  ./configure --enable-64bits --with-hepmc="+BSMDIR+"/hepmc/build --with-hepmcversion=2.06.08; make")
+#get external code: LHAPDF 6.1
+os.system("cp extraCode/LHAPDF-6.1.5.tar.gz .; tar -xzf LHAPDF-6.1.5.tar.gz; rm LHAPDF-6.1.5.tar.gz")
+os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR+"/lhapdf/; make; make install; cd ..; rm -r LHAPDF-6.1.5")
+
+#get external code: PYTHIA 8.210
+os.system("cp extraCode/pythia8210.tgz .; tar -xzf pythia8210.tgz; rm pythia8210.tgz")
+os.system("mv pythia8210 pythia; cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/ --with-lhapdf6="+BSMDIR+"/lhapdf/; make")
 
 #Compile BSMGen
-os.system("cd BSMGen; source ../pythia/examples/config.sh; make")
+os.system("cd BSMGen; source setup.sh; make")
 
-# fastjet
+# fastjet 3.1.3
 os.chdir("BSMApp")
-os.system("cp ../extraCode/fastjet-3.0.6.tar.gz .")
-os.system("tar -xzf fastjet-3.0.6.tar.gz; mkdir fastjet; cd fastjet-3.0.6; ./configure CXXFLAGS=-m64 --prefix=%s/BSMApp/fastjet/; make; make check; make install" %BSMDIR)
-os.system("rm -r fastjet-3.0.6.tar.gz fastjet-3.0.6")
+os.system("cp ../extraCode/fastjet-3.1.3.tar.gz .")
+os.system("tar -xzf fastjet-3.1.3.tar.gz; mkdir fastjet; cd fastjet-3.1.3; ./configure CXXFLAGS=-m64 --prefix=%s/BSMApp/fastjet/; make; make check; make install" %BSMDIR)
+os.system("rm -r fastjet-3.1.3.tar.gz fastjet-3.1.3")
 
 #Compile BSMApp
 os.system("make")

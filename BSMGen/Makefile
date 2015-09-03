@@ -5,7 +5,7 @@ ROOTGLIBS     = $(shell $(ROOTSYS)/bin/root-config --glibs)
 
 #PYTHIA
 PYTHIADIR     = $(PWD)/../pythia/
-LIBDIRARCH    = $(PYTHIADIR)lib/archive
+LIBDIRARCH    = $(PYTHIADIR)lib/
 
 #HEPMC
 HEPMCDIR      = $(PWD)/../hepmc/build/
@@ -66,7 +66,7 @@ GenPythia:$(SRCDIR)GenPythia.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8  -llhapdfdummy -l pythia8tohepmc  \
+	-L$(LIBDIRARCH) -lpythia8  -lLHAPDF   \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
 
@@ -77,7 +77,7 @@ SMGen:$(SRCDIR)SMGen.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -llhapdfdummy -lpythia8tohepmc \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -88,7 +88,7 @@ STDHEPConverter:$(SRCDIR)STDHEPConverter.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -llhapdfdummy -lpythia8tohepmc \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
 
@@ -99,7 +99,7 @@ LHEGen:$(SRCDIR)LHEGen.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -llhapdfdummy -lpythia8tohepmc \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -108,7 +108,7 @@ ZJetsGen:$(SRCDIR)ZJetsGen.C
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
-	-L$(LIBDIRARCH) -lpythia8 -llhapdfdummy -lpythia8tohepmc \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -117,7 +117,7 @@ SUSYDecay:$(SRCDIR)SUSYDecay.C
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
-	-L$(LIBDIRARCH) -lpythia8 -llhapdfdummy -lpythia8tohepmc \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $
 
