@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     cout << "OPTIONS:        " << endl;
     cout << "--verbose       Increase verbosity level for debug" << endl;
     cout << "--razor         Run Razor Analysis" << endl;
+    cout << "--razor13       Run Razor 13 TeV Analysis" << endl;
     cout << "--hggrazor      Razor Hgg" << endl;
     cout << "--hgghbbrazor   Razor Hgg with Hbb converstion" << endl;
     cout << "--susyvars      Razor, alpha_T, MT2, etc" << endl;

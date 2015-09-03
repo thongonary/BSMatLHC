@@ -63,6 +63,7 @@ protected:
   bool isPhoton(HepMC::GenParticle* p);
   bool isNeutrino(HepMC::GenParticle* p);
   bool isSUSY(HepMC::GenParticle* p);
+  bool isBSM(HepMC::GenParticle* p);
   bool isParticle(int id, string particle);
   int _blockSize;
 

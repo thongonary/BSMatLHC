@@ -47,7 +47,8 @@ bool GenCandidateFiller::isParticle(int id, string particle) {
   if(abs(id) == 14 and particle == "Neutrino") return true;
   if(abs(id) == 16 and particle == "Neutrino") return true;
   //added in additional SUSY particles
-  if(abs(id) >= (1000001 && abs(id) <= 1000039 || abs(id) >= 2000001 && abs(id) <= 2000015) and particle == "SUSY") return true;
+  if( ( ( abs(id) >= 1000001 && abs(id) <= 1000039 ) || ( abs(id) >= 2000001 && abs(id) <= 2000015) ) and particle == "SUSY") return true;
+  if(abs(id) >= 9000000 and particle == "BSM") return true;
   return false;
 }
 
@@ -105,6 +106,14 @@ bool GenCandidateFiller::isSUSY(HepMC::GenParticle* p) {
   return isSUSY;
 }
 
+bool GenCandidateFiller::isBSM(HepMC::GenParticle* p) {
+  // neutrinos are not considered
+  bool isBSM = false;
+  int pdgId = p->pdg_id();
+  // all other BSM particles
+  if(abs(pdgId) >= 9000000) isBSM = true;
+  return isBSM;
+}
 void GenCandidateFiller::NewEvent() {
   _privateData->newEvent();
   _blockSize = 0;
@@ -136,12 +145,14 @@ void GenCandidateFiller::FillEvent(HepMC::GenEvent* hepmcevt) {
       else if(_name == "Neutrino" && isNeutrino(*p)) writeParticle = true;
       // SUSY: all SUSY particles
       else if(_name == "SUSY" && isSUSY(*p)) writeParticle = true;
+      // BSM: all other BSM particles
+      else if(_name == "BSM" && isBSM(*p)) writeParticle = true;
 
       // write hard-process incoming/intermediate/outgoing particles
       else if(_name == "GenTreeParticle" && (*p)->status() >= 20 && (*p)->status() < 30) writeParticle = true;
       // whatever else is stable and visbile
       // else if(_name == "Particle" && !isSUSY(*p) && !isNeutrino(*p) && IsStable(*p)) writeParticle = true;
-      else if(_name == "Particle" && !isSUSY(*p) && !isNeutrino(*p) && (*p)->status() == 1) {
+      else if(_name == "Particle" && !isBSM(*p) && !isSUSY(*p) && !isNeutrino(*p) && (*p)->status() == 1) {
 	writeParticle = true;
 	isStable++;
 	// cout << (*p)->pdg_id() << " " << (*p)->status() << " " << (*p)->end_vertex() << endl;

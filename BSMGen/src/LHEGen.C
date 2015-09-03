@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) {
   GenCandidateFiller* photonFiller = new GenCandidateFiller(myTree,"Photon");
   GenCandidateFiller* neutrinoFiller = new GenCandidateFiller(myTree,"Neutrino");
   GenCandidateFiller* susyFiller = new GenCandidateFiller(myTree,"SUSY");
+  GenCandidateFiller* bsmFiller = new GenCandidateFiller(myTree,"BSM");
   GenCandidateFiller* particleFiller = new GenCandidateFiller(myTree,"Particle");
 
   // Begin event loop.
@@ -154,6 +155,7 @@ int main(int argc, char* argv[]) {
     photonFiller->FillEvent(hepmcevt);
     neutrinoFiller->FillEvent(hepmcevt);
     susyFiller->FillEvent(hepmcevt);
+    bsmFiller->FillEvent(hepmcevt);
     particleFiller->FillEvent(hepmcevt);
 
     // write data in TTree
@@ -167,6 +169,7 @@ int main(int argc, char* argv[]) {
     photonFiller->ClearEvent();
     neutrinoFiller->ClearEvent();
     susyFiller->ClearEvent();
+    bsmFiller->ClearEvent();
     particleFiller->ClearEvent();
     delete hepmcevt;
     

@@ -123,10 +123,10 @@ $(OUTLIB)DataAnalysis.o: $(SRCDIR)CommonTools/DataAnalysis.cc
 $(OUTLIB)CMSRazor.o: $(SRCDIR)CMS/CMSRazor.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor.o $<
 
-$(OUTLIB)CMSRazorHgg.o: $(SRCDIR)CMS/CMSRazorHgg.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorHgg.o $<
+$(OUTLIB)CMSRazorHgg.o: $(SRCDIR)CMS/CMSRazorHgg.cc $(OUTLIB)CMSReco.o $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHgg.o $<
 
-$(OUTLIB)CMSRazorHggHbb.o: $(SRCDIR)CMS/CMSRazorHggHbb.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorHggHbb.o $<
+$(OUTLIB)CMSRazorHggHbb.o: $(SRCDIR)CMS/CMSRazorHggHbb.cc $(OUTLIB)CMSReco.o $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHggHbb.o $<
 
 $(OUTLIB)CMSRazor13TeV.o: $(SRCDIR)CMS/CMSRazor13TeV.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
