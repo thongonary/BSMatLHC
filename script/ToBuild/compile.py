@@ -43,6 +43,10 @@ os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR
 os.system("cp extraCode/pythia8210.tgz .; tar -xzf pythia8210.tgz; rm pythia8210.tgz")
 os.system("mv pythia8210 pythia; cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/ --with-lhapdf6="+BSMDIR+"/lhapdf/; make")
 
+# get external code: MADGRAPH 5
+os.system("cp extraCode/MG5_aMC_v2.3.2.tar.gz .; tar xvzf MG5_aMC_v2.3.2.tar.gz; rm MG5_aMC_v2.3.2.tar.gz")
+os.system("mv MG5_aMC_v2_3_2 madgraph; cp -r BSMGen/data/madgraphModels/* madgraph/models/")
+
 #Compile BSMGen
 os.system("cd BSMGen; source setup.sh; make")
 
