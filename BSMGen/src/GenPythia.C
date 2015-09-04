@@ -10,6 +10,7 @@
 #include <TTree.h>
 #include <GenTree.hh>
 #include <GenCandidateFiller.hh>
+#include <EventFilter.hh>
 
 #include <stdio.h>
 #include <string.h>
@@ -51,6 +52,14 @@ int main(int argc, char* argv[]) {
   // Initialize. Beam parameters set in .pythia file.
   pythia.init();
 
+  // Values for filter.
+  int    select   = 3;
+  double etaMax   = 3.;
+  double pTminChg = 1.;
+
+  // Declare Event Filter according to specification.
+  EventFilter filter( select, etaMax, pTminChg);
+  
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
   int nList    = pythia.mode("Main:numberToList");
@@ -112,6 +121,9 @@ int main(int argc, char* argv[]) {
       cout << " Event generation aborted prematurely, owing to error!\n"; 
       break;
     }
+    
+    // Find final charged particles with |eta| < 3 and pT > 1 GeV.
+    filter.filter( pythia.event);
  
     // List first few events.
     if (iEvent < nList) { 

@@ -44,7 +44,8 @@ all:  lib GenPythia STDHEPConverter LHEGen SMGen SUSYDecay
 lib: 	$(OUTLIB)GenTreeColumn.o \
 	$(OUTLIB)GenTree.o \
 	$(OUTLIB)STDHEP.o \
-	$(OUTLIB)GenCandidateFiller.o 
+	$(OUTLIB)GenCandidateFiller.o \
+	$(OUTLIB)EventFilter.o
 
 $(OUTLIB)GenTreeColumn.o: $(SRCDIR)GenTreeColumn.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)GenTreeColumn.o $<
@@ -59,12 +60,15 @@ $(OUTLIB)GenCandidateFiller.o: $(SRCDIR)GenCandidateFiller.cc $(OUTLIB)GenTree.o
 $(OUTLIB)STDHEP.o: $(SRCDIR)STDHEP.cc $(OUTLIB)GenTree.o $(OUTLIB)GenCandidateFiller.o
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -I$(HEPMCDIR)include/ -o	$(OUTLIB)STDHEP.o $<
 
+$(OUTLIB)EventFilter.o: $(SRCDIR)EventFilter.cc 
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -I$(PYTHIADIR)include/ -o	$(OUTLIB)EventFilter.o $<
+
 GenPythia:$(SRCDIR)GenPythia.C 
 	$(CXX) $(CXXFLAGS) -o GenPythia $< \
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
-	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o \
+	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/EventFilter.o \
 	$(LIBS) \
 	-L$(LIBDIRARCH) -lpythia8  -lLHAPDF   \
 	-L$(HEPMCLIB) -lHepMC \
