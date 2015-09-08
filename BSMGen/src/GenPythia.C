@@ -53,12 +53,13 @@ int main(int argc, char* argv[]) {
   pythia.init();
 
   // Values for filter.
-  int    select   = 3;
-  double etaMax   = 3.;
-  double pTminChg = 1.;
+  int    pdgId   = 22; //ask for photons
+  int    pdgMothId   = 25; //ask for Higgs mother
+  double etaMax   = -1; //no requirement on eta
+  double pTmin = 0; //no requirement on pt
 
   // Declare Event Filter according to specification.
-  EventFilter filter( select, etaMax, pTminChg);
+  EventFilter filter( pdgId, pdgMothId, etaMax, pTmin );
   
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
@@ -104,15 +105,19 @@ int main(int argc, char* argv[]) {
 
   double pTHat = -1;
 
+  int iFilteredEvent = 0;
   TTree* outTree = new TTree("FinalParticles", "FinalParticles");
   outTree->Branch("pTHat", &pTHat, "pTHat/D");
 
   // Begin event loop.
   int nPace = max(1, nEvent / max(1, nShow) ); 
   int iAbort = 0;
-  for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
-    if (nShow > 0 && iEvent%nPace == 0) 
-      cout << " Now begin event " << iEvent << endl;
+  for (int iEvent = 0; ; ++iEvent) {
+    
+    if (iFilteredEvent >= nEvent) break;
+    if (nShow > 0 && iEvent%nPace == 0)      
+    //cout << " Now begin event " << iEvent << endl;
+      cout << " Now begin event " << iFilteredEvent << endl;
 
     // Generate events. Quit if many failures.
     if (!pythia.next()) {
@@ -122,19 +127,30 @@ int main(int argc, char* argv[]) {
       break;
     }
     
-    // Find final charged particles with |eta| < 3 and pT > 1 GeV.
+    // Find final state photons
     filter.filter( pythia.event);
- 
+    
+    //cout << "number of final state photons from Higgs = " << filter.size() << endl;
+    if (filter.size()<2) {
+      //cout << "< 2 final state photons from Higgs; not saving" << endl;
+      continue;
+    }
+    
+    iFilteredEvent +=1;
+			
+			 
     // List first few events.
     if (iEvent < nList) { 
       pythia.info.list();
       pythia.event.list();
     }
-    for (int j = 0; j<pythia.event.size(); j++){
-      if (fabs(pythia.event.at(j).id())==1000005){ //for looking at all of the sbottoms in the event
-	cout << "Event: " << iEvent  << " Mother: " << pythia.event.at(pythia.event.at(j).mother1()).id() << " Mother 2: " << pythia.event.at(pythia.event.at(j).mother2()).id() << " pdg: " << pythia.event.at(j).id() << " Status: " << pythia.event.at(j).status() << " Px: " << pythia.event.at(j).px() << " Py: " << pythia.event.at(j).py() << " Daughter: " << pythia.event.at(pythia.event.at(j).daughter1()).id() << " Daughter 2: "<< pythia.event.at(pythia.event.at(j).daughter2()).id()<< endl;
-	}
-    }
+
+    
+    // for (int j = 0; j<pythia.event.size(); j++){
+    //   if (fabs(pythia.event.at(j).id())==1000005){ //for looking at all of the sbottoms in the event
+    // 	cout << "Event: " << iEvent  << " Mother: " << pythia.event.at(pythia.event.at(j).mother1()).id() << " Mother 2: " << pythia.event.at(pythia.event.at(j).mother2()).id() << " pdg: " << pythia.event.at(j).id() << " Status: " << pythia.event.at(j).status() << " Px: " << pythia.event.at(j).px() << " Py: " << pythia.event.at(j).py() << " Daughter: " << pythia.event.at(pythia.event.at(j).daughter1()).id() << " Daughter 2: "<< pythia.event.at(pythia.event.at(j).daughter2()).id()<< endl;
+    // 	}
+    // }
     
 
     int numSbottoms = 0;
