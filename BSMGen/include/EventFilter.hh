@@ -23,10 +23,9 @@ class EventFilter {
 public:
 
   // Constructor sets properties of filter.
-  EventFilter( int selectIn, double etaMaxIn = 50.,
-    double pTminChargedIn = 0., double pTminNeutralIn = 0.)
-    : select(selectIn), etaMax(etaMaxIn), pTminCharged(pTminChargedIn),
-    pTminNeutral(pTminNeutralIn) {}
+  EventFilter( int pdgIdIn = 22, int pdgMothIdIn = 25, double etaMaxIn = -1,
+    double pTminIn = 0.)
+    : pdgId(pdgIdIn), pdgMothId(pdgMothIdIn), etaMax(etaMaxIn), pTmin(pTminIn) {}
 
   // Analysis of each new event to find acceptable particles.
   void filter(Event& event);
@@ -45,8 +44,8 @@ public:
 private:
 
   // Filter properties, set by constructor.
-  int    select;
-  double etaMax, pTminCharged, pTminNeutral;
+  int    pdgId, pdgMothId;
+  double etaMax, pTmin;
 
   // Kept particle indices and pointers, referring to original event.
   vector<int>       keptIndx;

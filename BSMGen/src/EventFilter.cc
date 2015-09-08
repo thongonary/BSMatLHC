@@ -18,15 +18,11 @@ using namespace Pythia8;
 // The EventFilter class.
 
 // The constructor takes the following arguments
-// select = 1 : keep only final particles.
-//        = 2 : keep only final visible particles (i.e. not neutrinos).
-//        = 3 : keep only final charged particles.
-// etaMax (default = 50) : keep only particles with pseudorapidity
+// pdgId (default = 22) : keep only final particles with this pdgId.
+// etaMax (default = -1) : keep only particles with pseudorapidity
 //        |eta| < etaMax.
-// pTminCharged (default = 0) : keep a charged particle only if
-//        its transverse momentum pT < pTminCharged.
-// pTminNeutral (default = 0) : keep a neutral particle only if
-//        its transverse momentum pT < pTminNeutral.
+// pTmin (default = 0) : keep the particle only if
+//        its transverse momentum pT > pTmin.
 
 // Main methods:
 // filter( event) takes an event record as input and analyzes it.
@@ -48,16 +44,14 @@ void EventFilter::filter(Event& event) {
 
     // Skip if particle kind selection criteria not fulfilled.
     if (!event[i].isFinal()) continue;
-    if (select == 2 && !event[i].isVisible()) continue;
-    bool isCharged = event[i].isCharged();
-    if (select == 3 && !isCharged) continue;
+    if (abs(event[i].id()) != pdgId) continue;
+    if (abs(event.at(event.at(i).mother1()).id()) != pdgMothId) continue;
 
     // Skip if too large pseudorapidity.
-    if (abs(event[i].eta()) > etaMax) continue;
+    if (etaMax > 0 && abs(event[i].eta()) > etaMax) continue;
 
     // Skip if too small pT.
-    if       (isCharged && event[i].pT() < pTminCharged) continue;
-    else if (!isCharged && event[i].pT() < pTminNeutral) continue;
+    if       (event[i].pT() < pTmin) continue;
 
     // Add particle to vectors of indices and pointers.
     keptIndx.push_back( i );
