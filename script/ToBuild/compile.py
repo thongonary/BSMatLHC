@@ -47,6 +47,10 @@ os.system("mv pythia8210 pythia; cd pythia;  ./configure --enable-64bit --with-h
 os.system("cp extraCode/MG5_aMC_v2.3.2.tar.gz .; tar xvzf MG5_aMC_v2.3.2.tar.gz; rm MG5_aMC_v2.3.2.tar.gz")
 os.system("mv MG5_aMC_v2_3_2 madgraph; cp -r BSMGen/data/madgraphModels/* madgraph/models/")
 
+# get external code: DELPHES 3
+os.system("cp extraCode/delphes-master.tar.gz .; tar xvzf delphes-master.tar.gz; rm delphes-master.tar.gz")
+os.system("mv delphes-master delphes; cd delphes; make")
+
 #Compile BSMGen
 os.system("cd BSMGen; source setup.sh; make")
 
