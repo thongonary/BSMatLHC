@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
   // Check that correct number of command-line arguments
   if (argc != 3) {
     cerr << " To run the code provide the name of the input pythia card and the output LHE file. \n"
-	 << " example: ./GenPythia data/pythiaCards/EXO/RSGraviton_gg_EXAMPLE.pythia outFile.root \n" << endl;
+	 << " example: ./GenPythia data/pythiaCards/EXO/RSGraviton_gg_EXAMPLE.pythia outFile \n" << endl;
     return 1;
   }
 
@@ -42,12 +42,23 @@ int main(int argc, char* argv[]) {
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
- 
+  
+  std::string cfg = argv[1];
+  std::string outfilename = argv[2];
+  
   // Generator. 
   Pythia pythia;
 
   // Read in commands from external file.
-  pythia.readFile(argv[1]);    
+  pythia.readFile(cfg);
+  
+  // Initialize Les Houches Event File run. List initialization information.
+  LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
+
+  // Open a file on which LHEF events should be stored, and write header.  
+  char lhename[256];
+  sprintf(lhename,"%s.lhe", outfilename.c_str());
+  myLHA.openLHEF(lhename);
 
   // Initialize. Beam parameters set in .pythia file.
   pythia.init();
@@ -81,13 +92,14 @@ int main(int argc, char* argv[]) {
 
   // the output file 
   char name[256];
-  sprintf(name,"%s", argv[2]);
+  sprintf(name,"%s_GenTree.root", outfilename.c_str());
   TFile* treeOut = new TFile(name,"recreate");
 
   // the output TTree with information on the model
-  double xsec;
+  double xsec, filtereff;
   TTree* infoTree = new TTree("infoTree", "infoTree");
   infoTree->Branch("xsec", &xsec, "xsec/D");
+  infoTree->Branch("filtereff", &filtereff, "filtereff/D");
 
   // the event TTree
   GenTree* myTree = new GenTree("GenEvent","GenEvent");
@@ -102,19 +114,17 @@ int main(int argc, char* argv[]) {
   GenCandidateFiller* gentreeparticleFiller = new GenCandidateFiller(myTree,"GenTreeParticle");
   GenCandidateFiller* particleFiller = new GenCandidateFiller(myTree,"Particle");
 
-
-  double pTHat = -1;
-
   int iFilteredEvent = 0;
-  TTree* outTree = new TTree("FinalParticles", "FinalParticles");
-  outTree->Branch("pTHat", &pTHat, "pTHat/D");
-
+  int nUnfilteredEvent = 0;
+  
   // Begin event loop.
   int nPace = max(1, nEvent / max(1, nShow) ); 
   int iAbort = 0;
   for (int iEvent = 0; ; ++iEvent) {
     
     if (iFilteredEvent >= nEvent) break;
+    nUnfilteredEvent++;
+    
     if (nShow > 0 && iEvent%nPace == 0)      
     //cout << " Now begin event " << iEvent << endl;
       cout << " Now begin event " << iFilteredEvent << endl;
@@ -145,49 +155,6 @@ int main(int argc, char* argv[]) {
       pythia.event.list();
     }
 
-    
-    // for (int j = 0; j<pythia.event.size(); j++){
-    //   if (fabs(pythia.event.at(j).id())==1000005){ //for looking at all of the sbottoms in the event
-    // 	cout << "Event: " << iEvent  << " Mother: " << pythia.event.at(pythia.event.at(j).mother1()).id() << " Mother 2: " << pythia.event.at(pythia.event.at(j).mother2()).id() << " pdg: " << pythia.event.at(j).id() << " Status: " << pythia.event.at(j).status() << " Px: " << pythia.event.at(j).px() << " Py: " << pythia.event.at(j).py() << " Daughter: " << pythia.event.at(pythia.event.at(j).daughter1()).id() << " Daughter 2: "<< pythia.event.at(pythia.event.at(j).daughter2()).id()<< endl;
-    // 	}
-    // }
-    
-
-    int numSbottoms = 0;
-    TLorentzVector sbottom_1;
-    TLorentzVector sbottom_2;
-
-   // recursive mother 
-    for (int j = 0; j<pythia.event.size(); j++){ //loop through particles
-
-      int motherIndex = pythia.event.at(j).mother1();
-      if (pythia.event.at(j).statusHepMC()==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
-	//      cout << "Event: " << iEvent << endl;
-      //      cout << "Initial particle: " << pythia.event.at(j).id() <<" index: " << j<< endl;
-	}
-      if (pythia.event.at(j).statusHepMC()==1 && fabs(pythia.event.at(j).id())==1000022){ //final state particle & chi1
-	//	cout << "Mother Chain: " << endl;
-	int motherStatus = pythia.event.at(motherIndex).status();
-	while (fabs(pythia.event.at(motherIndex).id()) != 1000005){ //loop while the mother isn't a sbottom
-	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<< endl;
-	  motherIndex = pythia.event.at(motherIndex).mother1();
-	  motherStatus = pythia.event.at(motherIndex).status();
-	  if (motherStatus == -11) break; 
-	  numSbottoms++;
-	}
-	if (numSbottoms == 1) { //note: only works if there are two final state chi1s found, otherwise might save misc things
-	  sbottom_1.SetPxPyPzE(pythia.event.at(motherIndex).px(), pythia.event.at(motherIndex).py(), pythia.event.at(motherIndex).pz(), pythia.event.at(motherIndex).e());
-	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<<endl;
-	}
-	else {
-	  sbottom_2.SetPxPyPzE(pythia.event.at(motherIndex).px(), pythia.event.at(motherIndex).py(), pythia.event.at(motherIndex).pz(), pythia.event.at(motherIndex).e());
-	  //	  cout << "PdgId: " << pythia.event.at(motherIndex).id() << " Status: " << pythia.event.at(motherIndex).status() << " Px: " << pythia.event.at(motherIndex).px() << " Py: "<< pythia.event.at(motherIndex).py()<<endl;
-	}	    
-      }
-    }
-    pTHat = (sbottom_1 + sbottom_2).Pt();
-    //    cout << "pTHat: " << pTHat << endl;
-
     // Construct new empty HepMC event. 
     HepMC::GenEvent* hepmcevt = new HepMC::GenEvent();
     // Fill HepMC event, including PDF info.
@@ -207,7 +174,6 @@ int main(int argc, char* argv[]) {
 
     // write data in TTree
     myTree->dumpData();
-    outTree->Fill();
 
     // Clear the event from memory
     muonFiller->ClearEvent();
@@ -221,9 +187,19 @@ int main(int argc, char* argv[]) {
     gentreeparticleFiller->ClearEvent();
     particleFiller->ClearEvent();
     delete hepmcevt;
+    
+    // Store event info in the LHAup object.
+    myLHA.setEvent();
 
+    // Write out this event info on the file.
+    // With optional argument (verbose =) false the file is smaller.
+    myLHA.eventLHEF();
+    
     // End of event loop.
   }
+  cout << "nEvent = " << nEvent << endl;
+  cout << "nUnfilteredEvent = " << nUnfilteredEvent << endl;
+  filtereff = nEvent*1.0/nUnfilteredEvent;
   
   // Write output file
   infoTree->Fill();
@@ -231,12 +207,17 @@ int main(int argc, char* argv[]) {
   TTree* roottree = myTree->getTree();
   roottree->Write();
   infoTree->Write();
-  outTree->Write();
   treeOut->Close();
 
   // Give statistics. 
   pythia.stat();
   
+  // Update the cross section info based on Monte Carlo integration during run.
+  myLHA.updateSigma();
+
+  // Write endtag. Overwrite initialization info with new cross sections.
+  myLHA.closeLHEF(true);
+    
   // Done.
   return 0;
 }
