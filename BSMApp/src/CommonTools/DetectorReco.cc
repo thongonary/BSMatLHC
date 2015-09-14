@@ -3,10 +3,11 @@
 //using namespace std;
 //using namespace stdcomb;
 
-DetectorReco::DetectorReco(TTree *tree) { 
+DetectorReco::DetectorReco(TTree *tree, bool delphesFormat) { 
 
-  verbose = false;  
-  DetectorBase::Init(tree);
+  verbose = false;
+  if (delphesFormat) DelphesTree::Init(tree);
+  else DetectorBase::Init(tree);
 
   // Initialize the random seed
   int jobpid = getpid();

@@ -34,7 +34,7 @@ class CMSReco : public DetectorReco{
 public:
 
   /// Class Constructor
-  CMSReco(TTree *tree=0);
+  CMSReco(TTree *tree=0, bool delphesFormat = false);
   /// Class Destructor
   virtual ~CMSReco();
 

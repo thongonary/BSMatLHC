@@ -14,7 +14,7 @@
 #include "CMS/CMSRazorHgg.hh"
 #include <fastjet/tools/Pruner.hh>
 
-CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis) : CMSReco(tree) {
+CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
   _Lumi = Lumi;
   _statTools = new StatTools(-99);
   _analysis = analysis;

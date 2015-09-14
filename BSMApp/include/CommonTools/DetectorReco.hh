@@ -54,7 +54,7 @@ class DetectorReco : public DelphesTree, public DetectorBase {
 public:
 
   /// Class Constructor
-  DetectorReco(TTree *tree=0);
+  DetectorReco(TTree *tree=0, bool delphesFormat=false);
   /// Class Destructor
   virtual ~DetectorReco();
   //! write the outpur file   

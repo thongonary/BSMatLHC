@@ -26,7 +26,7 @@ class CMSRazorHgg : public CMSReco, public DataAnalysis {
 public:
   
   //! constructor
-  CMSRazorHgg(TTree *tree, double Lumi, string analysis);
+  CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphesFormat);
   //! destructor
   virtual ~CMSRazorHgg();
   //! loop over events

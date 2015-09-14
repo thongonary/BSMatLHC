@@ -4,7 +4,7 @@
 using namespace std;
 using namespace stdcomb;
 
-CMSReco::CMSReco(TTree *tree) : DetectorReco(tree) {
+CMSReco::CMSReco(TTree *tree, bool delphesFormat) : DetectorReco(tree, delphesFormat) {
   dR = 0.5;
   cms = new CMSDetectorResponse(99999);
 }

@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
     }
 
     if(razorhgg){
-        CMSRazorHgg cmsrazorhgg(cmsChain, 0., "");
+      CMSRazorHgg cmsrazorhgg(cmsChain, 0., "",false);
         if(!writeOut){
             cout << "please specify output file" << endl;
             return 0;
