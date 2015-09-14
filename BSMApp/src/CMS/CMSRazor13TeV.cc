@@ -23,7 +23,7 @@ void CMSRazor13TeV::SetSqrts(double sqrts) {
 // loop over events - real analysis
 void CMSRazor13TeV::Loop(string outFileName) {
 
-	if(fChain == 0) return;
+	if(DetectorBase::fChain == 0) return;
 
 	double MR_Default, RSQ_Default, MR_KT_Jets, RSQ_KT_Jets, MR_AKT_Jets, RSQ_AKT_Jets, MR_CAM_Jets, RSQ_CAM_Jets;
 	double MRz_Default, MRz_KT_Jets, MRz_AKT_Jets, MRz_CAM_Jets, MRz_CAM_Cons, RSQz_Default, RSQz_KT_Jets, RSQz_AKT_Jets, RSQz_CAM_Jets;
@@ -74,7 +74,7 @@ void CMSRazor13TeV::Loop(string outFileName) {
 	
 	// loop over entries
 	Long64_t nbytes = 0, nb = 0;
-	Long64_t nentries = fChain->GetEntries();
+	Long64_t nentries = DetectorBase::fChain->GetEntries();
 	std::cout << "Number of entries = " << nentries << std::endl;
 	
 	// set the by-event weight
@@ -93,9 +93,9 @@ void CMSRazor13TeV::Loop(string outFileName) {
     CleanEvent();
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+    Long64_t ientry = DetectorBase::LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
 	//if (jentry > 10000) continue; //use for gen level comparison coding
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 	

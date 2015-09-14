@@ -49,11 +49,11 @@ void CMSDarkMatter::Loop(string outFileName) {
   razorTree->Branch("tTag", &tTag, "tTag/I");
   razorTree->Branch("bTag", &bTag, "bTag/I");
 
-  if(fChain == 0) return;
+  if(DetectorBase::fChain == 0) return;
 
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
-  Long64_t nentries = fChain->GetEntries();
+  Long64_t nentries = DetectorBase::fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
   for (Long64_t jentry=0; jentry<nentries;jentry+=1) {
 
@@ -61,9 +61,9 @@ void CMSDarkMatter::Loop(string outFileName) {
     CleanEvent();
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+    Long64_t ientry = DetectorBase::LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0 || verbose) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // Build the event at generator level

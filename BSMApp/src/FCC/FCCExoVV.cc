@@ -154,11 +154,11 @@ void FCCExoVV::Loop(string outFileName) {
     */
   }
 
-  if(fChain == 0) return;
+  if(DetectorBase::fChain == 0) return;
   
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
-  Long64_t nentries = fChain->GetEntries();
+  Long64_t nentries = DetectorBase::fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
   for (Long64_t jentry=0; jentry<nentries;jentry+=1) {
   //  for (Long64_t jentry=0; jentry<1000;jentry+=1) {
@@ -179,9 +179,9 @@ void FCCExoVV::Loop(string outFileName) {
     CleanEvent();
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+    Long64_t ientry = DetectorBase::LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     // gen plots first
