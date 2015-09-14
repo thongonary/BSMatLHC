@@ -456,9 +456,17 @@ void CMSRazorHgg::Loop(string outFileName) {
       cout << "No jets found!!!!" << endl;
       continue;
     }
-    GenMET();
-    PFMET = genMET;
-    MET = PFMET.pt();
+    if (_delphesFormat){
+      TVector3 v3;
+      v3.SetPtEtaPhi(MissingET_MET[0],MissingET_Eta[0],MissingET_Phi[0]);
+      PFMET = fastjet::PseudoJet(v3.Px(), v3.Py(), 0., v3.Mag());
+      MET = PFMET.pt();
+    }
+    else{
+      GenMET();
+      PFMET = genMET;
+      MET = PFMET.pt();
+    }
 
     //traditional hemispheres
     if(jetsForHemispheres.size() < 2){
