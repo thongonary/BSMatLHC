@@ -27,6 +27,8 @@ SRCDIR           = ./src/
 CXX	         += -I$(INCLUDEDIR) -I.
 OUTLIB	         = ./lib/
 
+DELPHESINCLUDEDIR = ../delphes
+
 .SUFFIXES: .cc,.C, .hh
 .PREFIXES: ./lib/
 
@@ -43,6 +45,7 @@ CMSApp:$(SRCDIR)CMS/CMSApp.C \
 	$(OUTLIB)CountingExperiment.o \
 	$(OUTLIB)CMSRazorLikelihood.o \
 	$(OUTLIB)DetectorBase.o \
+	$(OUTLIB)DelphesTree.o \
 	$(OUTLIB)DetectorReco.o \
 	$(OUTLIB)CMSHemisphere.o \
 	$(OUTLIB)CMSDetectorResponse.o \
@@ -54,7 +57,7 @@ CMSApp:$(SRCDIR)CMS/CMSApp.C \
 	$(OUTLIB)CMSSUSYVars.o \
 	$(OUTLIB)CMSRazor13TeV.o \
 	$(OUTLIB)CMSSubstructure.o 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -o CMSApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -I$(DELPHESINCLUDEDIR) -o CMSApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $<
 
 #	$(OUTLIB)CMSMonoJet.o 
 #	$(OUTLIB)CMSSSDilepBtag.o 
@@ -71,6 +74,7 @@ lib:	$(OUTLIB)StatTools.o \
 	$(OUTLIB)CountingExperiment.o \
 	$(OUTLIB)CMSRazorLikelihood.o \
 	$(OUTLIB)DetectorBase.o \
+	$(OUTLIB)DelphesTree.o \
 	$(OUTLIB)DetectorReco.o \
 	$(OUTLIB)JetSubstructure.o \
 	$(OUTLIB)CMSHemisphere.o \
@@ -81,7 +85,7 @@ lib:	$(OUTLIB)StatTools.o \
 	$(OUTLIB)CMSRazor.o \
 	$(OUTLIB)CMSRazorHgg.o \
 	$(OUTLIB)CMSRazorHggHbb.o \
-        $(OUTLIB)CMSSUSYVars.o \
+	$(OUTLIB)CMSSUSYVars.o \
 	$(OUTLIB)CMSRazor13TeV.o \
 	$(OUTLIB)CMSSubstructure.o 
 #	$(OUTLIB)CMSMonoJet.o 
@@ -102,53 +106,57 @@ $(OUTLIB)CMSRazorLikelihood.o: $(SRCDIR)CMS/CMSRazorLikelihood.cc $(OUTLIB)Count
 $(OUTLIB)DetectorBase.o: $(SRCDIR)CommonTools/DetectorBase.cc $<
 	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DetectorBase.o $<
 
+# Delphes base class
+$(OUTLIB)DelphesTree.o: $(SRCDIR)CommonTools/DelphesTree.cc $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)DelphesTree.o $<
+
 # main Detector functions
 $(OUTLIB)DetectorReco.o: $(SRCDIR)CommonTools/DetectorReco.cc $(OUTLIB)DetectorBase.o  $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DetectorReco.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)DetectorReco.o $<
 
 $(OUTLIB)CMSHemisphere.o: $(SRCDIR)CMS/CMSHemisphere.cc 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSHemisphere.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSHemisphere.o $<
 
 $(OUTLIB)CMSDetectorResponse.o: $(SRCDIR)CMS/CMSDetectorResponse.cc $ 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSDetectorResponse.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSDetectorResponse.o $<
 
 $(OUTLIB)CMSReco.o: $(SRCDIR)CMS/CMSReco.cc $(OUTLIB)CMSDetectorResponse.o $(OUTLIB)CMSHemisphere.o $(OUTLIB)DetectorReco.o $(OUTLIB)StatTools.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSReco.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSReco.o $<
 
 # generic Data Analysis (Abs Class)
 $(OUTLIB)DataAnalysis.o: $(SRCDIR)CommonTools/DataAnalysis.cc	
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DataAnalysis.o $<	
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)DataAnalysis.o $<	
 
 # CMS Analyses
 $(OUTLIB)CMSRazor.o: $(SRCDIR)CMS/CMSRazor.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor.o $<
 
 $(OUTLIB)CMSRazorHgg.o: $(SRCDIR)CMS/CMSRazorHgg.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHgg.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHgg.o $<
 
 $(OUTLIB)CMSRazorHggHbb.o: $(SRCDIR)CMS/CMSRazorHggHbb.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHggHbb.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazorHggHbb.o $<
 
 $(OUTLIB)CMSRazor13TeV.o: $(SRCDIR)CMS/CMSRazor13TeV.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor13TeV.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSRazor13TeV.o $<
 
 $(OUTLIB)CMSSUSYVars.o: $(SRCDIR)CMS/CMSSUSYVars.cc $(OUTLIB)CMSReco.o $(OUTLIB)CMSRazorLikelihood.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSSUSYVars.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSSUSYVars.o $<
 
 $(OUTLIB)CMSDisplacedJet.o: $(SRCDIR)CMS/CMSDisplacedJet.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSDisplacedJet.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSDisplacedJet.o $<
 
 $(OUTLIB)CMSMonoJet.o: $(SRCDIR)CMS/CMSMonoJet.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSMonoJet.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSMonoJet.o $<
 
 $(OUTLIB)CMSDarkMatter.o: $(SRCDIR)CMS/CMSDarkMatter.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSDarkMatter.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSDarkMatter.o $<
 
 $(OUTLIB)CMSSubstructure.o: $(SRCDIR)CMS/CMSSubstructure.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSSubstructure.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSSubstructure.o $<
 
 $(OUTLIB)CMSSSDilepBtag.o: $(SRCDIR)CMS/CMSSSDilepBtag.cc $(OUTLIB)CMSReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSSSDilepBtag.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)CMSSSDilepBtag.o $<
 
 #$(OUTLIB)CMSWprime.o: $(SRCDIR)CMSWprime.cc
 #	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)CMSWprime.o $<
@@ -158,6 +166,7 @@ $(OUTLIB)CMSSSDilepBtag.o: $(SRCDIR)CMS/CMSSSDilepBtag.cc $(OUTLIB)CMSReco.o $<
 
 fcclib:	$(OUTLIB)DetectorBase.o \
 	$(OUTLIB)DetectorReco.o \
+	$(OUTLIB)DelphesTree.o \
 	$(OUTLIB)DetectorResponse.o \
 	$(OUTLIB)JetSubstructure.o \
 	$(OUTLIB)FCCReco.o \
@@ -166,6 +175,7 @@ fcclib:	$(OUTLIB)DetectorBase.o \
 
 fcceelib: $(OUTLIB)DetectorBase.o \
 	$(OUTLIB)DetectorReco.o \
+	$(OUTLIB)DelphesTree.o \
 	$(OUTLIB)DetectorResponse.o \
 	$(OUTLIB)JetSubstructure.o \
 	$(OUTLIB)FCCReco.o \
@@ -176,19 +186,19 @@ fcceelib: $(OUTLIB)DetectorBase.o \
 # FCC STUDIES
 ################################
 $(OUTLIB)DetectorResponse.o: $(SRCDIR)CommonTools/DetectorResponse.cc $< 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)DetectorResponse.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)DetectorResponse.o $<
 
 $(OUTLIB)JetSubstructure.o: $(SRCDIR)CommonTools/JetSubstructure.cc $< 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)JetSubstructure.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)JetSubstructure.o $<
 
 $(OUTLIB)FCCReco.o: $(SRCDIR)FCC/FCCReco.cc $(OUTLIB)DetectorResponse.o $(OUTLIB)DetectorReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FCCReco.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)FCCReco.o $<
 
 $(OUTLIB)FCCExoVV.o: $(SRCDIR)FCC/FCCExoVV.cc $(OUTLIB)FCCReco.o $(OUTLIB)JetSubstructure.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FCCExoVV.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)FCCExoVV.o $<
 
 $(OUTLIB)FCCExoJJ.o: $(SRCDIR)FCC/FCCExoJJ.cc $(OUTLIB)FCCReco.o $(OUTLIB)JetSubstructure.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FCCExoJJ.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)FCCExoJJ.o $<
 
 fccclean: 
 	rm -f $(OUTLIB)*.o FCCApp
@@ -196,20 +206,20 @@ fccclean:
 FCCApp:$(SRCDIR)FCC/FCCApp.C \
 	$(OUTLIB)FCCExoVV.o \
 	$(OUTLIB)FCCExoJJ.o 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -o FCCApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -I$(DELPHESINCLUDEDIR) -o FCCApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
 
 ################################
 # FCCee STUDIES
 ################################
 $(OUTLIB)FCCeeRazor3D.o: $(SRCDIR)FCCee/FCCeeRazor3D.cc $(OUTLIB)FCCReco.o $<
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)FCCeeRazor3D.o $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -c -I$(DELPHESINCLUDEDIR) -I$(INCLUDEDIR) -o $(OUTLIB)FCCeeRazor3D.o $<
 
 fcceeclean: 
 	rm -f $(OUTLIB)*.o FCCeeApp
 
 FCCeeApp:$(SRCDIR)FCCee/FCCeeApp.C \
 	$(OUTLIB)FCCeeRazor3D.o 
-	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -o FCCeeApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
+	$(CXX) $(CXXFLAGS) $(FASTJETFLAGS) -I$(DELPHESINCLUDEDIR) -o FCCeeApp $(OUTLIB)/*.o $(GLIBS) $(FASTJETLIBS) $ $<
 
 #################################
 
