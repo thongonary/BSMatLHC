@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
   bool displaced = false;
   bool razorhgg = false;
   bool razorhgghbb = false;
+  bool delphesFormat = false;
   double sqrts = 13000.;
 
   for (int i=1;i<argc;i++){
@@ -83,6 +84,7 @@ int main(int argc, char* argv[]) {
     }
     if (strncmp(argv[i],"--verbose",9)==0)      verbose = true;
     if (strncmp(argv[i],"--monojet",9)==0)      monojet = true;
+    if (strncmp(argv[i],"--delphes",9)==0)      delphesFormat = true;
     if (strncmp(argv[i],"--substructure",14)==0) substructure = true;
     if (strncmp(argv[i],"--darkmatter",12)==0)  darkmatter = true;
     if (strncmp(argv[i],"--displaced",11)==0)   displaced = true;
@@ -100,7 +102,8 @@ int main(int argc, char* argv[]) {
     
     // RECO Tree
     TChain *cmsChain;
-    cmsChain = new TChain("GenEvent");
+    if (delphesFormat) cmsChain = new TChain("Delphes");
+    else cmsChain = new TChain("GenEvent");
     cmsChain->Add(inputCMS);
 
     // Open Output file
@@ -149,7 +152,7 @@ int main(int argc, char* argv[]) {
     }
 
     if(razorhgg){
-      CMSRazorHgg cmsrazorhgg(cmsChain, 0., "",false);
+      CMSRazorHgg cmsrazorhgg(cmsChain, 0., "", delphesFormat);
         if(!writeOut){
             cout << "please specify output file" << endl;
             return 0;

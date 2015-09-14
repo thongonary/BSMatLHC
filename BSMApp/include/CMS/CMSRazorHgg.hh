@@ -40,5 +40,7 @@ private:
   // collision energy
   double _sqrts;
 
+  // boolean to use Delphes format
+  double _delphesFormat;
 };
 #endif

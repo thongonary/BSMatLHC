@@ -151,6 +151,7 @@ protected:
 
 private:
   bool FoundParticle(fastjet::PseudoJet p, vector<fastjet::PseudoJet> q, double dR);
+  bool _delphesFormat;
 
 };
 

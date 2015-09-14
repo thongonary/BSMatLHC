@@ -7,6 +7,7 @@ using namespace stdcomb;
 CMSReco::CMSReco(TTree *tree, bool delphesFormat) : DetectorReco(tree, delphesFormat) {
   dR = 0.5;
   cms = new CMSDetectorResponse(99999);
+  _delphesFormat = delphesFormat;
 }
 
 CMSReco::~CMSReco() {
@@ -76,46 +77,102 @@ void CMSReco::MuReco() {
 }
 
 void CMSReco::PFReco() {
-  // list of gen muons
-  for(int i=0; i<Muon; i++) {
-    fastjet::PseudoJet p(MuonPx[i], MuonPy[i], MuonPz[i], MuonE[i]);
-    if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFMuons.push_back(p);
-    p.set_user_info(new ParticleInfo(MuonPdgId[i]));
-  }
+
+  if (_delphesFormat) {    
+    // list of gmuons
+    for(int i=0; i<Muon_size; i++) {    
+      double Px = Muon_PT[i]*TMath::Cos(Muon_Phi[i]);
+      double Py = Muon_PT[i]*TMath::Sin(Muon_Phi[i]);
+      double Pz = Muon_PT[i]*TMath::SinH(Muon_Eta[i]);
+      double E = Muon_PT[i]*TMath::CosH(Muon_Eta[i]);
+      fastjet::PseudoJet p(Px, Py, Pz, E);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFMuons.push_back(p);
+      //p.set_user_info(new ParticleInfo(Muon_PID[i]));
+    }
   
-  // list of gen electrons
-  for(int i=0; i<Electron; i++) {
-    fastjet::PseudoJet p(ElectronPx[i], ElectronPy[i], ElectronPz[i], ElectronE[i]);
-    if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFElectrons.push_back(p);
-    p.set_user_info(new ParticleInfo(ElectronPdgId[i]));
-  }
-
-  // list of gen photons
-  for(int i=0; i<Photon; i++) {
-    fastjet::PseudoJet p(PhotonPx[i], PhotonPy[i], PhotonPz[i], PhotonE[i]);
-    if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFPhotons.push_back(p);
-    p.set_user_info(new ParticleInfo(PhotonPdgId[i]));
-  }
-
-  // list of gen charged/neutral hadrons
-  for(int i=0; i<Particle; i++) {
-    fastjet::PseudoJet p(ParticlePx[i], ParticlePy[i], ParticlePz[i], ParticleE[i]);
-    if(p.pt()<0.5 || fabs(p.eta()) > 3.0) continue;
-    if(abs(ParticlePdgId[i]) == 11) continue; // already included as electron
-    if(abs(ParticlePdgId[i]) == 13) continue; // already included as muon
-    if(abs(ParticlePdgId[i]) == 22) continue; // already included as photon
-    if(IsCharged(ParticlePdgId[i])) {
-      int size = _PFChHadrons.size();
-      _PFChHadrons.push_back(p);
-      _PFChHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+    // list of electrons
+    for(int i=0; i<Electron_size; i++) {    
+      double Px = Electron_PT[i]*TMath::Cos(Electron_Phi[i]);
+      double Py = Electron_PT[i]*TMath::Sin(Electron_Phi[i]);
+      double Pz = Electron_PT[i]*TMath::SinH(Electron_Eta[i]);
+      double E = Electron_PT[i]*TMath::CosH(Electron_Eta[i]);
+      fastjet::PseudoJet p(Px, Py, Pz, E);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFElectrons.push_back(p);
+      //p.set_user_info(new ParticleInfo(Electron_PID[i]));
     }
-    else {
-      int size = _PFNeuHadrons.size();
-      _PFNeuHadrons.push_back(p);
-      _PFNeuHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+
+    // list of photons
+    for(int i=0; i<Photon_size; i++) {    
+      double Px = Photon_PT[i]*TMath::Cos(Photon_Phi[i]);
+      double Py = Photon_PT[i]*TMath::Sin(Photon_Phi[i]);
+      double Pz = Photon_PT[i]*TMath::SinH(Photon_Eta[i]);
+      double E = Photon_PT[i]*TMath::CosH(Photon_Eta[i]);
+      fastjet::PseudoJet p(Px, Py, Pz, E);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFPhotons.push_back(p);
+      //p.set_user_info(new ParticleInfo(Photon_PID[i]));
     }
-  }  
-  // smear each particle category
+
+    // list of charged/neutral hadrons
+    for(int i=0; i<Particle_size; i++) {
+      fastjet::PseudoJet p(Particle_Px[i], Particle_Py[i], Particle_Pz[i], Particle_E[i]);
+      if(p.pt()<0.5 || fabs(p.eta()) > 3.0) continue;
+      if(abs(Particle_PID[i]) == 11) continue; // already included as electron
+      if(abs(Particle_PID[i]) == 13) continue; // already included as muon
+      if(abs(Particle_PID[i]) == 22) continue; // already included as photon
+      if(IsCharged(Particle_PID[i])) {
+	int size = _PFChHadrons.size();
+	_PFChHadrons.push_back(p);
+	_PFChHadrons[size].set_user_info(new ParticleInfo(Particle_PID[i]));
+      }
+      else {
+	int size = _PFNeuHadrons.size();
+	_PFNeuHadrons.push_back(p);
+	_PFNeuHadrons[size].set_user_info(new ParticleInfo(Particle_PID[i]));
+      }
+    }  
+  }
+  else {
+    // list of gen muons
+    for(int i=0; i<Muon; i++) {
+      fastjet::PseudoJet p(MuonPx[i], MuonPy[i], MuonPz[i], MuonE[i]);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFMuons.push_back(p);
+      p.set_user_info(new ParticleInfo(MuonPdgId[i]));
+    }
+  
+    // list of gen electrons
+    for(int i=0; i<Electron; i++) {
+      fastjet::PseudoJet p(ElectronPx[i], ElectronPy[i], ElectronPz[i], ElectronE[i]);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFElectrons.push_back(p);
+      p.set_user_info(new ParticleInfo(ElectronPdgId[i]));
+    }
+
+    // list of gen photons
+    for(int i=0; i<Photon; i++) {
+      fastjet::PseudoJet p(PhotonPx[i], PhotonPy[i], PhotonPz[i], PhotonE[i]);
+      if(p.pt()>0.5 && fabs(p.eta()) < 2.4) _PFPhotons.push_back(p);
+      p.set_user_info(new ParticleInfo(PhotonPdgId[i]));
+    }
+
+    // list of gen charged/neutral hadrons
+    for(int i=0; i<Particle; i++) {
+      fastjet::PseudoJet p(ParticlePx[i], ParticlePy[i], ParticlePz[i], ParticleE[i]);
+      if(p.pt()<0.5 || fabs(p.eta()) > 3.0) continue;
+      if(abs(ParticlePdgId[i]) == 11) continue; // already included as electron
+      if(abs(ParticlePdgId[i]) == 13) continue; // already included as muon
+      if(abs(ParticlePdgId[i]) == 22) continue; // already included as photon
+      if(IsCharged(ParticlePdgId[i])) {
+	int size = _PFChHadrons.size();
+	_PFChHadrons.push_back(p);
+	_PFChHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+      }
+      else {
+	int size = _PFNeuHadrons.size();
+	_PFNeuHadrons.push_back(p);
+	_PFNeuHadrons[size].set_user_info(new ParticleInfo(ParticlePdgId[i]));
+      }
+    }
+    // smear each particle category
+  }
 
 }
 

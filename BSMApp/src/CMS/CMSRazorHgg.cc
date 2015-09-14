@@ -18,6 +18,7 @@ CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphes
   _Lumi = Lumi;
   _statTools = new StatTools(-99);
   _analysis = analysis;
+  _delphesFormat = delphesFormat;
 }
 
 CMSRazorHgg::~CMSRazorHgg(){
@@ -30,7 +31,8 @@ void CMSRazorHgg::SetSqrts(double sqrts) {
 // loop over events - real analysis
 void CMSRazorHgg::Loop(string outFileName) {
   srand(time(0)); 
-  if(DetectorBase::fChain == 0) return;
+  if( _delphesFormat && DelphesTree::fChain == 0) return;
+  if (!_delphesFormat && DetectorBase::fChain == 0) return;
   
   cout << "starting Loop" << endl;
 
@@ -123,7 +125,9 @@ void CMSRazorHgg::Loop(string outFileName) {
   cout << "getting number of entries" << endl;
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
-  Long64_t nentries = DetectorBase::fChain->GetEntries();
+  Long64_t nentries = 0;
+  if (_delphesFormat) nentries = DelphesTree::fChain->GetEntries();
+  else nentries = DetectorBase::fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
 
   // set the by-event weight
@@ -135,9 +139,16 @@ void CMSRazorHgg::Loop(string outFileName) {
     CleanEvent();
 
     // get new event
-    Long64_t ientry = DetectorBase::LoadTree(jentry);
-    if (ientry < 0) break;
-    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
+    if (_delphesFormat) {
+      Long64_t ientry = DelphesTree::LoadTree(jentry);      
+      if (ientry < 0) break;
+      nb = DelphesTree::fChain->GetEntry(jentry); nbytes += nb;
+    }
+    else {
+      Long64_t ientry = DetectorBase::LoadTree(jentry);
+      nb = DetectorBase::fChain->GetEntry(jentry); nbytes += nb;
+    }
+    
     if (jentry%1 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     //reset jet variables
@@ -173,29 +184,47 @@ void CMSRazorHgg::Loop(string outFileName) {
     TLorentzVector LSP2;
 
     // THIS PART SAVES SBOTTOM + LSP INFORMATION
-
-    cout << "SUSY: " << SUSY << " GenTreeParticle: " << GenTreeParticle <<  endl;
-    for(int iSUSY = 0; iSUSY < SUSY; iSUSY++){
-      //cout << "SUSYId: " << SUSYPdgId[iSUSY] << endl;
-      //cout << "SUSYD1Id: " << SUSYD1PdgId[iSUSY] << endl;
-      if (fabs(SUSYPdgId[iSUSY])==1000005 && (SUSYD1PdgId[iSUSY]==1000023 || SUSYD1PdgId[iSUSY]==1000022)) {
-	numSbottoms++;
-	if (numSbottoms == 1){
-	  sbottomvector1.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
-	  //	  cout << "Px1: " << sbottomvector1.Px() << endl;
+    if (_delphesFormat) {      
+      for(int iParticle = 0; iParticle < Particle_size; iParticle++){
+	if (fabs(Particle_PID[iParticle])==1000005) {
+	  numSbottoms++;
+	  if (numSbottoms == 1){
+	    sbottomvector1.SetPxPyPzE(Particle_Px[iParticle], Particle_Py[iParticle], Particle_Pz[iParticle], Particle_E[iParticle]);
+	  }
+	  else{
+	    sbottomvector2.SetPxPyPzE(Particle_Px[iParticle], Particle_Py[iParticle], Particle_Pz[iParticle], Particle_E[iParticle]);
+	  }
 	}
-	else{
-	  sbottomvector2.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
-	  //          cout << "Px2: " << sbottomvector2.Px() << endl;
+	if (fabs(Particle_PID[iParticle])==1000022) {
+	  numLSP++;
+	  if (numLSP == 1){
+	    LSP1.SetPxPyPzE(Particle_Px[iParticle], Particle_Py[iParticle], Particle_Pz[iParticle], Particle_E[iParticle]);
+	  }
+	  else{
+	    LSP2.SetPxPyPzE(Particle_Px[iParticle], Particle_Py[iParticle], Particle_Pz[iParticle], Particle_E[iParticle]);
+	  }
 	}
       }
-      if (fabs(SUSYPdgId[iSUSY])==1000022) {
-	numLSP++;
-	if (numLSP == 1){
-	  LSP1.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+    }
+    else {
+      for(int iSUSY = 0; iSUSY < SUSY; iSUSY++){
+	if (fabs(SUSYPdgId[iSUSY])==1000005 && (SUSYD1PdgId[iSUSY]==1000023 || SUSYD1PdgId[iSUSY]==1000022)) {
+	  numSbottoms++;
+	  if (numSbottoms == 1){
+	    sbottomvector1.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+	  }
+	  else{
+	    sbottomvector2.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+	  }
 	}
-	else{
-	  LSP2.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+	if (fabs(SUSYPdgId[iSUSY])==1000022) {
+	  numLSP++;
+	  if (numLSP == 1){
+	    LSP1.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+	  }
+	  else{
+	    LSP2.SetPxPyPzE(SUSYPx[iSUSY], SUSYPy[iSUSY], SUSYPz[iSUSY], SUSYE[iSUSY]);
+	  }
 	}
       }
     }
@@ -210,7 +239,6 @@ void CMSRazorHgg::Loop(string outFileName) {
     TLorentzVector LSPs = LSP1 + LSP2;
     neutMET = LSPs.Pt();
 
-
     TLorentzVector sbottoms = sbottomvector1 + sbottomvector2;
     sbottomPt[0] = sbottomvector1.Pt();
     sbottomPt[1] = sbottomvector2.Pt();
@@ -220,18 +248,8 @@ void CMSRazorHgg::Loop(string outFileName) {
     sbottomPhi[1] = sbottomvector2.Phi();
     pthat = sbottoms.Pt();
 
-    //    cout << "pthat: " << pthat << endl;
-
-    // Build the event at generator level
+    // Build the event 
     PFReco();
-    vector<fastjet::PseudoJet> empty;
-    vector<fastjet::PseudoJet> JetsConst = PFJetConstituents(empty,empty,empty); //note that this I think includes photons
-
-    // alternative might be 
-    /*for(int iPhot = 0; iPhot < _PFPhotons.size(); iPhot++){
-      vector<fastjet::PseudoJet> JetsConst = PFJetConstituents(_PFPhotons[iPhot],empty,empty);
-      }*/
-    // if you do this you need to adjust how numJets is defined (add 2 if there are two higgs found)
 
     //Photons 
     double bestSumPt = -1;
@@ -248,7 +266,6 @@ void CMSRazorHgg::Loop(string outFileName) {
     //loop over all pairs of gen photons and find the pair closest to Higgs mass
     for(int iPhot = 0; iPhot < _PFPhotons.size(); iPhot++){
       if(_PFPhotons[iPhot].pt() < 25) continue; //only count photons that are > 25 GeV
-      //    cout<< "found a photon" <<endl;
       numPhotons++;
       if(_PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
       for(int jPhot = 0; jPhot < _PFPhotons.size(); jPhot++){
@@ -318,13 +335,26 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsMass = bestDiphoton.m();
 
     // AK5 jets
-    fastjet::JetDefinition AK05_def(fastjet::antikt_algorithm, 0.5);
-    fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
-    vector<fastjet::PseudoJet> pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
-    std::cout << "--> pass ak5" << std::endl;
+    
+    vector<fastjet::PseudoJet> pfAK05;
+    if (_delphesFormat) {
+      fastjet::PseudoJet v;
+      for (int iJet = 0; iJet<Jet_size; iJet++){
+	TLorentzVector v;
+	v.SetPtEtaPhiM(Jet_PT[iJet],Jet_Eta[iJet],Jet_Phi[iJet],Jet_Mass[iJet]);
+	if (v.Pt()>30. && v.Eta()<3.) pfAK05.push_back(fastjet::PseudoJet(v.Px(), v.Py(), v.Pz(), v.E()));
+      }
+    }
+    else {
+      vector<fastjet::PseudoJet> empty;
+      vector<fastjet::PseudoJet> JetsConst = PFJetConstituents(empty,empty,empty); //note that this I think includes photons
+      fastjet::JetDefinition AK05_def(fastjet::antikt_algorithm, 0.5);
+      fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
+      pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
+    }
     if(pfAK05.size()<1){
-        cout << "No jets..." << endl;
-	       continue;
+      cout << "No jets..." << endl;
+      continue;
     }
 
     vector<fastjet::PseudoJet> jetsForHemispheres;
