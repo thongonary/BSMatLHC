@@ -6,7 +6,7 @@
 DetectorReco::DetectorReco(TTree *tree) { 
 
   verbose = false;  
-  Init(tree);
+  DetectorBase::Init(tree);
 
   // Initialize the random seed
   int jobpid = getpid();

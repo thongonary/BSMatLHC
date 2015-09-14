@@ -32,7 +32,7 @@ void CMSRazorHggHbb::SetSqrts(double sqrts) {
 // loop over events - real analysis
 void CMSRazorHggHbb::Loop(string outFileName) {
   srand(time(0)); 
-  if(fChain == 0) return;
+  if(DetectorBase::fChain == 0) return;
 
   double MR, RSQ;
 
@@ -120,7 +120,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
 
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
-  Long64_t nentries = fChain->GetEntries();
+  Long64_t nentries = DetectorBase::fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
 
   // set the by-event weight
@@ -132,9 +132,9 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     CleanEvent();
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+    Long64_t ientry = DetectorBase::LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     //reset jet variables
@@ -305,14 +305,14 @@ void CMSRazorHggHbb::Loop(string outFileName) {
       bestDiphoton = _PFPhotons[bestPhotIndex1] + _PFPhotons[bestPhotIndex2];
       if(bestDiphoton.pt() < 20 || fabs(_PFPhotons[bestPhotIndex1].eta()) > 1.44 || fabs(_PFPhotons[bestPhotIndex2].eta()) > 1.44){
         cout << "Diphoton system has pT too small or one of the photons is not in ECAL barrel" << endl; 
-	       continue;
+	continue;
       }
     }
     else { //pair #2 is diphoton
       bestDiphoton = _PFPhotons[secondBestPhotIndex1] + _PFPhotons[secondBestPhotIndex2];
       if(bestDiphoton.pt() < 20 || fabs(_PFPhotons[secondBestPhotIndex1].eta()) > 1.44 || fabs(_PFPhotons[secondBestPhotIndex2].eta()) > 1.44){
         cout << "Diphoton system has pT too small or one of the photons is not in ECAL barrel" << endl; 
-	        continue;
+	continue;
       }
     }
 
@@ -393,6 +393,7 @@ void CMSRazorHggHbb::Loop(string outFileName) {
     double thisDRB = -1;
     double thisDRB2 = -1;
     if (twoHiggs){
+      cout << "found two Higgs, doing something weird" << endl;
       thisDRB = min(bjet1.delta_R(pho1), bjet1.delta_R(pho2));
       thisDRB2 = min(bjet2.delta_R(pho1), bjet2.delta_R(pho2));
       double bjetEff = ((double)rand()/(RAND_MAX)); 

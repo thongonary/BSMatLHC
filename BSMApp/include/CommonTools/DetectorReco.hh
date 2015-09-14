@@ -39,6 +39,8 @@
 
 // DetectorRecoApp includes
 #include "DetectorBase.hh"
+#include "DelphesTree.hh"
+
 
 using namespace std;
 using namespace stdcomb;
@@ -47,7 +49,7 @@ using namespace stdcomb;
 /// functionality useful for any analysis of DetectorReco+jets events.
 /// It derives from DetectorBase.
 /// More specialized analysis classes should derive from DetectorReco.
-class DetectorReco : public DetectorBase {
+class DetectorReco : public DelphesTree, public DetectorBase {
 
 public:
 

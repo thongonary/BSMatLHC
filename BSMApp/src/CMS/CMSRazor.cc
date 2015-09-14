@@ -33,7 +33,7 @@ void CMSRazor::SetSqrts(double sqrts) {
 // loop over events - real analysis
 void CMSRazor::Loop(string outFileName) {
   
-  if(fChain == 0) return;
+  if(DetectorBase::fChain == 0) return;
   
   // saving info about the PFAK04 jets
   int pflen = 100;
@@ -346,7 +346,7 @@ void CMSRazor::Loop(string outFileName) {
   
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
-  Long64_t nentries = fChain->GetEntries();
+  Long64_t nentries = DetectorBase::fChain->GetEntries();
   std::cout << "Number of entries = " << nentries << std::endl;
   
   // set the by-event weight
@@ -363,9 +363,9 @@ void CMSRazor::Loop(string outFileName) {
     //cout << "------" << event_counter << "------" << endl;
 
     // get new event
-    Long64_t ientry = LoadTree(jentry);
+    Long64_t ientry = DetectorBase::LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);   nbytes += nb;
+    nb = DetectorBase::fChain->GetEntry(jentry);   nbytes += nb;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     //reset jet variables
