@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
 
   // Interface for conversion from Pythia8::Event to HepMC one. 
   HepMC::Pythia8ToHepMC ToHepMC;
+  
+
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
   ToHepMC.set_free_parton_warnings(false);
@@ -46,6 +48,11 @@ int main(int argc, char* argv[]) {
   std::string cfg = argv[1];
   std::string outfilename = argv[2];
   
+  // Specify file where HepMC events will be stored.
+  char hepmcname[256];
+  sprintf(hepmcname,"%s.hepmc", outfilename.c_str());  
+  HepMC::IO_GenEvent ascii_io(hepmcname, std::ios::out);
+  
   // Generator. 
   Pythia pythia;
 
@@ -54,7 +61,7 @@ int main(int argc, char* argv[]) {
   
   // Initialize Les Houches Event File run. List initialization information.
   LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
-
+  
   // Open a file on which LHEF events should be stored, and write header.  
   char lhename[256];
   sprintf(lhename,"%s.lhe", outfilename.c_str());
@@ -186,6 +193,9 @@ int main(int argc, char* argv[]) {
     susyFiller->ClearEvent();
     gentreeparticleFiller->ClearEvent();
     particleFiller->ClearEvent();
+
+    // Write the HepMC event to file. Done with it.
+    ascii_io << hepmcevt;
     delete hepmcevt;
     
     // Store event info in the LHAup object.

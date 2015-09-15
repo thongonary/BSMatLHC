@@ -58,6 +58,11 @@ int main(int argc, char* argv[]) {
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
   ToHepMC.set_free_parton_warnings(false);
+   
+  // Specify file where HepMC events will be stored.
+  char hepmcname[256];
+  sprintf(hepmcname,"%s.hepmc", outfilename.c_str());  
+  HepMC::IO_GenEvent ascii_io(hepmcname, std::ios::out);
 
   // Generator. 
   Pythia pythia;
@@ -171,6 +176,10 @@ int main(int argc, char* argv[]) {
     susyFiller->ClearEvent();
     bsmFiller->ClearEvent();
     particleFiller->ClearEvent();
+
+    
+    // Write the HepMC event to file. Done with it.
+    ascii_io << hepmcevt;
     delete hepmcevt;
     
     // Store event info in the LHAup object.
