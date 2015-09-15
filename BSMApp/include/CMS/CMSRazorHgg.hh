@@ -34,12 +34,14 @@ public:
   void SetSqrts(double sqrts);
   double DeltaPhi(TLorentzVector jet1, TLorentzVector jet2);
 private:
+  
+  /// Return the posterior distribution for the inclusive xsec,
+  /// given a pdf and efficiency for one of the boxes;
+  TH1D* XsecProb(TH2D* sigPdf, double eff, TString Filename, int ibin, double xmin, double xmax);
   /// Luminosity
   double _Lumi;
-
   // collision energy
   double _sqrts;
-
   // boolean to use Delphes format
   double _delphesFormat;
 };

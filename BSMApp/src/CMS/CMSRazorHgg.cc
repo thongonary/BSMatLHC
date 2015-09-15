@@ -122,6 +122,14 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("lspPhi", &lspPhi, "lspPhi[2]/D");
   outTree->Branch("pthat", &pthat, "pthat/D");
 
+  
+  double xedge[9] = {0, 100, 200, 300, 400, 500, 700, 1000, 2500};
+  double yedge[7] = {0,0.10,0.20,0.30,0.40,0.50,1.0};
+  TH2D* pdfHighPt = new TH2D("pdfHighPt","pdfHighPt",9,xedge,7,yedge);
+  TH2D* pdfHbb = new TH2D("pdfHbb","pdfHbb",9,xedge,7,yedge);
+  TH2D* pdfHighRes = new TH2D("pdfHighRes","pdfHighRes",9,xedge,7,yedge);
+
+
   cout << "getting number of entries" << endl;
   // loop over entries
   Long64_t nbytes = 0, nb = 0;
@@ -263,57 +271,45 @@ void CMSRazorHgg::Loop(string outFileName) {
     double secondBestMass = -1; 
     numBox = -1;
 
-    //loop over all pairs of gen photons and find the pair closest to Higgs mass
+    //loop over all pairs of gen photons and find the pair with largest scalar sum Pt
     for(int iPhot = 0; iPhot < _PFPhotons.size(); iPhot++){
-      if(_PFPhotons[iPhot].pt() < 25) continue; //only count photons that are > 25 GeV
+      if(_PFPhotons[iPhot].pt() < 25 && abs(_PFPhotons[iPhot].eta()) > 1.44) continue; //only count photons that have pt > 25 GeV, eta <1 .44
       numPhotons++;
-      if(_PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
-      for(int jPhot = 0; jPhot < _PFPhotons.size(); jPhot++){
-	if(iPhot == jPhot) continue;
-	//if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.44) continue;
+      for(int jPhot = iPhot+1; jPhot < _PFPhotons.size(); jPhot++){
+	if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.44) continue; //only count photons that have pt > 25 GeV, eta <1 .44
+	if(_PFPhotons[jPhot].pt() < 40 && _PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
 	fastjet::PseudoJet higgsCandidate = _PFPhotons[iPhot] + _PFPhotons[jPhot];
+	if (higgsCandidate.pt() < 20) continue; //higgs candidate at least 20 GeV
 	//check if this pair is in the correct mass range
 	if(higgsCandidate.m() > 100){
 	  cout << "Checking!" << endl;
 	  numHiggs++;
 	  if(_PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt() > bestSumPt){
 	    cout << "Made it!" << endl;
-	    secondBestMass = bestMass;
-	    secondBestSumPt = bestSumPt;
-	    secondBestPhotIndex1 = bestPhotIndex1;
-	    secondBestPhotIndex2 = bestPhotIndex2;
+	    //secondBestMass = bestMass;
+	    //secondBestSumPt = bestSumPt;
+	    //secondBestPhotIndex1 = bestPhotIndex1;
+	    //secondBestPhotIndex2 = bestPhotIndex2;
 	    bestMass = higgsCandidate.m();
 	    bestSumPt = _PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt();
-	    bestPhotIndex1 = iPhot;
-	    bestPhotIndex2 = jPhot;
+	    if (_PFPhotons[iPhot].pt() > _PFPhotons[jPhot].pt()){	      
+	      bestPhotIndex1 = iPhot;
+	      bestPhotIndex2 = jPhot;
+	    }
+	    else {       
+	      bestPhotIndex1 = jPhot;
+	      bestPhotIndex2 = iPhot;
+	    }
 	  }
 	}
       }
     }
 
-    bool firstPhot = true; //bool is true if there is only one photon or if the first diphoton pair is set as diphotons, if False we set first diphoton pair to be a "bb"
-    bool twoHiggs = false;
-    if (bestPhotIndex1 == -1){
-      //      cout << "Didn't find a higgs candidate" << endl;
-            continue; ///continue if we didn't find a higgs candidate
-    }
+    if (numHiggs<1) continue;
     cout << "Found higgs candidate!!!!" << endl;
 
     fastjet::PseudoJet bestDiphoton;
-    if (firstPhot){ //pair#1 is diphoton
-      bestDiphoton = _PFPhotons[bestPhotIndex1] + _PFPhotons[bestPhotIndex2];
-      if(bestDiphoton.pt() < 20 || fabs(_PFPhotons[bestPhotIndex1].eta()) > 1.44 || fabs(_PFPhotons[bestPhotIndex2].eta()) > 1.44){
-        cout << "Diphoton system has pT too small or one of the photons is not in ECAL barrel" << endl; 
-	continue;
-      }
-    }
-    else { //pair #2 is diphoton
-      bestDiphoton = _PFPhotons[secondBestPhotIndex1] + _PFPhotons[secondBestPhotIndex2];
-      if(bestDiphoton.pt() < 20 || fabs(_PFPhotons[secondBestPhotIndex1].eta()) > 1.44 || fabs(_PFPhotons[secondBestPhotIndex2].eta()) > 1.44){
-        cout << "Diphoton system has pT too small or one of the photons is not in ECAL barrel" << endl; 
-	continue;
-      }
-    }
+    bestDiphoton = _PFPhotons[bestPhotIndex1] + _PFPhotons[bestPhotIndex2];
 
     std::cout << "-->pass1" << std::endl;
     //fill photon and bjet variables
@@ -360,6 +356,8 @@ void CMSRazorHgg::Loop(string outFileName) {
     vector<fastjet::PseudoJet> jetsForHemispheres;
     fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
     fastjet::PseudoJet pho2(pho2Pt*cos(pho2Phi), pho2Pt*sin(pho2Phi), pho2Pt*sinh(pho2Eta), pho2Pt*cosh(pho2Eta));
+
+    
     
     fastjet::PseudoJet bjet1(bjet1Pt*cos(bjet1Phi), bjet1Pt*sin(bjet1Phi), bjet1Pt*sinh(bjet1Eta), bjet1Pt*cosh(bjet1Eta));
     fastjet::PseudoJet bjet2(bjet2Pt*cos(bjet2Phi), bjet2Pt*sin(bjet2Phi), bjet2Pt*sinh(bjet2Eta), bjet2Pt*cosh(bjet2Eta));
@@ -372,84 +370,21 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsvector.SetPtEtaPhiE(higgsPt, higgsEta, higgsPhi, higgsEnergy);
       
     jetsForHemispheres.push_back(higgs);
-    std::cout << "--> pass hem" << std::endl;
-    bool useHbb1 = false; //this says whether or not bjets are recognized
-    bool useHbb2 = false;
-    double thisDRB = -1;
-    double thisDRB2 = -1;
-    if (twoHiggs){
-      cout << "found two Higgs, doing something weird" << endl;
-      thisDRB = min(bjet1.delta_R(pho1), bjet1.delta_R(pho2));
-      thisDRB2 = min(bjet2.delta_R(pho1), bjet2.delta_R(pho2));
-      double bjetEff = ((double)rand()/(RAND_MAX)); 
-      double bjetBR = ((double)rand()/(RAND_MAX));
-      cout << "Random Number 2: " << bjetEff << endl;
-      if (thisDRB > 0.5 && bjetEff < 0.6 && (bjetBR < 0.578)){ //this applies a rough medium b-jet efficiency cut
-	  numBJets++;
-	  useHbb1 = true;
-      }
-      bjetEff = ((double)rand()/(RAND_MAX));
-      bjetBR = ((double)rand()/(RAND_MAX));	
-      cout << "Random Number 3: " << bjetEff<< bjetBR << endl;
-      if (thisDRB2 > 0.5 && bjetEff < 0.6 && (bjetBR < 0.578)){
-	numBJets++;
-	useHbb2 = true;
-      }
-    }
 
-    double bJetEffList[pfAK05.size()];
-    for(int i =0; i < pfAK05.size(); i++){
-      bJetEffList[i] = ((double)rand()/(RAND_MAX));
-    }
 
     for(int i = 0; i < pfAK05.size(); i++){
       //check if within DR < 0.5 of a selected photon
       double thisDR = min(pfAK05[i].delta_R(pho1), pfAK05[i].delta_R(pho2));
       if(thisDR < 0.5) continue;
-      numJets++; //this includes the two photons that I set as fake b-jets, so should return correct number of jets
-      //check if bjet
-      if(IsBJet(pfAK05[i],0.5,30) && bJetEffList[i] < 0.6) {
-	numBJets++;
-	if (useHbb1){ //pair up the Hbbs with the other jets
-	  double massTempB = (pfAK05[i] + bjet1).m();
-	  if (numBox <0 && massTempB > 110 && massTempB < 140){
-	    numBox = 1;
-	  }
-	}
-	if (useHbb2){
-	  double massTempB2 = (pfAK05[i] + bjet2).m();
-	  if (numBox <0 && massTempB2 > 110 && massTempB2 < 140){
-	    numBox = 1;
-	  }
-	}
-	for(int j = 0; j < pfAK05.size(); j++){ //check if in Hbb box
-	  double thisDR2 = min(pfAK05[j].delta_R(pho1), pfAK05[j].delta_R(pho2));
-	  if (i==j || (thisDR2 < 0.5)) continue;
-	  if(!IsBJet(pfAK05[j],0.5,30) && bJetEffList[j] > 0.6) continue;
-	  double massTemp = (pfAK05[i] + pfAK05[j]).m();
-	  if (numBox !=0 && massTemp > 110 && massTemp < 140){
-	    numBox = 1;
-	  }
-	  /*if (numBox <0 && massTemp > 76 && massTemp < 106){
-	    numBox = 2; //comment out later, this is for Zbb box
-	    }*/
-	}
-      }
+      numJets++; 
       jetPt[i] = pfAK05[i].pt();
       jetEta[i] = pfAK05[i].eta();
       jetPhi[i] = pfAK05[i].phi();
       jetsForHemispheres.push_back(pfAK05[i]);
     }
 
-    if (firstPhot && useHbb1 && useHbb2){ 
-      if (secondBestMass > 110 && secondBestMass < 140 && numBox<0){
-	numBox = 1;
-      }
-    }
-    else if (useHbb1 && useHbb2){
-      if (bestMass > 110 && bestMass < 140 && numBox < 0){
-	numBox = 1;
-      }
+    if (false){
+      numBox = 1;
     }
 
     if (numJets == 0){
@@ -496,50 +431,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	count2++;
       }
     }
-    int j = 0;
-    std::cout << "pass SAVE" << std::endl;
-    /*
-    while (Temporary[j] > -1) {
-      cout << "What'S going on: "<< Temporary[j] << endl;
-      if (Temporary[j]==0 && count1==1) {
-	// higgs only
-	leadingHemContents = 0;
-	break;
-      }
-      else if (Temporary[j]==0 && count1>1) {
-	// higgs + jets
-	leadingHemContents = 2;
-	break;
-      }
-      else {
-	leadingHemContents = 1;
-      }
-      j++;
-    }
-    */
-    j = 0;
-    std::cout << "pass SAVE 1" << std::endl;
-    /*
-    while (Temporary2[j] > -1){
-      if (Temporary2[j]==0 && count2==1) {
-	// higgs only
-	cout << "entered this" << endl;
-	subleadingHemContents = 0;
-	break;
-      }
-      else if (Temporary2[j]==0 && count2>1) {
-	// higgs + jets
-	subleadingHemContents = 2;
-	cout << "entered this" << endl;
-	break;
-      }
-      else {
-	subleadingHemContents = 1;
-      }
-      j++;
-    }
-    */
-    std::cout << "before delete Hem" << std::endl;
+    
     delete myHem;
 
     std::cout << "delete Hem" << std::endl;
@@ -556,14 +448,51 @@ void CMSRazorHgg::Loop(string outFileName) {
     // write event in the tree
     outTree->Fill();
 
+    
+    // fill PDF histograms
+    if(numBox == 0) pdfHighPt->Fill(MR, RSQ);
+    if(numBox == 1) pdfHbb->Fill(MR, RSQ);
+    if(numBox == 2) pdfHighRes->Fill(MR, RSQ);
+    
   }
 
   // full event TTree
   outTree->Write();
-  
-  file->cd();
 
+  
+  // eff TTree
+  double effHighPt = pdfHighPt->Integral()/double(nentries);
+  double effHbb = pdfHbb->Integral()/double(nentries);
+  double effHighRes = pdfHighRes->Integral()/double(nentries);
+  
+  // normalize the PDFs
+  if(pdfHighPt->Integral()>0)  pdfHighPt->Scale(1./pdfHighPt->Integral());
+  if(pdfHbb->Integral()>0)  pdfHbb->Scale(1./pdfHbb->Integral());
+  if(pdfHighRes->Integral()>0)  pdfHighRes->Scale(1./pdfHighRes->Integral());
+  
+  // write the PDFs
+  pdfHighPt->Write();  
+  pdfHbb->Write();
+  pdfHighRes->Write();
+
+  char name[256];
+  sprintf(name,"data/%s.root", _analysis.c_str());
+  //  TH1D* xsecProb = XsecProb(pdfHad, effHighRes,name, 1000, 0., 1.);
+  // Open Output file again 
+  file->cd();
+  double xsecULHighRes = 0.;//_statTools->FindUL(xsecProb, 0.95, 1.);
+  
+  TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
+  effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
+  effTree->Branch("effHbb", &effHbb, "effHbb/D");
+  effTree->Branch("effHighRes", &effHighRes, "effHighRes/D");
+  effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
+  effTree->Fill();
+  effTree->Write();
+  
+  //  xsecProb->Write();
   file->Close();
+  
 
 
 }
@@ -576,3 +505,34 @@ double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
 }
 
 
+TH1D* CMSRazorHgg::XsecProb(TH2D* sigPdf, double eff, TString Filename, int ibin, double xmin, double xmax) {
+  
+  int ibinX = sigPdf->GetXaxis()->GetNbins();
+  int ibinY = sigPdf->GetYaxis()->GetNbins();
+  
+  TH1D* probVec = new TH1D("probVec", "probVec", ibin, xmin, xmax);
+  
+  TFile* likFile = new TFile(Filename);  
+  gROOT->cd();
+  // a loop over xsec should go here... 
+  for(int i=0; i<ibin; i++) {
+    double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
+    double prob = 1;
+    for(int ix=0; ix<ibinX; ix++) {
+      for(int iy=0; iy<ibinY; iy++) {
+	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix,iy);
+	if(sBin <= 0.) continue;
+	char name[256];
+	sprintf(name, "lik_%i_%i", ix, iy);
+	TH1D* binProb = (TH1D*) likFile->Get(name);
+	if(prob < 10.e-30) prob = 0.;
+	if(prob <= 0) continue;
+	prob *= binProb->GetBinContent(binProb->FindBin(sBin));
+	delete binProb;
+      }
+    }
+    probVec->SetBinContent(i+1,prob);
+  }
+  likFile->Close();
+  return probVec;
+}
