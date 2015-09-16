@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
   for (int iEvent = 0; ; ++iEvent) {
     
     if (iFilteredEvent >= nEvent) break;
-    nUnfilteredEvent++;
+
     
     if (nShow > 0 && iEvent%nPace == 0)      
     //cout << " Now begin event " << iEvent << endl;
@@ -143,7 +143,9 @@ int main(int argc, char* argv[]) {
       cout << " Event generation aborted prematurely, owing to error!\n"; 
       break;
     }
-    
+
+    nUnfilteredEvent++;    
+
     // Find final state photons
     filter.filter( pythia.event);
     
@@ -153,7 +155,7 @@ int main(int argc, char* argv[]) {
       continue;
     }
     
-    iFilteredEvent +=1;
+    iFilteredEvent++;
 			
 			 
     // List first few events.
