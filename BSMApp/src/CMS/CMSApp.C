@@ -51,6 +51,7 @@ int main(int argc, char* argv[]) {
     cout << "--displaced     Run DSisplaced Jet Analysis" << endl;
     cout << "-sqrts          sqrts of collisions" << endl;
     cout << "-Output         Name of the output file (none created if not specified)" << endl;
+    cout << "--delphes       Sets input tree structure to be Delphes" << endl;
     return 1;
   }
 
@@ -151,69 +152,71 @@ int main(int argc, char* argv[]) {
         cmssusyvars.Loop(outFileName);
     }
 
-    if(razorhgg){
-      CMSRazorHgg cmsrazorhgg(cmsChain, 19800., "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
-      if(!writeOut){
-            cout << "please specify output file" << endl;
-            return 0;
-        }
-        if(verbose) cmsrazorhgg.SetVerbose(true);
-        cmsrazorhgg.SetSqrts(sqrts);
-        cmsrazorhgg.Loop(outFileName);
-    }
-
+    if(razorhgg)
+      {
+	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
+	if(!writeOut){
+	  cout << "please specify output file" << endl;
+	  return 0;
+	}
+	if(verbose) cmsrazorhgg->SetVerbose(true);
+	cmsrazorhgg->SetSqrts(sqrts);
+	cmsrazorhgg->Loop(outFileName);
+	//delete cmsrazorhgg;
+      }
+    
     if(razorhgghbb){
-        CMSRazorHggHbb cmsrazorhgghbb(cmsChain, 0., "");
-        if(!writeOut){
-            cout << "please specify output file" << endl;
-            return 0;
-        }
-        if(verbose) cmsrazorhgghbb.SetVerbose(true);
-        cmsrazorhgghbb.SetSqrts(sqrts);
-        cmsrazorhgghbb.Loop(outFileName);
+      CMSRazorHggHbb cmsrazorhgghbb(cmsChain, 0., "");
+      if(!writeOut){
+	cout << "please specify output file" << endl;
+	return 0;
+      }
+      if(verbose) cmsrazorhgghbb.SetVerbose(true);
+      cmsrazorhgghbb.SetSqrts(sqrts);
+      cmsrazorhgghbb.Loop(outFileName);
     }
-
+    
     /*    
     // EXO-11-059: MonoJet analysis
     if(monojet) {
-      CMSMonoJet cmsMonoJet(cmsChain, inputCMS, 4980., "CMSmonojet_EXO_11_059");
-      if(verbose) cmsMonoJet.SetVerbose(true);
-      cmsMonoJet.Loop();
+    CMSMonoJet cmsMonoJet(cmsChain, inputCMS, 4980., "CMSmonojet_EXO_11_059");
+    if(verbose) cmsMonoJet.SetVerbose(true);
+    cmsMonoJet.Loop();
     }
-
+    
     // SUS-11-020: SUSY Dilep SS + Btag
     if(ssdilepbtag) {
       CMSSSDilepBtag cmsSSDilepBtag(cmsChain, inputCMS, 4980., "CMSSSDilepBTag_SUS_11_020");
       if(verbose) cmsSSDilepBtag.SetVerbose(true);
       cmsSSDilepBtag.Loop();
-    }
-
-    // Displaced search
-    if(displaced) {
+      }
+      
+      // Displaced search
+      if(displaced) {
       CMSDisplacedJet cmsDisplacedJet(cmsChain);
       if(!writeOut) {
-	cout << "please specify output file" << endl;
-	return 0;
+      cout << "please specify output file" << endl;
+      return 0;
       }
       cmsDisplacedJet.Loop(outFileName);
-    }
-*/
-
+      }
+    */
+    
     // Dark Matter future studies
     if(darkmatter) {
       CMSDarkMatter cmsDarkMatter(cmsChain, inputCMS, 4980., "CMSmonojet_EXO_11_059");
       if(verbose) cmsDarkMatter.SetVerbose(true);
       cmsDarkMatter.Loop(outFileName);
     }
-
+    
     // Dark Matter future studies
     if(substructure) {
       CMSSubstructure cmsSubstructure(cmsChain, inputCMS, 4980., "CMSsubstructure");
       if(verbose) cmsSubstructure.SetVerbose(true);
       cmsSubstructure.Loop(outFileName);
     }
-
+    
   }
-  
+
   return 0;
 }
