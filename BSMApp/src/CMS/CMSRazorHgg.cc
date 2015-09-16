@@ -1,7 +1,7 @@
 //-------------------------------------------------------
 // Description:
 // Runs Hgg analysis
-// Authors: Duarte and Pena
+// Authors: Duarte, Pena and Wang
 //-------------------------------------------------------
 
 
@@ -25,6 +25,7 @@ CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphes
 }
 
 CMSRazorHgg::~CMSRazorHgg(){
+  std::cout << "CMSRazorHgg destructor" << std::endl;
 }
 
 void CMSRazorHgg::SetSqrts(double sqrts) {
@@ -159,7 +160,7 @@ void CMSRazorHgg::Loop(string outFileName) {
       nb = DetectorBase::fChain->GetEntry(jentry); nbytes += nb;
     }
     
-    if (jentry%1 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+    if (jentry%100 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     //reset jet variables
     numJets = 0;
@@ -288,7 +289,7 @@ void CMSRazorHgg::Loop(string outFileName) {
       }
     
     //---------------------------------------
-    //find the "best" photon pair, higher Pt!
+    //find the "best" photon pair, highest Pt!
     //---------------------------------------
     TLorentzVector HiggsCandidate(0,0,0,0);
     double bestSumPt = -99.;
@@ -301,8 +302,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	    TLorentzVector pho2 = phoCand[j];
 	    if ( _debug )
 	      {
-		std::cout << "[DEBUG]: pho1-> " << pho1.Pt()
-			  << " [DEBUG]: pho2->" << pho2.Pt() 
+		std::cout << "[DEBUG]: pho1-> " << pho1.Pt() << " [DEBUG]: pho2->" << pho2.Pt() 
 			  << std::endl;
 	      }
 	    //need one photon in the pair to have pt > 40 GeV
@@ -313,19 +313,18 @@ void CMSRazorHgg::Loop(string outFileName) {
 	      }
 	    //need diphoton mass between > 50 GeV, cut offline
 	    double diphotonMass = (pho1 + pho2).M();
-	    if ( _debug )
-	      {
-		std::cout << "[DEBUG] Diphoton Sum pT: " << pho1.Pt() + pho2.Pt() << std::endl;
-	      }
-	    
 	    if( diphotonMass < 50 )
 	      {
 		if ( _debug ) std::cout << "[DEBUG]: Diphoton mass < 100 GeV: mgg->" << diphotonMass << std::endl;
 		if ( _debug ) std::cout << "... pho1Pt: " << pho1.Pt()  << " pho2Pt: " << pho2.Pt()  << std::endl;
 		continue;
 	      }
-	    
-	    //if the sum of the photon pT's is larger than that of the current Higgs candidate, make this the Higgs candidate
+
+	    if ( _debug )
+	      {
+		std::cout << "[DEBUG] Diphoton Sum pT: " << pho1.Pt() + pho2.Pt() << std::endl;
+	      }
+	    //if sum PT of photons is larger than the current Higgs candidate, make this the Higgs candidate
 	    if( pho1.Pt() + pho2.Pt() > bestSumPt )
 	      {
 		bestSumPt = pho1.Pt() + pho2.Pt();
@@ -341,17 +340,17 @@ void CMSRazorHgg::Loop(string outFileName) {
       if(_PFPhotons[iPhot].pt() < 25 && abs(_PFPhotons[iPhot].eta()) > 1.44) continue; //only count photons that have pt > 25 GeV, eta <1 .44
       numPhotons++;
       for(int jPhot = iPhot+1; jPhot < _PFPhotons.size(); jPhot++){
-	if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.44) continue; //only count photons that have pt > 25 GeV, eta <1 .44
-	if(_PFPhotons[jPhot].pt() < 40 && _PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
-	fastjet::PseudoJet higgsCandidate = _PFPhotons[iPhot] + _PFPhotons[jPhot];
-	if (higgsCandidate.pt() < 20) continue; //higgs candidate at least 20 GeV
-	//check if this pair is in the correct mass range
-	if(higgsCandidate.m() > 100){
-	  cout << "Checking!" << endl;
-	  numHiggs++;
+      if(_PFPhotons[jPhot].pt() < 25 || abs(_PFPhotons[jPhot].eta()) > 1.44) continue; //only count photons that have pt > 25 GeV, eta <1 .44
+      if(_PFPhotons[jPhot].pt() < 40 && _PFPhotons[iPhot].pt() < 40) continue; //at least one photon is 40 GeV
+      fastjet::PseudoJet higgsCandidate = _PFPhotons[iPhot] + _PFPhotons[jPhot];
+      if (higgsCandidate.pt() < 20) continue; //higgs candidate at least 20 GeV
+      //check if this pair is in the correct mass range
+      if(higgsCandidate.m() > 100){
+      cout << "Checking!" << endl;
+      numHiggs++;
 	  if(_PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt() > bestSumPt){
-	    cout << "Made it!" << endl;
-	    //secondBestMass = bestMass;
+	  cout << "Made it!" << endl;
+	  //secondBestMass = bestMass;
 	    //secondBestSumPt = bestSumPt;
 	    //secondBestPhotIndex1 = bestPhotIndex1;
 	    //secondBestPhotIndex2 = bestPhotIndex2;
@@ -377,7 +376,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	continue;
       }
         
-    std::cout << "-->pass1" << std::endl;
+    if ( _debug ) std::cout << "[DEBUG]: --> pass higgs candidate selection" << std::endl;
     //---------------------
     //fill photon variables
     //---------------------
@@ -394,11 +393,6 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsEta    = HiggsCandidate.Eta();
     higgsPhi    = HiggsCandidate.Phi();
     higgsMass   = HiggsCandidate.M();
-
-    if (higgsPt > 110){
-      //cout << "higgsPt: "<<higgsPt<<endl;
-      numBox = 0;
-    }
     
     /*
     fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
@@ -416,29 +410,32 @@ void CMSRazorHgg::Loop(string outFileName) {
     vector<fastjet::PseudoJet> pfAK05;
     vector<fastjet::PseudoJet> pfAK05_btag;
 
+    std::vector<TLorentzVector> pfJets;
+    std::vector<TLorentzVector> pfJetsBtag;
     if ( _delphesFormat ) 
       {
-	for (int iJet = 0; iJet<Jet_size; iJet++)
+	for (int iJet = 0; iJet < Jet_size; iJet++ )
 	  {	
 	    TLorentzVector jet;
 	    jet.SetPtEtaPhiM(Jet_PT[iJet],Jet_Eta[iJet],Jet_Phi[iJet],Jet_Mass[iJet]);
 	    if ( jet.Pt() < 30. || jet.Eta() > 3. ) continue; 
-	    
 	    //check if within DR < 0.5 of a selected photon
 	    double thisDR = min( jet.DeltaR( photon1 ), jet.DeltaR( photon2 ) );	  
 	    if ( thisDR > 0.5 )
 	      {
 		numJets++;
 		pfAK05.push_back(fastjet::PseudoJet(jet.Px(), jet.Py(), jet.Pz(), jet.E()));
-		if (Jet_BTag[iJet]) 
+		pfJets.push_back( jet );
+		if ( Jet_BTag[iJet] ) 
 		  {
 		    numBJets++; 
 		    pfAK05_btag.push_back(fastjet::PseudoJet(jet.Px(), jet.Py(), jet.Pz(), jet.E()));
+		    pfJetsBtag.push_back( jet );
 		  }
 	      }
 	  }
-	
-	double minHiggsMassDiff = -1;
+	/*
+	  double minHiggsMassDiff = -1;
 	double minZMassDiff = -1;
 	int bestBjetIndex1 = -1;
 	int bestBjetIndex2 = -1;    
@@ -491,6 +488,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	  //fastjet::PseudoJet bjet1(bjet1Pt*cos(bjet1Phi), bjet1Pt*sin(bjet1Phi), bjet1Pt*sinh(bjet1Eta), bjet1Pt*cosh(bjet1Eta));
 	  //fastjet::PseudoJet bjet2(bjet2Pt*cos(bjet2Phi), bjet2Pt*sin(bjet2Phi), bjet2Pt*sinh(bjet2Eta), bjet2Pt*cosh(bjet2Eta));
 	}
+	*/
       }
     else {
       vector<fastjet::PseudoJet> empty;
@@ -499,50 +497,87 @@ void CMSRazorHgg::Loop(string outFileName) {
       fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
       pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
     }
+
+
+    //----------------------------
+    //Find H->bb, Z->bb Candidates
+    //----------------------------
+    double mbbH = .0;
+    double mbbZ = .0;
+    for( int i = 0; i < numBJets; i++)
+      {
+	for(int j = i+1; j < numBJets; j++)
+	  {
+	    double mbb = (pfJetsBtag[i] + pfJetsBtag[j]).M();
+	    //if mbb is closer to the higgs mass than mbbH, make mbbH = mbb
+	    if( fabs(mbbH - 125.0) > fabs(mbb - 125.0) ) mbbH = mbb;
+	    //same for mbbZ
+	    if( fabs(mbbZ - 91.2) > fabs(mbb - 91.2) ) mbbZ = mbb;
+	  }//end second jet loop
+      }//end first jet loop
     
-    if(pfAK05.size()<1){
-      cout << "No jets..." << endl;
-      continue;
-    }
-
-    vector<fastjet::PseudoJet> jetsForHemispheres;      
-    jetsForHemispheres.push_back( ConvertToPseudoJet(HiggsCandidate) );
-
-    for(int i = 0; i < pfAK05.size(); i++){
-      jetPt[i] = pfAK05[i].pt();
-      jetEta[i] = pfAK05[i].eta();
-      jetPhi[i] = pfAK05[i].phi();
-      jetsForHemispheres.push_back(pfAK05[i]);
-    }
-       
-    if (numBox<0){
-      numBox = 3;
-    }
-
-    if (_delphesFormat){
-      TVector3 v3;
-      v3.SetPtEtaPhi(MissingET_MET[0],MissingET_Eta[0],MissingET_Phi[0]);
-      PFMET = fastjet::PseudoJet(v3.Px(), v3.Py(), 0., v3.Mag());
-      MET = PFMET.pt();
-    }
-    else{
-      GenMET();
-      PFMET = genMET;
-      MET = PFMET.pt();
-    }
-
-    //traditional hemispheres
-    if(jetsForHemispheres.size() < 2){
-        cout << "Not enough objects for razor computation" << endl;
-        continue;
-    }
-    std::cout << "--> before CMSHEM" << std::endl;
-    CMSHemisphere* myHem = new CMSHemisphere(ConvertTo4Vector(jetsForHemispheres));
+    //---------------------------------------
+    //I n p u t   t o   H e m i s p h e r e s
+    //---------------------------------------
+    std::vector<TLorentzVector> JetsPlusHiggsCandidate;
+    JetsPlusHiggsCandidate.push_back( HiggsCandidate );//Adding Higgs
+    if( _delphesFormat )
+      {
+	//-----------------------------------
+	//D e l p h e s  j e t s + h i g  g s
+	//-----------------------------------
+	int i = 0;
+	for( auto tmp : pfJets )
+	  {
+	    jetPt[i]  = tmp.Pt();
+	    jetEta[i] = tmp.Eta();
+	    jetPhi[i] = tmp.Phi();
+	    JetsPlusHiggsCandidate.push_back( tmp );
+	    i++;
+	  }
+	//---
+	//MET
+	//---
+	double px = MissingET_MET[0]*cos( MissingET_Phi[0] );
+	double py = MissingET_MET[0]*sin( MissingET_Phi[0] );
+	PFMET = fastjet::PseudoJet(px, py, 0., MissingET_MET[0] );
+	MET = PFMET.pt();
+      }
+    else
+      {
+	//-----------------------------------
+	//P y t h i a  j e t s + h i g  g s
+	//-----------------------------------
+	for(int i = 0; i < pfAK05.size(); i++)
+	  {
+	    jetPt[i] = pfAK05[i].pt();
+	    jetEta[i] = pfAK05[i].eta();
+	    jetPhi[i] = pfAK05[i].phi();
+	    JetsPlusHiggsCandidate.push_back( ConvertTo4Vector( pfAK05[i] ) );
+	  }
+	//---
+	//MET
+	//---
+	GenMET();
+	PFMET = genMET;
+	MET = PFMET.pt();
+      }
+    
+    //--------------------------
+    //higgs+jets size at least 2
+    //--------------------------
+    if( JetsPlusHiggsCandidate.size() < 2 )
+      {
+	if( _debug ) std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
+	continue;
+      }
+    if ( _debug ) std::cout << "--> before CMSHEM" << std::endl;
+    CMSHemisphere* myHem = new CMSHemisphere( JetsPlusHiggsCandidate );
     myHem->CombineMinMass();
-    vector<TLorentzVector> hem = myHem->GetHemispheres();
-    vector<int> Temporary = myHem->GetHem1Constituents();
-    vector<int> Temporary2 = myHem->GetHem2Constituents();
-    std::cout << "--> pass CMSHEM" << std::endl;
+    std::vector<TLorentzVector> hem = myHem->GetHemispheres();
+    std::vector<int> Temporary = myHem->GetHem1Constituents();
+    std::vector<int> Temporary2 = myHem->GetHem2Constituents();
+    if ( _debug ) std::cout << "--> pass CMSHEM" << std::endl;
     
     // SAVES HEM CONSTITUENTS
     int count1 = 0;
@@ -562,7 +597,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     
     delete myHem;
 
-    std::cout << "delete Hem" << std::endl;
+    if ( _debug ) std::cout << "delete Hem" << std::endl;
     //compute traditional RSQ and MR
     TLorentzVector j1 = hem[0];
     TLorentzVector j2 = hem[1];  
@@ -571,8 +606,28 @@ void CMSRazorHgg::Loop(string outFileName) {
     dPhiHiggsJ2 = DeltaPhi( HiggsCandidate, j2);
     MR = CalcMR(j1, j2);
     RSQ = pow(CalcMRT(j1, j2, PFMET),2.)/MR/MR;
-    cout << "numBox: "<<numBox<<endl;
+    if ( _debug ) std::cout << "[DEBUG]: numBox-> "<< numBox << std::endl;
 
+    //---------------------------------------
+    //M a k i n g   B o x   H i e r a r c h y
+    //---------------------------------------
+    if ( higgsPt > 110. )
+      {
+	numBox = 0;
+      }
+    else if ( mbbH > 110. && mbbH < 140. )
+      {
+	numBox = 1;
+      }
+    else if ( mbbZ > 76.  && mbbZ < 106. )
+      {
+	numBox = 2;
+      }
+    else
+      {
+	numBox = 3;
+      }
+    
     // write event in the tree
     outTree->Fill();
     
@@ -634,10 +689,9 @@ void CMSRazorHgg::Loop(string outFileName) {
   effTree->Write();
   
   //  xsecProb->Write();
+  std::cout << "before malloc" << std::endl;
   file->Close();
-  
-
-
+  std::cout << "after malloc" << std::endl;
 }
 
 double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
