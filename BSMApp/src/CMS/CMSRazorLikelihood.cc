@@ -7,6 +7,8 @@ CMSRazorLikelihood::CMSRazorLikelihood(TString inputFname, TString nHname, TStri
   fileIN = TFile::Open(inputFname);
   nH = (TH2D*) fileIN->Get(nHname)->Clone();
   bH = (TH2D*) fileIN->Get(bHname)->Clone();
+  nH->Print("v");
+  bH->Print("v");
   _statTools = new StatTools(-99);
 }
 
@@ -16,7 +18,7 @@ CMSRazorLikelihood::~CMSRazorLikelihood(){
 }
 
 void CMSRazorLikelihood::CreatePosteriors(TString outputFname) {
-
+  cout << "creating posteriors" << endl;
   int nx = nH->GetXaxis()->GetNbins();
   int ny = nH->GetYaxis()->GetNbins();
   for(int ix=1; ix<=nx; ix++) {

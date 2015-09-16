@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
   }
 
   // Razor analysis
-  CMSRazorLikelihood cmsRazorLikelihood("data/ExpectedObserved_RazorHad_Winter2012.root", "hEXP", "hOBS");
-  cmsRazorLikelihood.CreatePosteriors("data/RazorLikelihood_RazorHad_Winter2012.root");
+  CMSRazorLikelihood cmsRazorLikelihood("data/ExpectedObserved_RazorHgg_HighRes_Summer2015.root", "hEXP", "hOBS");
+  cmsRazorLikelihood.CreatePosteriors("data/CMSRazorHgg_HighResLik_SUS_14_017.root");
   return 0;
 }
