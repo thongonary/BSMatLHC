@@ -152,8 +152,8 @@ int main(int argc, char* argv[]) {
     }
 
     if(razorhgg){
-      CMSRazorHgg cmsrazorhgg(cmsChain, 0., "", delphesFormat);
-        if(!writeOut){
+      CMSRazorHgg cmsrazorhgg(cmsChain, 19800., "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
+      if(!writeOut){
             cout << "please specify output file" << endl;
             return 0;
         }

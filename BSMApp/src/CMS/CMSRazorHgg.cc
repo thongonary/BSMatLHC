@@ -123,11 +123,12 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("pthat", &pthat, "pthat/D");
 
   
-  double xedge[9] = {0, 100, 200, 300, 400, 500, 700, 1000, 2500};
-  double yedge[7] = {0,0.10,0.20,0.30,0.40,0.50,1.0};
-  TH2D* pdfHighPt = new TH2D("pdfHighPt","pdfHighPt",9,xedge,7,yedge);
-  TH2D* pdfHbb = new TH2D("pdfHbb","pdfHbb",9,xedge,7,yedge);
-  TH2D* pdfHighRes = new TH2D("pdfHighRes","pdfHighRes",9,xedge,7,yedge);
+  //double xedge[9] = {0, 100, 200, 300, 400, 500, 700, 1000, 2500};
+  //double yedge[7] = {0, 0.10, 0.20, 0.30, 0.40, 0.50, 1.0};
+  TH1D* pdfHighPt = new TH1D("pdfHighPt","pdfHighPt",15,0,15);
+  TH1D* pdfHbb = new TH1D("pdfHbb","pdfHbb",3,0,3);
+  TH1D* pdfZbb = new TH1D("pdfZbb","pdfZbb",3,0,3);
+  TH1D* pdfHighRes = new TH1D("pdfHighRes","pdfHighRes",10,0,10);
 
 
   cout << "getting number of entries" << endl;
@@ -292,11 +293,9 @@ void CMSRazorHgg::Loop(string outFileName) {
 	    //secondBestPhotIndex2 = bestPhotIndex2;
 	    bestMass = higgsCandidate.m();
 	    bestSumPt = _PFPhotons[iPhot].pt() + _PFPhotons[jPhot].pt();
-	    if (_PFPhotons[iPhot].pt() > _PFPhotons[jPhot].pt()){	      
-	      bestPhotIndex1 = iPhot;
-	      bestPhotIndex2 = jPhot;
-	    }
-	    else {       
+	    bestPhotIndex1 = iPhot;
+	    bestPhotIndex2 = jPhot;
+	    if (_PFPhotons[iPhot].pt() < _PFPhotons[jPhot].pt()){	      
 	      bestPhotIndex1 = jPhot;
 	      bestPhotIndex2 = iPhot;
 	    }
@@ -329,16 +328,93 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsEta = bestDiphoton.eta();
     higgsPhi = bestDiphoton.phi();
     higgsMass = bestDiphoton.m();
-
-    // AK5 jets
     
+    fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
+    fastjet::PseudoJet pho2(pho2Pt*cos(pho2Phi), pho2Pt*sin(pho2Phi), pho2Pt*sinh(pho2Eta), pho2Pt*cosh(pho2Eta));
+
+    fastjet::PseudoJet higgs = pho1 + pho2;
+    double higgsPhi = higgs.phi();
+    double higgsEta = higgs.eta();
+    double higgsPt = higgs.pt();
+    double higgsEnergy = higgs.E();
+    TLorentzVector higgsvector;
+    higgsvector.SetPtEtaPhiE(higgsPt, higgsEta, higgsPhi, higgsEnergy);
+
+    // AK5 jets    
     vector<fastjet::PseudoJet> pfAK05;
+    vector<fastjet::PseudoJet> pfAK05_btag;
+
     if (_delphesFormat) {
-      fastjet::PseudoJet v;
-      for (int iJet = 0; iJet<Jet_size; iJet++){
+      for (int iJet = 0; iJet<Jet_size; iJet++){	
 	TLorentzVector v;
 	v.SetPtEtaPhiM(Jet_PT[iJet],Jet_Eta[iJet],Jet_Phi[iJet],Jet_Mass[iJet]);
-	if (v.Pt()>30. && v.Eta()<3.) pfAK05.push_back(fastjet::PseudoJet(v.Px(), v.Py(), v.Pz(), v.E()));
+	if (v.Pt()>30. && v.Eta()<3.) {	  
+	  //check if within DR < 0.5 of a selected photon
+	  fastjet::PseudoJet pv = ConvertToPseudoJet(v);
+	  double thisDR = min(pv.delta_R(pho1), pv.delta_R(pho2));	  
+	  if (thisDR > 0.5) {
+	    numJets++;
+	    pfAK05.push_back(fastjet::PseudoJet(v.Px(), v.Py(), v.Pz(), v.E()));
+	    if (Jet_BTag[iJet]) {
+	      numBJets++; 
+	      pfAK05_btag.push_back(fastjet::PseudoJet(v.Px(), v.Py(), v.Pz(), v.E()));
+	    }
+	  }
+	}
+      }
+      
+      double minHiggsMassDiff = -1;
+      double minZMassDiff = -1;
+      int bestBjetIndex1 = -1;
+      int bestBjetIndex2 = -1;    
+
+      if (numBox!=0) {
+	for (int i = 0; i < pfAK05_btag.size(); i++){
+	  for (int j = i+1; j < pfAK05_btag.size(); j++){	
+	    fastjet::PseudoJet bbCandidate = pfAK05_btag[i] + pfAK05_btag[j];
+	    if (bbCandidate.m()>110 && bbCandidate.m()<140) {
+	      numBox = 1;
+	      if ( fabs(bbCandidate.m()-125.) < minHiggsMassDiff || minHiggsMassDiff < 0){
+		minHiggsMassDiff = fabs(bbCandidate.m()-125.);	    
+		bestBjetIndex1 = i;
+		bestBjetIndex2 = j;
+		if (pfAK05_btag[bestBjetIndex1].pt() < pfAK05_btag[bestBjetIndex2].pt()) {
+		  bestBjetIndex1 = j;
+		  bestBjetIndex2 = i;
+		}
+	      }
+	    }
+	  }
+	}
+      }
+      if (numBox!=0 && numBox!=1){
+	for (int i = 0; i < pfAK05_btag.size(); i++){
+	  for (int j = i+1; j < pfAK05_btag.size(); j++){	      
+	    fastjet::PseudoJet bbCandidate = pfAK05_btag[i] + pfAK05_btag[j];
+	    if ( bbCandidate.m()>76 && bbCandidate.m()<106 ){
+	      numBox = 2;	    
+	      if ( fabs(bbCandidate.m()-90.2) < minZMassDiff || minZMassDiff < 0){
+		minZMassDiff = fabs(bbCandidate.m()-91.2);	    
+		bestBjetIndex1 = i;
+		bestBjetIndex2 = j;
+		if (pfAK05_btag[bestBjetIndex1].pt() < pfAK05_btag[bestBjetIndex2].pt()) {
+		  bestBjetIndex1 = j;
+		  bestBjetIndex2 = i;
+		}	    
+	      }
+	    }
+	  }
+	}
+      }
+      if (numBox==1 || numBox==2) {
+	bjet1Pt = pfAK05_btag[bestBjetIndex1].pt();      
+	bjet1Eta = pfAK05_btag[bestBjetIndex1].eta();
+	bjet1Phi = pfAK05_btag[bestBjetIndex1].phi();
+	bjet2Pt = pfAK05_btag[bestBjetIndex2].pt();      
+	bjet2Eta = pfAK05_btag[bestBjetIndex2].eta();
+	bjet2Phi = pfAK05_btag[bestBjetIndex2].phi();
+	//fastjet::PseudoJet bjet1(bjet1Pt*cos(bjet1Phi), bjet1Pt*sin(bjet1Phi), bjet1Pt*sinh(bjet1Eta), bjet1Pt*cosh(bjet1Eta));
+	//fastjet::PseudoJet bjet2(bjet2Pt*cos(bjet2Phi), bjet2Pt*sin(bjet2Phi), bjet2Pt*sinh(bjet2Eta), bjet2Pt*cosh(bjet2Eta));
       }
     }
     else {
@@ -348,49 +424,26 @@ void CMSRazorHgg::Loop(string outFileName) {
       fastjet::ClusterSequence pfAK05ClusterSequence = JetMaker(JetsConst, AK05_def);
       pfAK05 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK05ClusterSequence.inclusive_jets()),30., 3.0); //only cluster jets with > 30 GeV, eta < 3.0
     }
+    
     if(pfAK05.size()<1){
       cout << "No jets..." << endl;
       continue;
     }
 
-    vector<fastjet::PseudoJet> jetsForHemispheres;
-    fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
-    fastjet::PseudoJet pho2(pho2Pt*cos(pho2Phi), pho2Pt*sin(pho2Phi), pho2Pt*sinh(pho2Eta), pho2Pt*cosh(pho2Eta));
-
-    
-    
-    fastjet::PseudoJet bjet1(bjet1Pt*cos(bjet1Phi), bjet1Pt*sin(bjet1Phi), bjet1Pt*sinh(bjet1Eta), bjet1Pt*cosh(bjet1Eta));
-    fastjet::PseudoJet bjet2(bjet2Pt*cos(bjet2Phi), bjet2Pt*sin(bjet2Phi), bjet2Pt*sinh(bjet2Eta), bjet2Pt*cosh(bjet2Eta));
-    fastjet::PseudoJet higgs = pho1 + pho2;
-    double higgsPhi = higgs.phi();
-    double higgsEta = higgs.eta();
-    double higgsPt = higgs.pt();
-    double higgsEnergy = higgs.E();
-    TLorentzVector higgsvector;
-    higgsvector.SetPtEtaPhiE(higgsPt, higgsEta, higgsPhi, higgsEnergy);
-      
+    vector<fastjet::PseudoJet> jetsForHemispheres;      
     jetsForHemispheres.push_back(higgs);
 
-
     for(int i = 0; i < pfAK05.size(); i++){
-      //check if within DR < 0.5 of a selected photon
-      double thisDR = min(pfAK05[i].delta_R(pho1), pfAK05[i].delta_R(pho2));
-      if(thisDR < 0.5) continue;
-      numJets++; 
       jetPt[i] = pfAK05[i].pt();
       jetEta[i] = pfAK05[i].eta();
       jetPhi[i] = pfAK05[i].phi();
       jetsForHemispheres.push_back(pfAK05[i]);
     }
-
-    if (false){
-      numBox = 1;
+       
+    if (numBox<0){
+      numBox = 3;
     }
 
-    if (numJets == 0){
-      cout << "No jets found!!!!" << endl;
-      continue;
-    }
     if (_delphesFormat){
       TVector3 v3;
       v3.SetPtEtaPhi(MissingET_MET[0],MissingET_Eta[0],MissingET_Phi[0]);
@@ -447,12 +500,23 @@ void CMSRazorHgg::Loop(string outFileName) {
 
     // write event in the tree
     outTree->Fill();
-
     
     // fill PDF histograms
-    if(numBox == 0) pdfHighPt->Fill(MR, RSQ);
-    if(numBox == 1) pdfHbb->Fill(MR, RSQ);
-    if(numBox == 2) pdfHighRes->Fill(MR, RSQ);
+    if(numBox == 0) pdfHighPt->Fill(0);
+    if(numBox == 1) pdfHbb->Fill(0);
+    if(numBox == 2) pdfZbb->Fill(0);
+    if(numBox == 3) {
+      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) pdfHighRes->Fill(0);
+      else if (MR>=150 && MR<250 && RSQ>=0.05 && RSQ<0.10) pdfHighRes->Fill(1);
+      else if (MR>=150 && MR<250 && RSQ>=0.10 && RSQ<0.15) pdfHighRes->Fill(2);
+      else if (MR>=150 && MR<250 && RSQ>=0.15 && RSQ<1.00) pdfHighRes->Fill(3);
+      else if (MR>=250 && MR<400 && RSQ>=0.00 && RSQ<0.05) pdfHighRes->Fill(4);
+      else if (MR>=250 && MR<400 && RSQ>=0.05 && RSQ<0.10) pdfHighRes->Fill(5);
+      else if (MR>=250 && MR<400 && RSQ>=0.10 && RSQ<1.00) pdfHighRes->Fill(6);
+      else if (MR>=400 && MR<1400 && RSQ>=0 && RSQ<0.05) pdfHighRes->Fill(7);
+      else if (MR>=400 && MR<1400 && RSQ>=0.05 && RSQ<1.00) pdfHighRes->Fill(8);
+      else if (MR>=1400 && MR<3000 && RSQ>=0 && RSQ<1.00) pdfHighRes->Fill(9);
+    }
     
   }
 
@@ -463,28 +527,32 @@ void CMSRazorHgg::Loop(string outFileName) {
   // eff TTree
   double effHighPt = pdfHighPt->Integral()/double(nentries);
   double effHbb = pdfHbb->Integral()/double(nentries);
+  double effZbb = pdfZbb->Integral()/double(nentries);
   double effHighRes = pdfHighRes->Integral()/double(nentries);
   
   // normalize the PDFs
   if(pdfHighPt->Integral()>0)  pdfHighPt->Scale(1./pdfHighPt->Integral());
   if(pdfHbb->Integral()>0)  pdfHbb->Scale(1./pdfHbb->Integral());
+  if(pdfZbb->Integral()>0)  pdfZbb->Scale(1./pdfZbb->Integral());
   if(pdfHighRes->Integral()>0)  pdfHighRes->Scale(1./pdfHighRes->Integral());
   
   // write the PDFs
   pdfHighPt->Write();  
   pdfHbb->Write();
+  pdfZbb->Write();
   pdfHighRes->Write();
 
-  char name[256];
-  sprintf(name,"data/%s.root", _analysis.c_str());
-  //  TH1D* xsecProb = XsecProb(pdfHad, effHighRes,name, 1000, 0., 1.);
+  //char outname[256];
+  //sprintf(outname,"data/%s.root", _analysis.c_str());
+  //TH1D* xsecProb = XsecProb(pdfHighRes, effHighRes,name, 1000, 0., 1.);
   // Open Output file again 
   file->cd();
-  double xsecULHighRes = 0.;//_statTools->FindUL(xsecProb, 0.95, 1.);
+  double xsecULHighRes = 0.0;// _statTools->FindUL(xsecProb, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
   effTree->Branch("effHbb", &effHbb, "effHbb/D");
+  effTree->Branch("effZbb", &effZbb, "effZbb/D");
   effTree->Branch("effHighRes", &effHighRes, "effHighRes/D");
   effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
   effTree->Fill();
@@ -505,7 +573,7 @@ double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
 }
 
 
-TH1D* CMSRazorHgg::XsecProb(TH2D* sigPdf, double eff, TString Filename, int ibin, double xmin, double xmax) {
+TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, TString Filename, int ibin, double xmin, double xmax) {
   
   int ibinX = sigPdf->GetXaxis()->GetNbins();
   int ibinY = sigPdf->GetYaxis()->GetNbins();
