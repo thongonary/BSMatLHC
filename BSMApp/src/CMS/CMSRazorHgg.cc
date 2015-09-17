@@ -17,8 +17,9 @@
 
 #define _debug 0
 
-CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
+CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, double filterEff, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
   _Lumi = Lumi;
+  _filterEff = filterEff;
   _statTools = new StatTools(-99);
   _analysis = analysis;
   _delphesFormat = delphesFormat;
@@ -655,10 +656,10 @@ void CMSRazorHgg::Loop(string outFileName) {
 
   
   // eff TTree
-  double effHighPt = pdfHighPt->Integral()/double(nentries);
-  double effHbb = pdfHbb->Integral()/double(nentries);
-  double effZbb = pdfZbb->Integral()/double(nentries);
-  double effHighRes = pdfHighRes->Integral()/double(nentries);
+  double effHighPt = _filterEff*pdfHighPt->Integral()/double(nentries);
+  double effHbb = _filterEff*pdfHbb->Integral()/double(nentries);
+  double effZbb = _filterEff*pdfZbb->Integral()/double(nentries);
+  double effHighRes = _filterEff*pdfHighRes->Integral()/double(nentries);
   
   // normalize the PDFs
   if(pdfHighPt->Integral()>0)  pdfHighPt->Scale(1./pdfHighPt->Integral());
@@ -672,12 +673,12 @@ void CMSRazorHgg::Loop(string outFileName) {
   pdfZbb->Write();
   pdfHighRes->Write();
 
-  //char outname[256];
-  //sprintf(outname,"data/%s.root", _analysis.c_str());
-  //TH1D* xsecProb = XsecProb(pdfHighRes, effHighRes,name, 1000, 0., 1.);
+  char outname[256];
+  sprintf(outname,"data/%s.root", _analysis.c_str());
+  TH1D* xsecProb = XsecProb(pdfHighRes, effHighRes, outname, 100, 0., 3.0);
   // Open Output file again 
   file->cd();
-  double xsecULHighRes = 0.0;// _statTools->FindUL(xsecProb, 0.95, 1.);
+  double xsecULHighRes = _statTools->FindUL(xsecProb, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
@@ -688,10 +689,10 @@ void CMSRazorHgg::Loop(string outFileName) {
   effTree->Fill();
   effTree->Write();
   
-  //  xsecProb->Write();
-  std::cout << "before malloc" << std::endl;
+  xsecProb->Write();
+  //std::cout << "before malloc" << std::endl;
   file->Close();
-  std::cout << "after malloc" << std::endl;
+  //std::cout << "after malloc" << std::endl;
 }
 
 double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
@@ -715,21 +716,31 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, TString Filename, int ibin
   for(int i=0; i<ibin; i++) {
     double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
     double prob = 1;
+    double logprob = 0;
     for(int ix=0; ix<ibinX; ix++) {
       for(int iy=0; iy<ibinY; iy++) {
-	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix,iy);
-	if(sBin <= 0.) continue;
+	//if (!((ix==8) && iy==0)) continue; //just using the bin with the excess
+	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
+	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
+	//cout << "xsec = " << xsec << endl;
+	//cout << "sBin = " << sBin <<endl; 
+	if (sBin >= 100) cout << "Note: signal events exceed 100! sBin = " << sBin << endl;
 	char name[256];
 	sprintf(name, "lik_%i_%i", ix, iy);
 	TH1D* binProb = (TH1D*) likFile->Get(name);
-	if(prob < 10.e-30) prob = 0.;
-	if(prob <= 0) continue;
+	//if(prob < 10.e-30) prob = 0.;
+	//if(prob <= 0) continue;
+	logprob += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
 	prob *= binProb->GetBinContent(binProb->FindBin(sBin));
 	delete binProb;
       }
     }
-    probVec->SetBinContent(i+1,prob);
+    //cout << "prob = " << prob << endl;
+    //cout << "exp(logprob) = " << TMath::Exp(logprob) << endl;
+    //probVec->SetBinContent(i+1,prob);
+    probVec->SetBinContent(i+1,TMath::Exp(logprob));
   }
+  probVec->Scale(1./probVec->Integral());
   likFile->Close();
   return probVec;
 }
