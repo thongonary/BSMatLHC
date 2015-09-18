@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 
     if(razorhgg)
       {
-	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 4.4e-3, "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
+	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 0.0044280, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
        //	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 1.0, "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
 	if(!writeOut){
 	  cout << "please specify output file" << endl;

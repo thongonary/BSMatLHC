@@ -91,7 +91,7 @@ TH1D* StatTools::LogNormPoissonConv(TString name, double n, Double_t CenB, Doubl
   }  
   
   // normalize the pdf
-  histo->Scale(1./histo->Integral());
+  //histo->Scale(1./histo->Integral());
   return histo;
 }
 

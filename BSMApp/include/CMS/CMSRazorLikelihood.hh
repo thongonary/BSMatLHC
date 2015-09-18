@@ -25,7 +25,7 @@ public:
   //! destructor
   virtual ~CMSRazorLikelihood();
   /// Create 1D bin-by-bin histograms of the posterior on s
-  void CreatePosteriors(TString outputFname);
+  void CreatePosteriors(TString outputFname, TString directory);
   
 private:
   TH2D* nH;
