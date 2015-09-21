@@ -699,10 +699,10 @@ void CMSRazorHgg::Loop(string outFileName) {
 
   char outname[256];
   sprintf(outname,"data/%s.root", _analysis.c_str());
-  TH1D* xsecProbHighPt = XsecProb(pdfHighRes, effHighPt, outname, "HighPt", 100, 0., 4.0);
-  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., 4.0);
-  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., 4.0);
-  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., 4.0);
+  TH1D* xsecProbHighPt = XsecProb(pdfHighRes, effHighPt, outname, "HighPt", 500, 0., 4.0);
+  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 500, 0., 4.0);
+  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 500, 0., 4.0);
+  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 500, 0., 4.0);
   // Open Output file again 
   file->cd();
   

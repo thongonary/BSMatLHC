@@ -73,20 +73,23 @@ TH1D* StatTools::LogNormPoissonConv(TString name, double n, Double_t CenB, Doubl
     
     // // integrate numerically over b using MC
     // for(int j=0; j<5000; j++) {
-    //   //double thisb = CenB*pow(1+SigB/CenB, gRandom->Gaus(0., 1.));
-    //   double thisb = gRandom->Gaus(CenB,SigB);
+    //   double thisb = CenB*pow(1+SigB/CenB, gRandom->Gaus(0., 1.));
+    //   //double thisb = gRandom->Gaus(CenB,SigB);
     //   histo->Fill(s, TMath::Poisson(n, s+thisb));
     // }
     
     // integrate numerically over b using 1D Num Int
-    PoissonGaussian func;
+    //PoissonGaussian func;
+    PoissonLogNormal func;
     double params[4];
     params[0] = CenB;  params[1] = SigB;
     params[2] = s;     params[3] = n;
     func.SetParameters(params);
-    ROOT::Math::Integrator ig(ROOT::Math::IntegrationOneDim::kADAPTIVE,1E-12,1E-12);
+    //ROOT::Math::Integrator ig(ROOT::Math::IntegrationOneDim::kADAPTIVESINGULAR,1E-13,1E-13);
+    ROOT::Math::Integrator ig(ROOT::Math::IntegrationOneDim::kNONADAPTIVE,0,0);
     ig.SetFunction(func,false);      
-    double integral = ig.IntegralUp(0.);
+    //double integral = ig.IntegralUp(0.);
+    double integral = ig.Integral(0.,CenB+SigB*100);
     histo->Fill(s, integral);  
   }  
   
