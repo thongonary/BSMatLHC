@@ -17,8 +17,9 @@
 
 #define _debug 0
 
-CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
+CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, double filterEff, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
   _Lumi = Lumi;
+  _filterEff = filterEff;
   _statTools = new StatTools(-99);
   _analysis = analysis;
   _delphesFormat = delphesFormat;
@@ -632,9 +633,33 @@ void CMSRazorHgg::Loop(string outFileName) {
     outTree->Fill();
     
     // fill PDF histograms
-    if(numBox == 0) pdfHighPt->Fill(0);
-    if(numBox == 1) pdfHbb->Fill(0);
-    if(numBox == 2) pdfZbb->Fill(0);
+    if(numBox == 0) {
+      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(0);
+      else if (MR>=150 && MR<200 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(1);
+      else if (MR>=150 && MR<200 && RSQ>=0.10 && RSQ<0.15) pdfHighPt->Fill(2);
+      else if (MR>=150 && MR<200 && RSQ>=0.15 && RSQ<0.20) pdfHighPt->Fill(3);
+      else if (MR>=150 && MR<200 && RSQ>=0.20 && RSQ<1.00) pdfHighPt->Fill(4);
+      else if (MR>=200 && MR<300 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(5);
+      else if (MR>=200 && MR<300 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(6);
+      else if (MR>=200 && MR<300 && RSQ>=0.10 && RSQ<0.15) pdfHighPt->Fill(7);
+      else if (MR>=200 && MR<300 && RSQ>=0.15 && RSQ<1.00) pdfHighPt->Fill(8);
+      else if (MR>=300 && MR<500 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(9);
+      else if (MR>=300 && MR<500 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(10);
+      else if (MR>=300 && MR<500 && RSQ>=0.10 && RSQ<1.00) pdfHighPt->Fill(11);
+      else if (MR>=500 && MR<1600 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(12);
+      else if (MR>=500 && MR<1600 && RSQ>=0.05 && RSQ<1.00) pdfHighPt->Fill(13);
+      else if (MR>=1600 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfHighPt->Fill(14);
+    }
+    if(numBox == 1) {
+      if (MR>=150 && MR<300 && RSQ>=0.00 && RSQ<0.05) pdfHbb->Fill(0);
+      else if (MR>=150 && MR<300 && RSQ>=0.05 && RSQ<1.00) pdfHbb->Fill(1);
+      else if (MR>=300 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfHbb->Fill(2);
+    }
+    if(numBox == 2) {
+      if (MR>=150 && MR<450 && RSQ>=0.00 && RSQ<0.05) pdfZbb->Fill(0);
+      else if (MR>=150 && MR<450 && RSQ>=0.05 && RSQ<1.00) pdfZbb->Fill(1);
+      else if (MR>=450 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfZbb->Fill(2);
+    }
     if(numBox == 3) {
       if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) pdfHighRes->Fill(0);
       else if (MR>=150 && MR<250 && RSQ>=0.05 && RSQ<0.10) pdfHighRes->Fill(1);
@@ -655,10 +680,10 @@ void CMSRazorHgg::Loop(string outFileName) {
 
   
   // eff TTree
-  double effHighPt = pdfHighPt->Integral()/double(nentries);
-  double effHbb = pdfHbb->Integral()/double(nentries);
-  double effZbb = pdfZbb->Integral()/double(nentries);
-  double effHighRes = pdfHighRes->Integral()/double(nentries);
+  double effHighPt = _filterEff*pdfHighPt->Integral()/double(nentries);
+  double effHbb = _filterEff*pdfHbb->Integral()/double(nentries);
+  double effZbb = _filterEff*pdfZbb->Integral()/double(nentries);
+  double effHighRes = _filterEff*pdfHighRes->Integral()/double(nentries);
   
   // normalize the PDFs
   if(pdfHighPt->Integral()>0)  pdfHighPt->Scale(1./pdfHighPt->Integral());
@@ -672,26 +697,39 @@ void CMSRazorHgg::Loop(string outFileName) {
   pdfZbb->Write();
   pdfHighRes->Write();
 
-  //char outname[256];
-  //sprintf(outname,"data/%s.root", _analysis.c_str());
-  //TH1D* xsecProb = XsecProb(pdfHighRes, effHighRes,name, 1000, 0., 1.);
+  char outname[256];
+  sprintf(outname,"data/%s.root", _analysis.c_str());
+  TH1D* xsecProbHighPt = XsecProb(pdfHighRes, effHighPt, outname, "HighPt", 500, 0., 4.0);
+  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 500, 0., 4.0);
+  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 500, 0., 4.0);
+  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 500, 0., 4.0);
   // Open Output file again 
   file->cd();
-  double xsecULHighRes = 0.0;// _statTools->FindUL(xsecProb, 0.95, 1.);
+  
+  double xsecULHighPt = _statTools->FindUL(xsecProbHighPt, 0.95, 1.);
+  double xsecULHbb = _statTools->FindUL(xsecProbHbb, 0.95, 1.);
+  double xsecULZbb = _statTools->FindUL(xsecProbZbb, 0.95, 1.);
+  double xsecULHighRes = _statTools->FindUL(xsecProbHighRes, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
   effTree->Branch("effHbb", &effHbb, "effHbb/D");
   effTree->Branch("effZbb", &effZbb, "effZbb/D");
   effTree->Branch("effHighRes", &effHighRes, "effHighRes/D");
+  effTree->Branch("xsecULHighPt", &xsecULHighPt, "xsecULHighPt/D");
+  effTree->Branch("xsecULHbb", &xsecULHbb, "xsecULHbb/D");
+  effTree->Branch("xsecULZbb", &xsecULZbb, "xsecULZbb/D");
   effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
   effTree->Fill();
   effTree->Write();
-  
-  //  xsecProb->Write();
-  std::cout << "before malloc" << std::endl;
+
+  xsecProbHighPt->Write();
+  xsecProbHbb->Write();
+  xsecProbZbb->Write();
+  xsecProbHighRes->Write();
+  //std::cout << "before malloc" << std::endl;
   file->Close();
-  std::cout << "after malloc" << std::endl;
+  //std::cout << "after malloc" << std::endl;
 }
 
 double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
@@ -702,34 +740,46 @@ double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
 }
 
 
-TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, TString Filename, int ibin, double xmin, double xmax) {
+TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string directory, int ibin, double xmin, double xmax) {
   
   int ibinX = sigPdf->GetXaxis()->GetNbins();
   int ibinY = sigPdf->GetYaxis()->GetNbins();
   
-  TH1D* probVec = new TH1D("probVec", "probVec", ibin, xmin, xmax);
+  char histname[256];
+  sprintf(histname, "%s%s","probVec", directory.c_str());
+  TH1D* probVec = new TH1D(histname, histname, ibin, xmin, xmax);
   
-  TFile* likFile = new TFile(Filename);  
+  TFile* likFile = new TFile(TString(Filename));  
   gROOT->cd();
   // a loop over xsec should go here... 
   for(int i=0; i<ibin; i++) {
     double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
     double prob = 1;
+    double logprob = 0;
     for(int ix=0; ix<ibinX; ix++) {
       for(int iy=0; iy<ibinY; iy++) {
-	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix,iy);
-	if(sBin <= 0.) continue;
+	//if (!((ix==8) && iy==0)) continue; //just using the bin with the excess
+	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
+	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
+	//cout << "xsec = " << xsec << endl;
+	//cout << "sBin = " << sBin <<endl; 
+	if (sBin >= 100) cout << "Note: signal events exceed 100! sBin = " << sBin << endl;
 	char name[256];
-	sprintf(name, "lik_%i_%i", ix, iy);
+	sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
 	TH1D* binProb = (TH1D*) likFile->Get(name);
-	if(prob < 10.e-30) prob = 0.;
-	if(prob <= 0) continue;
+	//if(prob < 10.e-30) prob = 0.;
+	//if(prob <= 0) continue;
+	logprob += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
 	prob *= binProb->GetBinContent(binProb->FindBin(sBin));
 	delete binProb;
       }
     }
-    probVec->SetBinContent(i+1,prob);
+    //cout << "prob = " << prob << endl;
+    //cout << "exp(logprob) = " << TMath::Exp(logprob) << endl;
+    //probVec->SetBinContent(i+1,prob);
+    probVec->SetBinContent(i+1,TMath::Exp(logprob));
   }
+  probVec->Scale(1./probVec->Integral());
   likFile->Close();
   return probVec;
 }

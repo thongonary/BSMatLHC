@@ -62,7 +62,16 @@ int main(int argc, char* argv[]) {
   }
 
   // Razor analysis
-  CMSRazorLikelihood cmsRazorLikelihood("data/ExpectedObserved_RazorHgg_HighRes_Summer2015.root", "hEXP", "hOBS");
-  cmsRazorLikelihood.CreatePosteriors("data/CMSRazorHgg_HighResLik_SUS_14_017.root");
+  CMSRazorLikelihood cmsRazorLikelihoodHighRes("data/ExpectedObserved_RazorHgg_HighRes_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodHighRes.CreatePosteriors("data/CMSRazorHgg_HighResLik_SUS_14_017.root","HighRes");
+  
+  CMSRazorLikelihood cmsRazorLikelihoodHighPt("data/ExpectedObserved_RazorHgg_HighPt_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodHighPt.CreatePosteriors("data/CMSRazorHgg_HighPtLik_SUS_14_017.root","HighPt");
+  
+  CMSRazorLikelihood cmsRazorLikelihoodHbb("data/ExpectedObserved_RazorHgg_Hbb_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodHbb.CreatePosteriors("data/CMSRazorHgg_HbbLik_SUS_14_017.root","Hbb");
+  
+  CMSRazorLikelihood cmsRazorLikelihoodZbb("data/ExpectedObserved_RazorHgg_Zbb_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodZbb.CreatePosteriors("data/CMSRazorHgg_ZbbLik_SUS_14_017.root","Zbb");
   return 0;
 }

@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   Pythia pythia;
 
   // Read in commands from external file.
-  pythia.readFile(cfg);
+  pythia.readFile(cfg);  
   
   // Initialize Les Houches Event File run. List initialization information.
   LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
@@ -69,6 +69,8 @@ int main(int argc, char* argv[]) {
 
   // Initialize. Beam parameters set in .pythia file.
   pythia.init();
+  
+  pythia.particleData.doForceWidth(1000005,true);
 
   // Values for filter.
   int    pdgId   = 22; //ask for photons
@@ -81,16 +83,16 @@ int main(int argc, char* argv[]) {
   
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
-  int nList    = pythia.mode("Main:numberToList");
+  //int nList    = pythia.mode("Main:numberToList");
   int nShow    = pythia.mode("Main:timesToShow");
   int nAbort   = pythia.mode("Main:timesAllowErrors"); 
-  bool showCS  = pythia.flag("Main:showChangedSettings");
+  //bool showCS  = pythia.flag("Main:showChangedSettings");
   bool showAS  = pythia.flag("Main:showAllSettings");
   bool showCPD = pythia.flag("Main:showChangedParticleData");
   bool showAPD = pythia.flag("Main:showAllParticleData");  
 
   // List settings.
-  if (showCS) pythia.settings.listChanged();
+  //if (showCS) pythia.settings.listChanged();
   if (showAS) pythia.settings.listAll();
 
   // List particle data.  
@@ -159,10 +161,10 @@ int main(int argc, char* argv[]) {
 			
 			 
     // List first few events.
-    if (iEvent < nList) { 
-      pythia.info.list();
-      pythia.event.list();
-    }
+    //if (iEvent < nList) { 
+    //  pythia.info.list();
+    //  pythia.event.list();
+    //}
 
     // Construct new empty HepMC event. 
     HepMC::GenEvent* hepmcevt = new HepMC::GenEvent();
