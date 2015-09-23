@@ -1,0 +1,28 @@
+! This file contains commands to be read in for a Pythia8 run. 
+! Lines not beginning with a letter or digit are comments.
+Main:numberOfEvents = 1000
+PartonLevel:ISR = on
+PartonLevel:FSR = on
+PartonLevel:MPI = on
+HadronLevel:Hadronize = on 
+Beams:frameType = 4
+!Beams:LHEF = WinoNLSP_chargino500_bino1_10_hw_aaw.lhe
+!SLHA:file = data/pythiaCards/SUSY/SimplifiedModels/simplifiedModel.TChiwh.500.1.slha
+!SLHA:verbose = 3
+!SLHA:readFrom = 2
+!SLHA:keepSM   = on
+!SLHA:useDecayTable = on
+! Specify jet matching parameters for MLM (not necessary!)
+JetMatching:merge            = on
+JetMatching:scheme           = 1
+JetMatching:setMad           = on
+JetMatching:qCut             = 15.0
+JetMatching:coneRadius       = 1.0
+JetMatching:etaJetMax        = 10.0
+JetMatching:nJetMax          = 0
+! Be more forgiving with momentum mismatches.
+Check:epTolErr               = 1e-2
+! Subruns for MLM jet matching
+LHEFInputs:nSubruns       = 1
+Main:subrun               = 0
+Beams:LHEF                = WinoNLSP_chargino500_bino1_10_hw_aaw.lhe
