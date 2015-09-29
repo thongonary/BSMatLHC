@@ -3,11 +3,6 @@
 
 ! 1) Settings that could be used in a main program, if desired.
 Main:numberOfEvents = 1000
-Main:numberToList = 0              ! number of events to print
-Main:timesToShow = 20              ! show how far along run is
-Main:timesAllowErrors = 30         ! max number of allowed errors
-Main:showChangedSettings = on      ! print changed flags/modes/parameters
-Main:showChangedParticleData = on  ! print changed particle and decay data
 
 ! 2) LHC beams parameter settings. 
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
@@ -15,7 +10,11 @@ Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 8000
 
 ! 3) Settings for SUSY and the hard-process generation
-SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
+!SUSY:all = on                      ! Switches on ALL (~400) SUSY processesSUSY:gg2squarkantisquark  = on
+SUSY:qqbar2squarkantisquark = on
+!SUSY:qq2squarksquark = on
+SUSY:idA = 1000005
+SUSY:idB = 1000005
 SLHA:file = data/pythiaCards/SUSY/sbottomsHgg/SbottomSbottom_To_HChi_HChi.slha
 SLHA:verbose = 1                  ! verbosity 
 SLHA:readFrom = 2                  ! read in from the SLHA:file
@@ -24,7 +23,7 @@ SLHA:useDecayTable = on
 !SLHA:minDecayDeltaM = 0.005        ! compressed spectra up to DeltaM = 50 MeV
 
 ! 4) Settings for the event generation process in the Pythia8 library.
-PartonLevel:MI = on                ! no multiple interactions
+PartonLevel:MPI = on                ! no multiple interactions
 PartonLevel:ISR = on               ! no initial-state radiation 
 #PartonLevel:ISR = off               ! no initial-state radiation 
 PartonLevel:FSR = on               ! no final-state radiation

@@ -241,13 +241,27 @@ void CMSRazorHgg::Loop(string outFileName) {
       }
     }
     
+
+    if ( _delphesFormat )
+      {
+	LSP1.SetPxPyPzE(1,0,0,1);
+	LSP2.SetPxPyPzE(1,0,0,1);
+	sbottomvector1.SetPxPyPzE(1,0,0,1);
+	sbottomvector2.SetPxPyPzE(1,0,0,1);
+      }
+    //std::cout << "PT test" << std::endl;
+    
     lspPt[0] = LSP1.Pt();
+    //std::cout << "PT test1" << lspPt[0] << std::endl;
     lspPt[1] = LSP2.Pt();
+    //std::cout << "PT test2" << lspPt[1] << std::endl;
     lspEta[0] = LSP1.Eta();
+    //std::cout << "PT test2.1" << lspEta[0] << std::endl;
     lspEta[1] = LSP2.Eta();
+    //std::cout << "PT test2.2" << lspEta[1] << std::endl;
     lspPhi[0] = LSP1.Phi();
     lspPhi[1] = LSP2.Phi();
-    
+    //std::cout << "PT test3" << std::endl;
     TLorentzVector LSPs = LSP1 + LSP2;
     neutMET = LSPs.Pt();
     
@@ -259,7 +273,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     sbottomPhi[0] = sbottomvector1.Phi();
     sbottomPhi[1] = sbottomvector2.Phi();
     pthat = sbottoms.Pt();
-    
+    //std::cout << "PT test4" << std::endl;
     // Build the event 
     PFReco();
     
@@ -387,6 +401,8 @@ void CMSRazorHgg::Loop(string outFileName) {
     pho2Pt  = photon2.Pt();
     pho2Eta = photon2.Eta();
     pho2Phi = photon2.Phi();
+    if ( !((pho1Pt > 40. && pho2Pt > 25.) || (pho2Pt > 40. && pho1Pt > 25.)) ) continue;
+    if ( fabs( pho1Eta ) < 1.48 || fabs( pho2Eta ) < 1.48 ) continue;
     //---------
     //Higgs
     //---------
@@ -394,7 +410,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsEta    = HiggsCandidate.Eta();
     higgsPhi    = HiggsCandidate.Phi();
     higgsMass   = HiggsCandidate.M();
-    
+    if ( higgsPt < 20. ) continue;
     /*
     fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
     fastjet::PseudoJet pho2(pho2Pt*cos(pho2Phi), pho2Pt*sin(pho2Phi), pho2Pt*sinh(pho2Eta), pho2Pt*cosh(pho2Eta));
@@ -609,24 +625,56 @@ void CMSRazorHgg::Loop(string outFileName) {
     RSQ = pow(CalcMRT(j1, j2, PFMET),2.)/MR/MR;
     if ( _debug ) std::cout << "[DEBUG]: numBox-> "<< numBox << std::endl;
 
+    
+    double highPt_SR[2] = {121.88, 129.12};
+    double hbb_SR[2]= {121., 130.};
+    double highRes_SR[2]= {122.08, 128.92};
     //---------------------------------------
     //M a k i n g   B o x   H i e r a r c h y
     //---------------------------------------
     if ( higgsPt > 110. )
       {
-	numBox = 0;
+	if (higgsMass > highPt_SR[0] && higgsMass < highPt_SR[1])
+	  {
+	    numBox = 0;
+	  }
+	else
+	  {
+	    numBox = -1;
+	  }
       }
     else if ( mbbH > 110. && mbbH < 140. )
       {
-	numBox = 1;
+	if (higgsMass > hbb_SR[0] && higgsMass < hbb_SR[1])
+	  {
+	    numBox = 1;
+	  }
+	else
+	  {
+	    numBox = -1;
+	  }
       }
-    else if ( mbbZ > 76.  && mbbZ < 106. )
+    else if ( mbbZ > 76.  && mbbZ < 106. && (higgsMass > hbb_SR[0] && higgsMass < hbb_SR[1]) )
       {
-	numBox = 2;
+	if (higgsMass > hbb_SR[0] && higgsMass < hbb_SR[1])
+	  {
+	    numBox = 2;
+	  }
+	else
+	  {
+	    numBox = -1;
+	  }
       }
     else
       {
-	numBox = 3;
+	if ( higgsMass > highRes_SR[0] && higgsMass < highRes_SR[1] )
+	  {
+	    numBox = 3;
+	  }
+	else
+	  {
+	    numBox = -1;
+	  }
       }
     
     // write event in the tree

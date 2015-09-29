@@ -2,7 +2,7 @@
 ! Lines not beginning with a letter or digit are comments.
 
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 10000
+Main:numberOfEvents = _NEVENTS
 
 ! 2) LHC beams parameter settings. 
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
@@ -16,7 +16,7 @@ SUSY:qqbar2squarkantisquark = on
 SUSY:qq2squarksquark = on
 SUSY:idA = 1000005
 SUSY:idB = 2000005
-SLHA:file = data/pythiaCards/SUSY/sbottomsHgg/SbottomLSbottomR_To_HChi_HChi_test.slha
+SLHA:file = _SLHAFILE
 SLHA:verbose = 1                  ! verbosity 
 SLHA:readFrom = 2                  ! read in from the SLHA:file
 SLHA:keepSM   = on                 ! SM particles setting in SLHA file ignored [change for full scan]
