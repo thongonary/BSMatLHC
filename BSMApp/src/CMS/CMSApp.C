@@ -49,8 +49,10 @@ int main(int argc, char* argv[]) {
     cout << "--substructure  Run Substructure tagger analysis on jets" << endl;
     cout << "--ssdilepbtag   Run the SS dilepton btag Analysis" << endl;
     cout << "--displaced     Run DSisplaced Jet Analysis" << endl;
-    cout << "-sqrts          sqrts of collisions" << endl;
-    cout << "-Output         Name of the output file (none created if not specified)" << endl;
+    cout << "--sqrts         sqrts of collisions" << endl;
+    cout << "--filter        gen-level filter efficiency"  << endl;
+    cout << "--lumi          luminosity in inverse picobarns" << endl;
+    cout << "--output        Name of the output file (none created if not specified)" << endl;
     cout << "--delphes       Sets input tree structure to be Delphes" << endl;
     return 1;
   }
@@ -74,14 +76,22 @@ int main(int argc, char* argv[]) {
   bool razorhgghbb = false;
   bool delphesFormat = false;
   double sqrts = 13000.;
+  double filter = 1.;
+  double lumi = 19800.;
 
   for (int i=1;i<argc;i++){
-    if (strncmp(argv[i],"-Output",7)==0) {
-      sscanf(argv[i],"-Output=%s",outFileName);
+    if (strncmp(argv[i],"--output",8)==0) {
+      sscanf(argv[i],"--output=%s",outFileName);
       writeOut = true;
     }
-    if (strncmp(argv[i],"-sqrts=",7)==0)  {
-      sscanf(argv[i],"-sqrts=%lf",&sqrts);
+    if (strncmp(argv[i],"--sqrts",7)==0)  {
+      sscanf(argv[i],"--sqrts=%lf",&sqrts);
+    }
+    if (strncmp(argv[i],"--filter",8)==0)  {
+      sscanf(argv[i],"--filter=%lf",&filter);
+    }
+    if (strncmp(argv[i],"--lumi",6)==0)  {
+      sscanf(argv[i],"--lumi=%lf",&lumi);
     }
     if (strncmp(argv[i],"--verbose",9)==0)      verbose = true;
     if (strncmp(argv[i],"--monojet",9)==0)      monojet = true;
@@ -154,8 +164,8 @@ int main(int argc, char* argv[]) {
 
     if(razorhgg)
       {
-	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 0.0044280, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
-       //	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 1.0, "CMSRazorHgg_HighResLik_SUS_14_017", delphesFormat);
+	//CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 0.0044280, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
+	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, lumi, filter, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
 	if(!writeOut){
 	  cout << "please specify output file" << endl;
 	  return 0;

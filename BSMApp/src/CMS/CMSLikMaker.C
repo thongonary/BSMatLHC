@@ -73,5 +73,9 @@ int main(int argc, char* argv[]) {
   
   CMSRazorLikelihood cmsRazorLikelihoodZbb("data/ExpectedObserved_RazorHgg_Zbb_Summer2015.root", "hOBS", "hEXP");
   cmsRazorLikelihoodZbb.CreatePosteriors("data/CMSRazorHgg_ZbbLik_SUS_14_017.root","Zbb");
+  
+  CMSRazorLikelihood cmsRazorLikelihoodTotal("data/ExpectedObserved_RazorHgg_Total_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodTotal.CreatePosteriors("data/CMSRazorHgg_TotalLik_SUS_14_017.root","Total");
+  
   return 0;
 }

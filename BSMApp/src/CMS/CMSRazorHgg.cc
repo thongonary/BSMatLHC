@@ -128,12 +128,16 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("pthat", &pthat, "pthat/D");
 
   
-  //double xedge[9] = {0, 100, 200, 300, 400, 500, 700, 1000, 2500};
-  //double yedge[7] = {0, 0.10, 0.20, 0.30, 0.40, 0.50, 1.0};
   TH1D* pdfHighPt = new TH1D("pdfHighPt","pdfHighPt",15,0,15);
   TH1D* pdfHbb = new TH1D("pdfHbb","pdfHbb",3,0,3);
   TH1D* pdfZbb = new TH1D("pdfZbb","pdfZbb",3,0,3);
   TH1D* pdfHighRes = new TH1D("pdfHighRes","pdfHighRes",10,0,10);
+  TH1D* pdfTotal = new TH1D("pdfTotal","pdfTotal",31,0,31);
+  
+  double xedge[5] = {150, 250, 400, 1400, 3000};
+  double yedge[5] = {0, 0.05, 0.10, 0.15, 1.0};
+
+  TH2D* pdfHighResRsqMR = new TH2D("pdfHighResRsqMR","pdfHighResRsqMR",4,xedge,4,yedge);
 
 
   std::cout << "[INFO]: getting number of entries" << std::endl;
@@ -634,43 +638,44 @@ void CMSRazorHgg::Loop(string outFileName) {
     
     // fill PDF histograms
     if(numBox == 0) {
-      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(0);
-      else if (MR>=150 && MR<200 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(1);
-      else if (MR>=150 && MR<200 && RSQ>=0.10 && RSQ<0.15) pdfHighPt->Fill(2);
-      else if (MR>=150 && MR<200 && RSQ>=0.15 && RSQ<0.20) pdfHighPt->Fill(3);
-      else if (MR>=150 && MR<200 && RSQ>=0.20 && RSQ<1.00) pdfHighPt->Fill(4);
-      else if (MR>=200 && MR<300 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(5);
-      else if (MR>=200 && MR<300 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(6);
-      else if (MR>=200 && MR<300 && RSQ>=0.10 && RSQ<0.15) pdfHighPt->Fill(7);
-      else if (MR>=200 && MR<300 && RSQ>=0.15 && RSQ<1.00) pdfHighPt->Fill(8);
-      else if (MR>=300 && MR<500 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(9);
-      else if (MR>=300 && MR<500 && RSQ>=0.05 && RSQ<0.10) pdfHighPt->Fill(10);
-      else if (MR>=300 && MR<500 && RSQ>=0.10 && RSQ<1.00) pdfHighPt->Fill(11);
-      else if (MR>=500 && MR<1600 && RSQ>=0.00 && RSQ<0.05) pdfHighPt->Fill(12);
-      else if (MR>=500 && MR<1600 && RSQ>=0.05 && RSQ<1.00) pdfHighPt->Fill(13);
-      else if (MR>=1600 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfHighPt->Fill(14);
+      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) { pdfHighPt->Fill(0); pdfTotal->Fill(0); }
+      else if (MR>=150 && MR<200 && RSQ>=0.05 && RSQ<0.10) { pdfHighPt->Fill(1); pdfTotal->Fill(1); }
+      else if (MR>=150 && MR<200 && RSQ>=0.10 && RSQ<0.15) { pdfHighPt->Fill(2); pdfTotal->Fill(2); }
+      else if (MR>=150 && MR<200 && RSQ>=0.15 && RSQ<0.20) { pdfHighPt->Fill(3); pdfTotal->Fill(3); }
+      else if (MR>=150 && MR<200 && RSQ>=0.20 && RSQ<1.00) { pdfHighPt->Fill(4); pdfTotal->Fill(4); }
+      else if (MR>=200 && MR<300 && RSQ>=0.00 && RSQ<0.05) { pdfHighPt->Fill(5); pdfTotal->Fill(5); }
+      else if (MR>=200 && MR<300 && RSQ>=0.05 && RSQ<0.10) { pdfHighPt->Fill(6); pdfTotal->Fill(6); }
+      else if (MR>=200 && MR<300 && RSQ>=0.10 && RSQ<0.15) { pdfHighPt->Fill(7); pdfTotal->Fill(7); }
+      else if (MR>=200 && MR<300 && RSQ>=0.15 && RSQ<1.00) { pdfHighPt->Fill(8); pdfTotal->Fill(8); }
+      else if (MR>=300 && MR<500 && RSQ>=0.00 && RSQ<0.05) { pdfHighPt->Fill(9); pdfTotal->Fill(9); }
+      else if (MR>=300 && MR<500 && RSQ>=0.05 && RSQ<0.10) { pdfHighPt->Fill(10); pdfTotal->Fill(10); }
+      else if (MR>=300 && MR<500 && RSQ>=0.10 && RSQ<1.00) { pdfHighPt->Fill(11); pdfTotal->Fill(11); }
+      else if (MR>=500 && MR<1600 && RSQ>=0.00 && RSQ<0.05) { pdfHighPt->Fill(12); pdfTotal->Fill(12); }
+      else if (MR>=500 && MR<1600 && RSQ>=0.05 && RSQ<1.00) { pdfHighPt->Fill(13); pdfTotal->Fill(13); }
+      else if (MR>=1600 && MR<3000 && RSQ>=0.00 && RSQ<1.00) { pdfHighPt->Fill(14); pdfTotal->Fill(14); }
     }
     if(numBox == 1) {
-      if (MR>=150 && MR<300 && RSQ>=0.00 && RSQ<0.05) pdfHbb->Fill(0);
-      else if (MR>=150 && MR<300 && RSQ>=0.05 && RSQ<1.00) pdfHbb->Fill(1);
-      else if (MR>=300 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfHbb->Fill(2);
+      if (MR>=150 && MR<300 && RSQ>=0.00 && RSQ<0.05) { pdfHbb->Fill(0); pdfTotal->Fill(15); }
+      else if (MR>=150 && MR<300 && RSQ>=0.05 && RSQ<1.00) { pdfHbb->Fill(1); pdfTotal->Fill(16); }
+      else if (MR>=300 && MR<3000 && RSQ>=0.00 && RSQ<1.00) { pdfHbb->Fill(2); pdfTotal->Fill(17); }
     }
     if(numBox == 2) {
-      if (MR>=150 && MR<450 && RSQ>=0.00 && RSQ<0.05) pdfZbb->Fill(0);
-      else if (MR>=150 && MR<450 && RSQ>=0.05 && RSQ<1.00) pdfZbb->Fill(1);
-      else if (MR>=450 && MR<3000 && RSQ>=0.00 && RSQ<1.00) pdfZbb->Fill(2);
+      if (MR>=150 && MR<450 && RSQ>=0.00 && RSQ<0.05) { pdfZbb->Fill(0); pdfTotal->Fill(18); }
+      else if (MR>=150 && MR<450 && RSQ>=0.05 && RSQ<1.00) { pdfZbb->Fill(1); pdfTotal->Fill(19); }
+      else if (MR>=450 && MR<3000 && RSQ>=0.00 && RSQ<1.00) { pdfZbb->Fill(2); pdfTotal->Fill(20); }
     }
     if(numBox == 3) {
-      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) pdfHighRes->Fill(0);
-      else if (MR>=150 && MR<250 && RSQ>=0.05 && RSQ<0.10) pdfHighRes->Fill(1);
-      else if (MR>=150 && MR<250 && RSQ>=0.10 && RSQ<0.15) pdfHighRes->Fill(2);
-      else if (MR>=150 && MR<250 && RSQ>=0.15 && RSQ<1.00) pdfHighRes->Fill(3);
-      else if (MR>=250 && MR<400 && RSQ>=0.00 && RSQ<0.05) pdfHighRes->Fill(4);
-      else if (MR>=250 && MR<400 && RSQ>=0.05 && RSQ<0.10) pdfHighRes->Fill(5);
-      else if (MR>=250 && MR<400 && RSQ>=0.10 && RSQ<1.00) pdfHighRes->Fill(6);
-      else if (MR>=400 && MR<1400 && RSQ>=0 && RSQ<0.05) pdfHighRes->Fill(7);
-      else if (MR>=400 && MR<1400 && RSQ>=0.05 && RSQ<1.00) pdfHighRes->Fill(8);
-      else if (MR>=1400 && MR<3000 && RSQ>=0 && RSQ<1.00) pdfHighRes->Fill(9);
+      pdfHighResRsqMR->Fill(MR,RSQ);
+      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) { pdfHighRes->Fill(0); pdfTotal->Fill(21); }
+      else if (MR>=150 && MR<250 && RSQ>=0.05 && RSQ<0.10) { pdfHighRes->Fill(1); pdfTotal->Fill(22); }
+      else if (MR>=150 && MR<250 && RSQ>=0.10 && RSQ<0.15) { pdfHighRes->Fill(2); pdfTotal->Fill(23); }
+      else if (MR>=150 && MR<250 && RSQ>=0.15 && RSQ<1.00) { pdfHighRes->Fill(3); pdfTotal->Fill(24); }
+      else if (MR>=250 && MR<400 && RSQ>=0.00 && RSQ<0.05) { pdfHighRes->Fill(4); pdfTotal->Fill(25); }
+      else if (MR>=250 && MR<400 && RSQ>=0.05 && RSQ<0.10) { pdfHighRes->Fill(5); pdfTotal->Fill(26); }
+      else if (MR>=250 && MR<400 && RSQ>=0.10 && RSQ<1.00) { pdfHighRes->Fill(6); pdfTotal->Fill(27); }
+      else if (MR>=400 && MR<1400 && RSQ>=0 && RSQ<0.05) { pdfHighRes->Fill(7); pdfTotal->Fill(28); }
+      else if (MR>=400 && MR<1400 && RSQ>=0.05 && RSQ<1.00) { pdfHighRes->Fill(8); pdfTotal->Fill(29); }
+      else if (MR>=1400 && MR<3000 && RSQ>=0 && RSQ<1.00) { pdfHighRes->Fill(9); pdfTotal->Fill(30); }
     }
     
   }
@@ -684,25 +689,31 @@ void CMSRazorHgg::Loop(string outFileName) {
   double effHbb = _filterEff*pdfHbb->Integral()/double(nentries);
   double effZbb = _filterEff*pdfZbb->Integral()/double(nentries);
   double effHighRes = _filterEff*pdfHighRes->Integral()/double(nentries);
+  double effTotal = _filterEff*pdfTotal->Integral()/double(nentries);
   
   // normalize the PDFs
   if(pdfHighPt->Integral()>0)  pdfHighPt->Scale(1./pdfHighPt->Integral());
   if(pdfHbb->Integral()>0)  pdfHbb->Scale(1./pdfHbb->Integral());
   if(pdfZbb->Integral()>0)  pdfZbb->Scale(1./pdfZbb->Integral());
   if(pdfHighRes->Integral()>0)  pdfHighRes->Scale(1./pdfHighRes->Integral());
+  if(pdfTotal->Integral()>0)  pdfTotal->Scale(1./pdfTotal->Integral());
   
   // write the PDFs
   pdfHighPt->Write();  
   pdfHbb->Write();
   pdfZbb->Write();
   pdfHighRes->Write();
+  pdfTotal->Write();
+  
+  pdfHighResRsqMR->Write();
 
   char outname[256];
   sprintf(outname,"data/%s.root", _analysis.c_str());
-  TH1D* xsecProbHighPt = XsecProb(pdfHighRes, effHighPt, outname, "HighPt", 500, 0., 4.0);
-  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 500, 0., 4.0);
-  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 500, 0., 4.0);
-  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 500, 0., 4.0);
+  TH1D* xsecProbHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., 5.0);
+  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., 5.0);
+  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., 5.0);
+  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., 5.0);
+  TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., 5.0);
   // Open Output file again 
   file->cd();
   
@@ -710,16 +721,19 @@ void CMSRazorHgg::Loop(string outFileName) {
   double xsecULHbb = _statTools->FindUL(xsecProbHbb, 0.95, 1.);
   double xsecULZbb = _statTools->FindUL(xsecProbZbb, 0.95, 1.);
   double xsecULHighRes = _statTools->FindUL(xsecProbHighRes, 0.95, 1.);
+  double xsecULTotal = _statTools->FindUL(xsecProbTotal, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
   effTree->Branch("effHbb", &effHbb, "effHbb/D");
   effTree->Branch("effZbb", &effZbb, "effZbb/D");
   effTree->Branch("effHighRes", &effHighRes, "effHighRes/D");
+  effTree->Branch("effTotal", &effTotal, "effTotal/D");
   effTree->Branch("xsecULHighPt", &xsecULHighPt, "xsecULHighPt/D");
   effTree->Branch("xsecULHbb", &xsecULHbb, "xsecULHbb/D");
   effTree->Branch("xsecULZbb", &xsecULZbb, "xsecULZbb/D");
   effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
+  effTree->Branch("xsecULTotal", &xsecULTotal, "xsecULTotal/D");
   effTree->Fill();
   effTree->Write();
 
@@ -727,6 +741,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbHbb->Write();
   xsecProbZbb->Write();
   xsecProbHighRes->Write();
+  xsecProbTotal->Write();
   //std::cout << "before malloc" << std::endl;
   file->Close();
   //std::cout << "after malloc" << std::endl;
@@ -755,29 +770,31 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string di
   for(int i=0; i<ibin; i++) {
     double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
     double prob = 1;
-    double logprob = 0;
+    double logProb = 0;
     for(int ix=0; ix<ibinX; ix++) {
       for(int iy=0; iy<ibinY; iy++) {
 	//if (!((ix==8) && iy==0)) continue; //just using the bin with the excess
 	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
 	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
 	//cout << "xsec = " << xsec << endl;
-	//cout << "sBin = " << sBin <<endl; 
+	//cout << "sBin = " << sBin << endl;
 	if (sBin >= 100) cout << "Note: signal events exceed 100! sBin = " << sBin << endl;
 	char name[256];
 	sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
 	TH1D* binProb = (TH1D*) likFile->Get(name);
 	//if(prob < 10.e-30) prob = 0.;
 	//if(prob <= 0) continue;
-	logprob += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
-	prob *= binProb->GetBinContent(binProb->FindBin(sBin));
+	logProb += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
+	prob *= binProb->GetBinContent(binProb->FindBin(sBin)); 
+	//cout << "logProb = " << logProb << endl;
+	//cout << "prob = " << prob << endl;
 	delete binProb;
       }
     }
     //cout << "prob = " << prob << endl;
     //cout << "exp(logprob) = " << TMath::Exp(logprob) << endl;
     //probVec->SetBinContent(i+1,prob);
-    probVec->SetBinContent(i+1,TMath::Exp(logprob));
+    probVec->SetBinContent(i+1,TMath::Exp(logProb));
   }
   probVec->Scale(1./probVec->Integral());
   likFile->Close();
