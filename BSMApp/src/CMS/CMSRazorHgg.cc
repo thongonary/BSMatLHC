@@ -40,6 +40,14 @@ void CMSRazorHgg::Loop(string outFileName) {
   if (!_delphesFormat && DetectorBase::fChain == 0) return;
   
   std::cout << "[INFO]: starting Loop" << std::endl;
+
+  //----------------------
+  //keep track of cut flow
+  //----------------------
+  int _noPhotonCut  = 0;
+  int _twoPhotonCut = 0;
+  int _higgsPtCut   = 0;
+  int _twoJetCut    = 0;
   
   double MR, RSQ;
   
@@ -245,7 +253,7 @@ void CMSRazorHgg::Loop(string outFileName) {
       }
     }
     
-
+    
     if ( _delphesFormat )
       {
 	LSP1.SetPxPyPzE(1,0,0,1);
@@ -307,6 +315,9 @@ void CMSRazorHgg::Loop(string outFileName) {
 	phoCand.push_back( tmp );
       }
     
+    _noPhotonCut++;
+    if ( phoCand.size() < 2 ) continue;
+    _twoPhotonCut++;
     //---------------------------------------
     //find the "best" photon pair, highest Pt!
     //---------------------------------------
@@ -394,7 +405,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	if ( _debug ) std::cout << "[DEBUG]: failed higgs pt requirement"<< std::endl;
 	continue;
       }
-        
+    _higgsPtCut++;
     if ( _debug ) std::cout << "[DEBUG]: --> pass higgs candidate selection" << std::endl;
     //---------------------
     //fill photon variables
@@ -406,7 +417,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     pho2Eta = photon2.Eta();
     pho2Phi = photon2.Phi();
     if ( !((pho1Pt > 40. && pho2Pt > 25.) || (pho2Pt > 40. && pho1Pt > 25.)) ) continue;
-    if ( fabs( pho1Eta ) < 1.48 || fabs( pho2Eta ) < 1.48 ) continue;
+    if ( fabs( pho1Eta ) > 1.48 || fabs( pho2Eta ) > 1.48 ) continue;
     //---------
     //Higgs
     //---------
@@ -414,7 +425,6 @@ void CMSRazorHgg::Loop(string outFileName) {
     higgsEta    = HiggsCandidate.Eta();
     higgsPhi    = HiggsCandidate.Phi();
     higgsMass   = HiggsCandidate.M();
-    if ( higgsPt < 20. ) continue;
     /*
     fastjet::PseudoJet pho1(pho1Pt*cos(pho1Phi), pho1Pt*sin(pho1Phi), pho1Pt*sinh(pho1Eta), pho1Pt*cosh(pho1Eta));
     fastjet::PseudoJet pho2(pho2Pt*cos(pho2Phi), pho2Pt*sin(pho2Phi), pho2Pt*sinh(pho2Eta), pho2Pt*cosh(pho2Eta));
@@ -592,6 +602,8 @@ void CMSRazorHgg::Loop(string outFileName) {
 	if( _debug ) std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
 	continue;
       }
+    _twoJetCut++;//pass two object requirement
+    
     if ( _debug ) std::cout << "--> before CMSHEM" << std::endl;
     CMSHemisphere* myHem = new CMSHemisphere( JetsPlusHiggsCandidate );
     myHem->CombineMinMass();
@@ -681,6 +693,7 @@ void CMSRazorHgg::Loop(string outFileName) {
 	  }
       }
     
+    //if ( numBox == -1 ) continue;
     // write event in the tree
     outTree->Fill();
     
@@ -772,6 +785,10 @@ void CMSRazorHgg::Loop(string outFileName) {
   double xsecULTotal = _statTools->FindUL(xsecProbTotal, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
+  effTree->Branch("_noPhotonCut", &_noPhotonCut, "_noPhotonCut/I");
+  effTree->Branch("_twoPhotonCut", &_twoPhotonCut, "_twoPhotonCut/I");
+  effTree->Branch("_higgsPtCut", &_higgsPtCut, "_higgsPtCut/I");
+  effTree->Branch("_twoJetCut", &_twoJetCut, "_twoJetCut/I");
   effTree->Branch("effHighPt", &effHighPt, "effHighPt/D");
   effTree->Branch("effHbb", &effHbb, "effHbb/D");
   effTree->Branch("effZbb", &effZbb, "effZbb/D");
