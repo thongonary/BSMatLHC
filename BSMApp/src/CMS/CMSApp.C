@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
   double sqrts = 13000.;
   double filter = 1.;
   double lumi = 19800.;
-
+  
   for (int i=1;i<argc;i++){
     if (strncmp(argv[i],"--output",8)==0) {
       sscanf(argv[i],"--output=%s",outFileName);
@@ -109,6 +109,10 @@ int main(int argc, char* argv[]) {
     if (strncmp(argv[i],"--hgghbbrazor",13)==0)        razorhgghbb = true;
   }
   
+  std::cout << "[INFO]: output file --> " << outFileName << std::endl;
+  std::cout << "[INFO]: center of mass energy --> " << sqrts << std::endl;
+  std::cout << "[INFO]: isDelphes? --> " << delphesFormat << std::endl;
+
   if(strncmp(inputCMS,"none",4)!=0) {
     
     // RECO Tree

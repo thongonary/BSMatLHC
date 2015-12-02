@@ -79,6 +79,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   double pthat = -1;
   int numSbottoms;
   int numHgg=0;
+  double mbbH, mbbZ;
   double neutMET;
   double sbottomPt[2];
   double sbottomEta[2];
@@ -129,6 +130,9 @@ void CMSRazorHgg::Loop(string outFileName) {
   outTree->Branch("sbottomPhi", &sbottomPhi, "sbottomPhi[2]/D");
   outTree->Branch("numSbottoms", &numSbottoms, "numSbottoms/I");
   outTree->Branch("numHgg", &numHgg, "numHgg/I");
+  outTree->Branch("mbbH", &mbbH, "mbbH/D");
+  outTree->Branch("mbbZ", &mbbZ, "mbbZ/D");
+  
   outTree->Branch("neutMET", &neutMET, "neutMET/D");
   outTree->Branch("lspPt", &lspPt, "lspPt[2]/D");
   outTree->Branch("lspEta", &lspEta, "lspEta[2]/D");
@@ -533,8 +537,8 @@ void CMSRazorHgg::Loop(string outFileName) {
     //----------------------------
     //Find H->bb, Z->bb Candidates
     //----------------------------
-    double mbbH = .0;
-    double mbbZ = .0;
+    mbbH = .0;
+    mbbZ = .0;
     for( int i = 0; i < numBJets; i++)
       {
 	for(int j = i+1; j < numBJets; j++)
