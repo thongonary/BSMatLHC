@@ -52,6 +52,7 @@ int main(int argc, char* argv[]) {
     cout << "--sqrts         sqrts of collisions" << endl;
     cout << "--filter        gen-level filter efficiency"  << endl;
     cout << "--lumi          luminosity in inverse picobarns" << endl;
+    cout << "--xsec          max xsec in picobarns" << endl;
     cout << "--output        Name of the output file (none created if not specified)" << endl;
     cout << "--delphes       Sets input tree structure to be Delphes" << endl;
     return 1;
@@ -78,6 +79,7 @@ int main(int argc, char* argv[]) {
   double sqrts = 13000.;
   double filter = 1.;
   double lumi = 19800.;
+  double xsecMax = 20.;
   
   for (int i=1;i<argc;i++){
     if (strncmp(argv[i],"--output",8)==0) {
@@ -92,6 +94,9 @@ int main(int argc, char* argv[]) {
     }
     if (strncmp(argv[i],"--lumi",6)==0)  {
       sscanf(argv[i],"--lumi=%lf",&lumi);
+    }
+    if (strncmp(argv[i],"--xsec",6)==0)  {
+      sscanf(argv[i],"--xsec=%lf",&xsecMax);
     }
     if (strncmp(argv[i],"--verbose",9)==0)      verbose = true;
     if (strncmp(argv[i],"--monojet",9)==0)      monojet = true;
@@ -169,7 +174,7 @@ int main(int argc, char* argv[]) {
     if(razorhgg)
       {
 	//CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, 19800., 0.0044280, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
-	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, lumi, filter, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
+	CMSRazorHgg* cmsrazorhgg = new CMSRazorHgg(cmsChain, lumi, filter, xsecMax, "CMSRazorHgg_Lik_SUS_14_017", delphesFormat);
 	if(!writeOut){
 	  cout << "please specify output file" << endl;
 	  return 0;

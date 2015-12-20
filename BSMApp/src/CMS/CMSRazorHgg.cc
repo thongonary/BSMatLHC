@@ -17,9 +17,10 @@
 
 #define _debug 0
 
-CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, double filterEff, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
+CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, double filterEff, double xsecMax, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
   _Lumi = Lumi;
   _filterEff = filterEff;
+  _xsecMax = xsecMax;
   _statTools = new StatTools(-99);
   _analysis = analysis;
   _delphesFormat = delphesFormat;
@@ -774,11 +775,11 @@ void CMSRazorHgg::Loop(string outFileName) {
 
   char outname[256];
   sprintf(outname,"data/%s.root", _analysis.c_str());
-  TH1D* xsecProbHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., 5.0);
-  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., 5.0);
-  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., 5.0);
-  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., 5.0);
-  TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., 5.0);
+  TH1D* xsecProbHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax);
+  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax);
+  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax);
+  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax);
+  TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax);
   // Open Output file again 
   file->cd();
   
@@ -845,12 +846,15 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string di
 	//if (!((ix==8) && iy==0)) continue; //just using the bin with the excess
 	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
 	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
-	//cout << "xsec = " << xsec << endl;
-	//cout << "sBin = " << sBin << endl;
-	if (sBin >= 100) cout << "Note: signal events exceed 100! sBin = " << sBin << endl;
 	char name[256];
 	sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
 	TH1D* binProb = (TH1D*) likFile->Get(name);
+	double yieldmax = binProb->GetXaxis()->GetXmax();
+	if (sBin >= yieldmax) {
+	  cout << "Note: signal events exceed " << yieldmax << "! sBin = " << sBin << endl;
+	  cout << "FindBin returns: " << binProb->FindBin(sBin) << endl;
+	  cout << "bin prob returns: " << binProb->GetBinContent(binProb->FindBin(sBin)) << endl;
+	}
 	//if(prob < 10.e-30) prob = 0.;
 	//if(prob <= 0) continue;
 	logProb += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));

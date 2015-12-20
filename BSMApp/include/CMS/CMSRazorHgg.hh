@@ -26,7 +26,7 @@ class CMSRazorHgg : public CMSReco, public DataAnalysis {
 public:
   
   //! constructor
-  CMSRazorHgg(TTree *tree, double Lumi, double filterEff, string analysis, bool delphesFormat);
+  CMSRazorHgg(TTree *tree, double Lumi, double filterEff, double xsecMax, string analysis, bool delphesFormat);
   //! destructor
   virtual ~CMSRazorHgg();
   //! loop over events
@@ -42,6 +42,8 @@ private:
   double _Lumi;
   // Gen-level filter efficiency
   double _filterEff;
+  // Max xsec for plots [pb]
+  double _xsecMax;
   // collision energy
   double _sqrts;
   // boolean to use Delphes format
