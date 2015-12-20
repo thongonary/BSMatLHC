@@ -70,8 +70,9 @@ int main(int argc, char* argv[]) {
   // Initialize. Beam parameters set in .pythia file.
   pythia.init();
   
-  pythia.particleData.doForceWidth(1000005,true);
-
+  //pythia.particleData.doForceWidth(1000005,true);
+  //pythia.particleData.mayDecay(1000005, false);
+  
   // Values for filter.
   int    pdgId   = 22; //ask for photons
   int    pdgMothId   = 25; //ask for Higgs mother
