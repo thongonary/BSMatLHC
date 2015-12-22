@@ -128,7 +128,9 @@ if __name__ == '__main__':
 
     # Run CMSApp to do apply the CMS analyses to the generated sample
     cmsOut = delphesOut.replace('_delphes.root','_cmsapp.root')
-    command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOut,filtereff,options.lumi,options.xsecMax,options.sqrts)    
+    cmsOutTemp = pwd+'/output/'+cmsOut.replace('/')[-1]
+    command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOutTemp,filtereff,options.lumi,options.xsecMax,options.sqrts)    
     os.chdir(susyappdir)
     exec_me(command,True)
+    exec_me('mv %s %s'%(cmsOutTemp, cmsOut),True)
  
