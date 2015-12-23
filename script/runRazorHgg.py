@@ -20,7 +20,7 @@ if __name__ == '__main__':
                   help="Template pythia card to use")
     parser.add_option('--slha',dest="slhaTemplate",type="string",default="config/run2.config",
                   help="Template pythia card to use")
-    parser.add_option('-d','--dir',dest="outDir",default="./",type="string",
+    parser.add_option('-d','--dir',dest="outDir",default="output",type="string",
                   help="Output directory to store output")
     parser.add_option('-n','--nevents',dest="nevents", default=10000,type="int",
                   help="number of events")
@@ -28,17 +28,17 @@ if __name__ == '__main__':
                   help="CM energy")
     parser.add_option('-l','--lumi',dest="lumi", default=19800,type="float",
                   help="CM energy")
-    parser.add_option('--mChargino',dest="mChargino", default=130,type="int",
-                  help="value to replace CHARGINO in all templates; Note Chargino mass = Neutralino2 mass")
     parser.add_option('--mLSP',dest="mLSP", default=1,type="int",
                   help="value to replace LSP in all templates")
-    parser.add_option('--mSbottom',dest="mSbottom", default=470,type="int",
-                  help="value to replace SBOTTOM in all templates")
+    parser.add_option('--mParent',dest="mParent", default=130,type="int",
+                  help="value to replace Parent mass in all templates")
     parser.add_option('--xsec',dest="xsecMax", default=20,type="int",
                   help="max xsec for priors, etc.")
     parser.add_option('-m','--model',dest="model",type="string",default="TChiwh",
                   help="model name")
-    
+    parser.add_option('--dry-run',dest='dryRun',default=False,action='store_true',
+                  help="dry run")
+
 
     (options,args) = parser.parse_args()
     
@@ -52,27 +52,25 @@ if __name__ == '__main__':
     delphesdir = pwd+'/delphes/'
 
     outDir = options.outDir
+    tmpDir = pwd+'/tmp'
+    exec_me('mkdir -p %s'%outDir)
+    exec_me('mkdir -p %s'%tmpDir)
     if outDir[0]!='/':
         outDir = pwd+'/'+outDir
         
     delphesCard = 'cards/delphes_card_CMS_CPena.tcl'
 
-    mParent = 0
-    if options.model=='TChiwh':
-        mParent = options.mChargino
-    if options.model=='T2bH':
-        mParent = options.mSbottom
     
     #create the SLHA card from template    
-    slha = options.slhaTemplate.replace(options.model,'%s.%i.%i'%(options.model,mParent,options.mLSP))
+    slha = options.slhaTemplate.replace(options.model,'%s.%i.%i'%(options.model,options.mParent,options.mLSP))
     slhaFile = open(slha, 'w')
     slhaTemplateFile = open(options.slhaTemplate,'r')
     for line in slhaTemplateFile:
         if 'CHARGINO' in line and options.model=="TChiwh":
-            newline = line.replace('CHARGINO','%i'%options.mChargino)
+            newline = line.replace('CHARGINO','%i'%options.mParent)
             slhaFile.write(newline)
         elif 'SBOTTOM' in line and options.model=="T2bH":
-            newline = line.replace('SBOTTOM','%i'%options.mSbottom)
+            newline = line.replace('SBOTTOM','%i'%options.mParent)
             slhaFile.write(newline)
         elif 'NLSP' in line and options.model=="T2bH":
             newline = line.replace('NLSP','%i'%(options.mLSP+130))
@@ -86,7 +84,7 @@ if __name__ == '__main__':
     slhaTemplateFile.close()
 
     #create the PYTHIA8 card from template
-    pythiaCard = options.pythiaCardTemplate.replace(options.model,'%s.%i.%i'%(options.model,mParent,options.mLSP))
+    pythiaCard = options.pythiaCardTemplate.replace(options.model,'%s.%i.%i'%(options.model,options.mParent,options.mLSP))
     pythiaCardFile = open(pythiaCard, "w")
     pythiaCardTemplateFile = open(options.pythiaCardTemplate,"r")
     for line in pythiaCardTemplateFile:
@@ -107,16 +105,22 @@ if __name__ == '__main__':
     slha = pwd+'/'+slha
     
     # Run GenPythia to generate events:
-    pythiaOut = outDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
+    pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
     command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s'%(pythiaCard,pythiaOut)
     os.chdir(susygendir)
-    exec_me(command,True)
+    exec_me(command,options.dryRun)
+    exec_me('cp %s/*_GenTree.root %s'%(tmpDir, outDir),options.dryRun)
+    exec_me('cp %s/*.hepmc %s'%(tmpDir, outDir),options.dryRun)
+    exec_me('cp %s/*.lhe %s'%(tmpDir, outDir),options.dryRun)
 
     # Get gen-level filter information
-    genTreeFile = rt.TFile.Open(pythiaOut+'_GenTree.root')
-    infoTree = genTreeFile.Get('infoTree')
-    infoTree.GetEntry(0)
-    filtereff = infoTree.filtereff
+    if options.dryRun:
+        filtereff = 1
+    else:
+        genTreeFile = rt.TFile.Open(pythiaOut+'_GenTree.root')
+        infoTree = genTreeFile.Get('infoTree')
+        infoTree.GetEntry(0)
+        filtereff = infoTree.filtereff
     if options.model=='TChiwh':
         filtereff *= 0.002
 
@@ -124,13 +128,15 @@ if __name__ == '__main__':
     delphesOut = pythiaOut+'_delphes.root'
     command = './DelphesHepMC %s %s %s'%(delphesCard,delphesOut,pythiaOut+'.hepmc')
     os.chdir(delphesdir)
-    exec_me(command,True)
+    exec_me(command,options.dryRun)
+    exec_me('cp %s/*_delphes.root %s'%(tmpDir, outDir),options.dryRun)
 
     # Run CMSApp to do apply the CMS analyses to the generated sample
     cmsOut = delphesOut.replace('_delphes.root','_cmsapp.root')
-    cmsOutTemp = pwd+'/output/'+cmsOut.replace('/')[-1]
-    command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOutTemp,filtereff,options.lumi,options.xsecMax,options.sqrts)    
+    command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOut,filtereff,options.lumi,options.xsecMax,options.sqrts)    
     os.chdir(susyappdir)
-    exec_me(command,True)
-    exec_me('mv %s %s'%(cmsOutTemp, cmsOut),True)
+    exec_me(command,options.dryRun)
+    exec_me('cp %s/*_cmsapp.root %s'%(tmpDir, outDir),options.dryRun)
+    
+    exec_me('rm -rf %s'%(tmpDir),options.dryRun)
  
