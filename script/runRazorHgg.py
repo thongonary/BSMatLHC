@@ -53,8 +53,8 @@ if __name__ == '__main__':
 
     outDir = options.outDir
     tmpDir = pwd+'/tmp'
-    exec_me('mkdir -p %s'%outDir)
-    exec_me('mkdir -p %s'%tmpDir)
+    exec_me('mkdir -p %s'%outDir,options.dryRun)
+    exec_me('mkdir -p %s'%tmpDir,options.dryRun)
     if outDir[0]!='/':
         outDir = pwd+'/'+outDir
         
