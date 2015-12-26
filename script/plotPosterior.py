@@ -19,12 +19,14 @@ if __name__ == '__main__':
                   help="Output directory to store plots")
     parser.add_option('-i','--indir',dest="inDir",default="./",type="string",
                   help="Input directory")
+    parser.add_option('--expected',dest='expected',default=False,action='store_true',
+                  help="expected")
     
     (options,args) = parser.parse_args()
 
     tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(options.inDir,options.model,options.mParent,options.mLSP))
-    boxes = ['HighPt','HighRes','Total']
-    colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'Total': rt.kBlack}
+    boxes = ['HighPt','HighRes','Hbb','Zbb','Total']
+    colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'Hbb': rt.kGreen, 'Zbb': rt.kMagenta, 'Total': rt.kBlack}
     hists = {}
     histsFill = {}
     xsecUL = {}
@@ -34,7 +36,10 @@ if __name__ == '__main__':
     limit = tfile.Get('RazorInclusiveEfficiency')
     limit.GetEntry(0)
     for box in boxes:
-        hist = tfile.Get("probVec"+box)
+        if options.expected:            
+            hist = tfile.Get("probVecExp"+box)
+        else:
+            hist = tfile.Get("probVec"+box)
         hist.SetLineColor(colors[box])
         hists[box] = hist
         exec('mylimit = float(limit.xsecUL%s)'%box)
@@ -51,7 +56,10 @@ if __name__ == '__main__':
     #c.SetLogy()
     hists[maxBox].GetXaxis().SetTitle("Cross Section [pb]")
     #hists[maxBox].GetXaxis().SetRangeUser(0,10)
-    hists[maxBox].GetYaxis().SetTitle("Posterior Probability")
+    if options.expected:
+        hists[maxBox].GetYaxis().SetTitle("Expected Posterior Probability")
+    else:
+        hists[maxBox].GetYaxis().SetTitle("Posterior Probability")
     hists[maxBox].GetYaxis().SetTitleOffset(1.3)
     hists[maxBox].Draw()
     graphs = []
@@ -89,13 +97,19 @@ if __name__ == '__main__':
     if options.model=="T2bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{b}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mParent,options.mLSP))
-    leg = rt.TLegend(0.5,0.65,0.85,0.8)
-    leg.SetTextFont(42)
-    leg.SetFillColor(rt.kWhite)
-    leg.SetLineColor(rt.kWhite)
+    if len(boxes)==5:
+        leg = rt.TLegend(0.7,0.45,0.89,0.7)
+    elif len(boxes)==4:
+        leg = rt.TLegend(0.7,0.5,0.89,0.7)
+    elif len(boxes)==3:
+        leg = rt.TLegend(0.7,0.55,0.89,0.7)
+    elif len(boxes)==2:
+        leg = rt.TLegend(0.7,0.6,0.89,0.7)
+    elif len(boxes)==1:
+        leg = rt.TLegend(0.7,0.65,0.89,0.7)
     
         
-    leg = rt.TLegend(0.7,0.55,0.89,0.7)
+    #leg = rt.TLegend(0.7,0.5,0.89,0.7)
     leg.SetTextFont(42)
     leg.SetFillColor(rt.kWhite)
     leg.SetLineColor(rt.kWhite)
@@ -104,6 +118,10 @@ if __name__ == '__main__':
         leg.AddEntry(hists[box], box,"l")
 
     leg.Draw()
-    
-    c.Print("%s/posterior_%s_%i_%i.pdf"%(options.outDir,options.model,options.mParent,options.mLSP))
-    c.Print("%s/posterior_%s_%i_%i.C"%(options.outDir,options.model,options.mParent,options.mLSP))
+
+    if options.expected:        
+        c.Print("%s/posterior_expected_%s_%i_%i.pdf"%(options.outDir,options.model,options.mParent,options.mLSP))
+        c.Print("%s/posterior_expected_%s_%i_%i.C"%(options.outDir,options.model,options.mParent,options.mLSP))
+    else:
+        c.Print("%s/posterior_%s_%i_%i.pdf"%(options.outDir,options.model,options.mParent,options.mLSP))
+        c.Print("%s/posterior_%s_%i_%i.C"%(options.outDir,options.model,options.mParent,options.mLSP))

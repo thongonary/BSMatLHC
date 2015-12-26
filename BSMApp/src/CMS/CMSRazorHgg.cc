@@ -775,11 +775,17 @@ void CMSRazorHgg::Loop(string outFileName) {
 
   char outname[256];
   sprintf(outname,"data/%s.root", _analysis.c_str());
-  TH1D* xsecProbHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax);
-  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax);
-  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax);
-  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax);
-  TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax);
+  TH1D* xsecProbHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax, false);
+  TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, false);
+  TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, false);
+  TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, false);
+  TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, false);
+  
+  TH1D* xsecProbExpHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax, true);
+  TH1D* xsecProbExpHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, true);
+  TH1D* xsecProbExpZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, true);
+  TH1D* xsecProbExpHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, true);
+  TH1D* xsecProbExpTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, true);
   // Open Output file again 
   file->cd();
   
@@ -788,6 +794,12 @@ void CMSRazorHgg::Loop(string outFileName) {
   double xsecULZbb = _statTools->FindUL(xsecProbZbb, 0.95, 1.);
   double xsecULHighRes = _statTools->FindUL(xsecProbHighRes, 0.95, 1.);
   double xsecULTotal = _statTools->FindUL(xsecProbTotal, 0.95, 1.);
+  
+  double xsecULExpHighPt = _statTools->FindUL(xsecProbExpHighPt, 0.95, 1.);
+  double xsecULExpHbb = _statTools->FindUL(xsecProbExpHbb, 0.95, 1.);
+  double xsecULExpZbb = _statTools->FindUL(xsecProbExpZbb, 0.95, 1.);
+  double xsecULExpHighRes = _statTools->FindUL(xsecProbExpHighRes, 0.95, 1.);
+  double xsecULExpTotal = _statTools->FindUL(xsecProbExpTotal, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("_noPhotonCut", &_noPhotonCut, "_noPhotonCut/I");
@@ -804,6 +816,11 @@ void CMSRazorHgg::Loop(string outFileName) {
   effTree->Branch("xsecULZbb", &xsecULZbb, "xsecULZbb/D");
   effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
   effTree->Branch("xsecULTotal", &xsecULTotal, "xsecULTotal/D");
+  effTree->Branch("xsecULExpHighPt", &xsecULExpHighPt, "xsecULExpHighPt/D");
+  effTree->Branch("xsecULExpHbb", &xsecULExpHbb, "xsecULExpHbb/D");
+  effTree->Branch("xsecULExpZbb", &xsecULExpZbb, "xsecULExpZbb/D");
+  effTree->Branch("xsecULExpHighRes", &xsecULExpHighRes, "xsecULExpHighRes/D");
+  effTree->Branch("xsecULExpTotal", &xsecULExpTotal, "xsecULExpTotal/D");
   effTree->Fill();
   effTree->Write();
 
@@ -812,6 +829,11 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbZbb->Write();
   xsecProbHighRes->Write();
   xsecProbTotal->Write();
+  xsecProbExpHighPt->Write();
+  xsecProbExpHbb->Write();
+  xsecProbExpZbb->Write();
+  xsecProbExpHighRes->Write();
+  xsecProbExpTotal->Write();
   //std::cout << "before malloc" << std::endl;
   file->Close();
   //std::cout << "after malloc" << std::endl;
@@ -825,13 +847,14 @@ double CMSRazorHgg::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
 }
 
 
-TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string directory, int ibin, double xmin, double xmax) {
+TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string directory, int ibin, double xmin, double xmax, bool expected) {
   
   int ibinX = sigPdf->GetXaxis()->GetNbins();
   int ibinY = sigPdf->GetYaxis()->GetNbins();
   
   char histname[256];
-  sprintf(histname, "%s%s","probVec", directory.c_str());
+  if (expected) sprintf(histname, "%s%s","probVecExp", directory.c_str());
+  else sprintf(histname, "%s%s","probVec", directory.c_str());
   TH1D* probVec = new TH1D(histname, histname, ibin, xmin, xmax);
   
   TFile* likFile = new TFile(TString(Filename));  
@@ -847,7 +870,9 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string di
 	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
 	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
 	char name[256];
-	sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
+	if (expected) sprintf(name, "%s/exp_%i_%i", directory.c_str(), ix, iy);
+	else sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
+	
 	TH1D* binProb = (TH1D*) likFile->Get(name);
 	double yieldmax = binProb->GetXaxis()->GetXmax();
 	if (sBin >= yieldmax) {
