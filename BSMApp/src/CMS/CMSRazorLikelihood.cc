@@ -29,8 +29,12 @@ void CMSRazorLikelihood::CreatePosteriors(TString outputFname, TString directory
     for(int iy=1; iy<=ny; iy++) {
       char name[256];
       sprintf(name, "lik_%i_%i", ix-1, iy-1);
-      TH1D* thisHisto = _statTools->LogNormPoissonConv(TString(name), nH->GetBinContent(ix, iy), bH->GetBinContent(ix, iy), bH->GetBinError(ix, iy));
-      thisHisto->Write();
+      TH1D* obsHisto = _statTools->LogNormPoissonConv(TString(name), nH->GetBinContent(ix, iy), bH->GetBinContent(ix, iy), bH->GetBinError(ix, iy));
+      obsHisto->Write();
+      char expname[256];
+      sprintf(expname, "exp_%i_%i", ix-1, iy-1);
+      TH1D* expHisto = _statTools->LogNormPoissonConv(TString(expname), bH->GetBinContent(ix, iy), bH->GetBinContent(ix, iy), bH->GetBinError(ix, iy));
+      expHisto->Write();
       //outFile->Close();
       //delete thisHisto;
     }
