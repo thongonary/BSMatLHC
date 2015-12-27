@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Sep 11 14:24:13 2015 by ROOT version 5.34/31
+// Sun Dec 27 01:56:31 2015 by ROOT version 5.34/31
 // from TTree Delphes/Analysis tree
-// found on file: output.root
+// found on file: output_TChiwh/simplifiedModel.TChiwh.130.1_delphes.root
 //////////////////////////////////////////////////////////
 
 #ifndef DelphesTree_h
@@ -21,14 +21,14 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
    const Int_t kMaxEvent = 1;
-   const Int_t kMaxWeight = 1;
-   const Int_t kMaxParticle = 100;
-   const Int_t kMaxTrack = 100;
-   const Int_t kMaxTower = 100;
-   const Int_t kMaxEFlowTrack = 100;
-   const Int_t kMaxEFlowPhoton = 100;
-   const Int_t kMaxEFlowNeutralHadron = 100;
+   const Int_t kMaxParticle = 2000;
+   const Int_t kMaxTrack = 500;
+   const Int_t kMaxTower = 500;
+   const Int_t kMaxEFlowTrack = 500;
+   const Int_t kMaxEFlowPhoton = 500;
+   const Int_t kMaxEFlowNeutralHadron = 500;
    const Int_t kMaxGenJet = 100;
+   const Int_t kMaxGenMissingET = 1;
    const Int_t kMaxJet = 100;
    const Int_t kMaxElectron = 30;
    const Int_t kMaxPhoton = 100;
@@ -49,16 +49,19 @@ public :
    Float_t         Event_ReadTime[kMaxEvent];   //[Event_]
    Float_t         Event_ProcTime[kMaxEvent];   //[Event_]
    Int_t           Event_ProcessID[kMaxEvent];   //[Event_]
+   Int_t           Event_MPI[kMaxEvent];   //[Event_]
    Float_t         Event_Weight[kMaxEvent];   //[Event_]
-   Float_t         Event_ScalePDF[kMaxEvent];   //[Event_]
+   Float_t         Event_Scale[kMaxEvent];   //[Event_]
    Float_t         Event_AlphaQED[kMaxEvent];   //[Event_]
    Float_t         Event_AlphaQCD[kMaxEvent];   //[Event_]
+   Int_t           Event_ID1[kMaxEvent];   //[Event_]
+   Int_t           Event_ID2[kMaxEvent];   //[Event_]
+   Float_t         Event_X1[kMaxEvent];   //[Event_]
+   Float_t         Event_X2[kMaxEvent];   //[Event_]
+   Float_t         Event_ScalePDF[kMaxEvent];   //[Event_]
+   Float_t         Event_PDF1[kMaxEvent];   //[Event_]
+   Float_t         Event_PDF2[kMaxEvent];   //[Event_]
    Int_t           Event_size;
-   Int_t           Weight_;
-   UInt_t          Weight_fUniqueID[kMaxWeight];   //[Weight_]
-   UInt_t          Weight_fBits[kMaxWeight];   //[Weight_]
-   Float_t         Weight_Weight[kMaxWeight];   //[Weight_]
-   Int_t           Weight_size;
    Int_t           Particle_;
    UInt_t          Particle_fUniqueID[kMaxParticle];   //[Particle_]
    UInt_t          Particle_fBits[kMaxParticle];   //[Particle_]
@@ -220,6 +223,13 @@ public :
    Double_t        GenJet_Area_fP_fZ[kMaxGenJet];   //[GenJet_]
    Double_t        GenJet_Area_fE[kMaxGenJet];   //[GenJet_]
    Int_t           GenJet_size;
+   Int_t           GenMissingET_;
+   UInt_t          GenMissingET_fUniqueID[kMaxGenMissingET];   //[GenMissingET_]
+   UInt_t          GenMissingET_fBits[kMaxGenMissingET];   //[GenMissingET_]
+   Float_t         GenMissingET_MET[kMaxGenMissingET];   //[GenMissingET_]
+   Float_t         GenMissingET_Eta[kMaxGenMissingET];   //[GenMissingET_]
+   Float_t         GenMissingET_Phi[kMaxGenMissingET];   //[GenMissingET_]
+   Int_t           GenMissingET_size;
    Int_t           Jet_;
    UInt_t          Jet_fUniqueID[kMaxJet];   //[Jet_]
    UInt_t          Jet_fBits[kMaxJet];   //[Jet_]
@@ -335,16 +345,19 @@ public :
    TBranch        *b_Event_ReadTime;   //!
    TBranch        *b_Event_ProcTime;   //!
    TBranch        *b_Event_ProcessID;   //!
+   TBranch        *b_Event_MPI;   //!
    TBranch        *b_Event_Weight;   //!
-   TBranch        *b_Event_ScalePDF;   //!
+   TBranch        *b_Event_Scale;   //!
    TBranch        *b_Event_AlphaQED;   //!
    TBranch        *b_Event_AlphaQCD;   //!
+   TBranch        *b_Event_ID1;   //!
+   TBranch        *b_Event_ID2;   //!
+   TBranch        *b_Event_X1;   //!
+   TBranch        *b_Event_X2;   //!
+   TBranch        *b_Event_ScalePDF;   //!
+   TBranch        *b_Event_PDF1;   //!
+   TBranch        *b_Event_PDF2;   //!
    TBranch        *b_Event_size;   //!
-   TBranch        *b_Weight_;   //!
-   TBranch        *b_Weight_fUniqueID;   //!
-   TBranch        *b_Weight_fBits;   //!
-   TBranch        *b_Weight_Weight;   //!
-   TBranch        *b_Weight_size;   //!
    TBranch        *b_Particle_;   //!
    TBranch        *b_Particle_fUniqueID;   //!
    TBranch        *b_Particle_fBits;   //!
@@ -506,6 +519,13 @@ public :
    TBranch        *b_GenJet_Area_fP_fZ;   //!
    TBranch        *b_GenJet_Area_fE;   //!
    TBranch        *b_GenJet_size;   //!
+   TBranch        *b_GenMissingET_;   //!
+   TBranch        *b_GenMissingET_fUniqueID;   //!
+   TBranch        *b_GenMissingET_fBits;   //!
+   TBranch        *b_GenMissingET_MET;   //!
+   TBranch        *b_GenMissingET_Eta;   //!
+   TBranch        *b_GenMissingET_Phi;   //!
+   TBranch        *b_GenMissingET_size;   //!
    TBranch        *b_Jet_;   //!
    TBranch        *b_Jet_fUniqueID;   //!
    TBranch        *b_Jet_fBits;   //!
@@ -632,9 +652,9 @@ DelphesTree::DelphesTree(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("output.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("output_TChiwh/simplifiedModel.TChiwh.130.1_delphes.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("output.root");
+         f = new TFile("output_TChiwh/simplifiedModel.TChiwh.130.1_delphes.root");
       }
       f->GetObject("Delphes",tree);
 
@@ -690,16 +710,19 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("Event.ReadTime", Event_ReadTime, &b_Event_ReadTime);
    fChain->SetBranchAddress("Event.ProcTime", Event_ProcTime, &b_Event_ProcTime);
    fChain->SetBranchAddress("Event.ProcessID", Event_ProcessID, &b_Event_ProcessID);
+   fChain->SetBranchAddress("Event.MPI", Event_MPI, &b_Event_MPI);
    fChain->SetBranchAddress("Event.Weight", Event_Weight, &b_Event_Weight);
-   fChain->SetBranchAddress("Event.ScalePDF", Event_ScalePDF, &b_Event_ScalePDF);
+   fChain->SetBranchAddress("Event.Scale", Event_Scale, &b_Event_Scale);
    fChain->SetBranchAddress("Event.AlphaQED", Event_AlphaQED, &b_Event_AlphaQED);
    fChain->SetBranchAddress("Event.AlphaQCD", Event_AlphaQCD, &b_Event_AlphaQCD);
+   fChain->SetBranchAddress("Event.ID1", Event_ID1, &b_Event_ID1);
+   fChain->SetBranchAddress("Event.ID2", Event_ID2, &b_Event_ID2);
+   fChain->SetBranchAddress("Event.X1", Event_X1, &b_Event_X1);
+   fChain->SetBranchAddress("Event.X2", Event_X2, &b_Event_X2);
+   fChain->SetBranchAddress("Event.ScalePDF", Event_ScalePDF, &b_Event_ScalePDF);
+   fChain->SetBranchAddress("Event.PDF1", Event_PDF1, &b_Event_PDF1);
+   fChain->SetBranchAddress("Event.PDF2", Event_PDF2, &b_Event_PDF2);
    fChain->SetBranchAddress("Event_size", &Event_size, &b_Event_size);
-   fChain->SetBranchAddress("Weight", &Weight_, &b_Weight_);
-   fChain->SetBranchAddress("Weight.fUniqueID", &Weight_fUniqueID, &b_Weight_fUniqueID);
-   fChain->SetBranchAddress("Weight.fBits", &Weight_fBits, &b_Weight_fBits);
-   fChain->SetBranchAddress("Weight.Weight", &Weight_Weight, &b_Weight_Weight);
-   fChain->SetBranchAddress("Weight_size", &Weight_size, &b_Weight_size);
    fChain->SetBranchAddress("Particle", &Particle_, &b_Particle_);
    fChain->SetBranchAddress("Particle.fUniqueID", Particle_fUniqueID, &b_Particle_fUniqueID);
    fChain->SetBranchAddress("Particle.fBits", Particle_fBits, &b_Particle_fBits);
@@ -726,29 +749,29 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("Particle.Z", Particle_Z, &b_Particle_Z);
    fChain->SetBranchAddress("Particle_size", &Particle_size, &b_Particle_size);
    fChain->SetBranchAddress("Track", &Track_, &b_Track_);
-   fChain->SetBranchAddress("Track.fUniqueID", &Track_fUniqueID, &b_Track_fUniqueID);
-   fChain->SetBranchAddress("Track.fBits", &Track_fBits, &b_Track_fBits);
-   fChain->SetBranchAddress("Track.PID", &Track_PID, &b_Track_PID);
-   fChain->SetBranchAddress("Track.Charge", &Track_Charge, &b_Track_Charge);
-   fChain->SetBranchAddress("Track.PT", &Track_PT, &b_Track_PT);
-   fChain->SetBranchAddress("Track.Eta", &Track_Eta, &b_Track_Eta);
-   fChain->SetBranchAddress("Track.Phi", &Track_Phi, &b_Track_Phi);
-   fChain->SetBranchAddress("Track.EtaOuter", &Track_EtaOuter, &b_Track_EtaOuter);
-   fChain->SetBranchAddress("Track.PhiOuter", &Track_PhiOuter, &b_Track_PhiOuter);
-   fChain->SetBranchAddress("Track.X", &Track_X, &b_Track_X);
-   fChain->SetBranchAddress("Track.Y", &Track_Y, &b_Track_Y);
-   fChain->SetBranchAddress("Track.Z", &Track_Z, &b_Track_Z);
-   fChain->SetBranchAddress("Track.T", &Track_T, &b_Track_T);
-   fChain->SetBranchAddress("Track.XOuter", &Track_XOuter, &b_Track_XOuter);
-   fChain->SetBranchAddress("Track.YOuter", &Track_YOuter, &b_Track_YOuter);
-   fChain->SetBranchAddress("Track.ZOuter", &Track_ZOuter, &b_Track_ZOuter);
-   fChain->SetBranchAddress("Track.TOuter", &Track_TOuter, &b_Track_TOuter);
-   fChain->SetBranchAddress("Track.Dxy", &Track_Dxy, &b_Track_Dxy);
-   fChain->SetBranchAddress("Track.SDxy", &Track_SDxy, &b_Track_SDxy);
-   fChain->SetBranchAddress("Track.Xd", &Track_Xd, &b_Track_Xd);
-   fChain->SetBranchAddress("Track.Yd", &Track_Yd, &b_Track_Yd);
-   fChain->SetBranchAddress("Track.Zd", &Track_Zd, &b_Track_Zd);
-   fChain->SetBranchAddress("Track.Particle", &Track_Particle, &b_Track_Particle);
+   fChain->SetBranchAddress("Track.fUniqueID", Track_fUniqueID, &b_Track_fUniqueID);
+   fChain->SetBranchAddress("Track.fBits", Track_fBits, &b_Track_fBits);
+   fChain->SetBranchAddress("Track.PID", Track_PID, &b_Track_PID);
+   fChain->SetBranchAddress("Track.Charge", Track_Charge, &b_Track_Charge);
+   fChain->SetBranchAddress("Track.PT", Track_PT, &b_Track_PT);
+   fChain->SetBranchAddress("Track.Eta", Track_Eta, &b_Track_Eta);
+   fChain->SetBranchAddress("Track.Phi", Track_Phi, &b_Track_Phi);
+   fChain->SetBranchAddress("Track.EtaOuter", Track_EtaOuter, &b_Track_EtaOuter);
+   fChain->SetBranchAddress("Track.PhiOuter", Track_PhiOuter, &b_Track_PhiOuter);
+   fChain->SetBranchAddress("Track.X", Track_X, &b_Track_X);
+   fChain->SetBranchAddress("Track.Y", Track_Y, &b_Track_Y);
+   fChain->SetBranchAddress("Track.Z", Track_Z, &b_Track_Z);
+   fChain->SetBranchAddress("Track.T", Track_T, &b_Track_T);
+   fChain->SetBranchAddress("Track.XOuter", Track_XOuter, &b_Track_XOuter);
+   fChain->SetBranchAddress("Track.YOuter", Track_YOuter, &b_Track_YOuter);
+   fChain->SetBranchAddress("Track.ZOuter", Track_ZOuter, &b_Track_ZOuter);
+   fChain->SetBranchAddress("Track.TOuter", Track_TOuter, &b_Track_TOuter);
+   fChain->SetBranchAddress("Track.Dxy", Track_Dxy, &b_Track_Dxy);
+   fChain->SetBranchAddress("Track.SDxy", Track_SDxy, &b_Track_SDxy);
+   fChain->SetBranchAddress("Track.Xd", Track_Xd, &b_Track_Xd);
+   fChain->SetBranchAddress("Track.Yd", Track_Yd, &b_Track_Yd);
+   fChain->SetBranchAddress("Track.Zd", Track_Zd, &b_Track_Zd);
+   fChain->SetBranchAddress("Track.Particle", Track_Particle, &b_Track_Particle);
    fChain->SetBranchAddress("Track_size", &Track_size, &b_Track_size);
    fChain->SetBranchAddress("Tower", &Tower_, &b_Tower_);
    fChain->SetBranchAddress("Tower.fUniqueID", Tower_fUniqueID, &b_Tower_fUniqueID);
@@ -765,29 +788,29 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("Tower.Particles", Tower_Particles, &b_Tower_Particles);
    fChain->SetBranchAddress("Tower_size", &Tower_size, &b_Tower_size);
    fChain->SetBranchAddress("EFlowTrack", &EFlowTrack_, &b_EFlowTrack_);
-   fChain->SetBranchAddress("EFlowTrack.fUniqueID", &EFlowTrack_fUniqueID, &b_EFlowTrack_fUniqueID);
-   fChain->SetBranchAddress("EFlowTrack.fBits", &EFlowTrack_fBits, &b_EFlowTrack_fBits);
-   fChain->SetBranchAddress("EFlowTrack.PID", &EFlowTrack_PID, &b_EFlowTrack_PID);
-   fChain->SetBranchAddress("EFlowTrack.Charge", &EFlowTrack_Charge, &b_EFlowTrack_Charge);
-   fChain->SetBranchAddress("EFlowTrack.PT", &EFlowTrack_PT, &b_EFlowTrack_PT);
-   fChain->SetBranchAddress("EFlowTrack.Eta", &EFlowTrack_Eta, &b_EFlowTrack_Eta);
-   fChain->SetBranchAddress("EFlowTrack.Phi", &EFlowTrack_Phi, &b_EFlowTrack_Phi);
-   fChain->SetBranchAddress("EFlowTrack.EtaOuter", &EFlowTrack_EtaOuter, &b_EFlowTrack_EtaOuter);
-   fChain->SetBranchAddress("EFlowTrack.PhiOuter", &EFlowTrack_PhiOuter, &b_EFlowTrack_PhiOuter);
-   fChain->SetBranchAddress("EFlowTrack.X", &EFlowTrack_X, &b_EFlowTrack_X);
-   fChain->SetBranchAddress("EFlowTrack.Y", &EFlowTrack_Y, &b_EFlowTrack_Y);
-   fChain->SetBranchAddress("EFlowTrack.Z", &EFlowTrack_Z, &b_EFlowTrack_Z);
-   fChain->SetBranchAddress("EFlowTrack.T", &EFlowTrack_T, &b_EFlowTrack_T);
-   fChain->SetBranchAddress("EFlowTrack.XOuter", &EFlowTrack_XOuter, &b_EFlowTrack_XOuter);
-   fChain->SetBranchAddress("EFlowTrack.YOuter", &EFlowTrack_YOuter, &b_EFlowTrack_YOuter);
-   fChain->SetBranchAddress("EFlowTrack.ZOuter", &EFlowTrack_ZOuter, &b_EFlowTrack_ZOuter);
-   fChain->SetBranchAddress("EFlowTrack.TOuter", &EFlowTrack_TOuter, &b_EFlowTrack_TOuter);
-   fChain->SetBranchAddress("EFlowTrack.Dxy", &EFlowTrack_Dxy, &b_EFlowTrack_Dxy);
-   fChain->SetBranchAddress("EFlowTrack.SDxy", &EFlowTrack_SDxy, &b_EFlowTrack_SDxy);
-   fChain->SetBranchAddress("EFlowTrack.Xd", &EFlowTrack_Xd, &b_EFlowTrack_Xd);
-   fChain->SetBranchAddress("EFlowTrack.Yd", &EFlowTrack_Yd, &b_EFlowTrack_Yd);
-   fChain->SetBranchAddress("EFlowTrack.Zd", &EFlowTrack_Zd, &b_EFlowTrack_Zd);
-   fChain->SetBranchAddress("EFlowTrack.Particle", &EFlowTrack_Particle, &b_EFlowTrack_Particle);
+   fChain->SetBranchAddress("EFlowTrack.fUniqueID", EFlowTrack_fUniqueID, &b_EFlowTrack_fUniqueID);
+   fChain->SetBranchAddress("EFlowTrack.fBits", EFlowTrack_fBits, &b_EFlowTrack_fBits);
+   fChain->SetBranchAddress("EFlowTrack.PID", EFlowTrack_PID, &b_EFlowTrack_PID);
+   fChain->SetBranchAddress("EFlowTrack.Charge", EFlowTrack_Charge, &b_EFlowTrack_Charge);
+   fChain->SetBranchAddress("EFlowTrack.PT", EFlowTrack_PT, &b_EFlowTrack_PT);
+   fChain->SetBranchAddress("EFlowTrack.Eta", EFlowTrack_Eta, &b_EFlowTrack_Eta);
+   fChain->SetBranchAddress("EFlowTrack.Phi", EFlowTrack_Phi, &b_EFlowTrack_Phi);
+   fChain->SetBranchAddress("EFlowTrack.EtaOuter", EFlowTrack_EtaOuter, &b_EFlowTrack_EtaOuter);
+   fChain->SetBranchAddress("EFlowTrack.PhiOuter", EFlowTrack_PhiOuter, &b_EFlowTrack_PhiOuter);
+   fChain->SetBranchAddress("EFlowTrack.X", EFlowTrack_X, &b_EFlowTrack_X);
+   fChain->SetBranchAddress("EFlowTrack.Y", EFlowTrack_Y, &b_EFlowTrack_Y);
+   fChain->SetBranchAddress("EFlowTrack.Z", EFlowTrack_Z, &b_EFlowTrack_Z);
+   fChain->SetBranchAddress("EFlowTrack.T", EFlowTrack_T, &b_EFlowTrack_T);
+   fChain->SetBranchAddress("EFlowTrack.XOuter", EFlowTrack_XOuter, &b_EFlowTrack_XOuter);
+   fChain->SetBranchAddress("EFlowTrack.YOuter", EFlowTrack_YOuter, &b_EFlowTrack_YOuter);
+   fChain->SetBranchAddress("EFlowTrack.ZOuter", EFlowTrack_ZOuter, &b_EFlowTrack_ZOuter);
+   fChain->SetBranchAddress("EFlowTrack.TOuter", EFlowTrack_TOuter, &b_EFlowTrack_TOuter);
+   fChain->SetBranchAddress("EFlowTrack.Dxy", EFlowTrack_Dxy, &b_EFlowTrack_Dxy);
+   fChain->SetBranchAddress("EFlowTrack.SDxy", EFlowTrack_SDxy, &b_EFlowTrack_SDxy);
+   fChain->SetBranchAddress("EFlowTrack.Xd", EFlowTrack_Xd, &b_EFlowTrack_Xd);
+   fChain->SetBranchAddress("EFlowTrack.Yd", EFlowTrack_Yd, &b_EFlowTrack_Yd);
+   fChain->SetBranchAddress("EFlowTrack.Zd", EFlowTrack_Zd, &b_EFlowTrack_Zd);
+   fChain->SetBranchAddress("EFlowTrack.Particle", EFlowTrack_Particle, &b_EFlowTrack_Particle);
    fChain->SetBranchAddress("EFlowTrack_size", &EFlowTrack_size, &b_EFlowTrack_size);
    fChain->SetBranchAddress("EFlowPhoton", &EFlowPhoton_, &b_EFlowPhoton_);
    fChain->SetBranchAddress("EFlowPhoton.fUniqueID", EFlowPhoton_fUniqueID, &b_EFlowPhoton_fUniqueID);
@@ -804,18 +827,18 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("EFlowPhoton.Particles", EFlowPhoton_Particles, &b_EFlowPhoton_Particles);
    fChain->SetBranchAddress("EFlowPhoton_size", &EFlowPhoton_size, &b_EFlowPhoton_size);
    fChain->SetBranchAddress("EFlowNeutralHadron", &EFlowNeutralHadron_, &b_EFlowNeutralHadron_);
-   fChain->SetBranchAddress("EFlowNeutralHadron.fUniqueID", &EFlowNeutralHadron_fUniqueID, &b_EFlowNeutralHadron_fUniqueID);
-   fChain->SetBranchAddress("EFlowNeutralHadron.fBits", &EFlowNeutralHadron_fBits, &b_EFlowNeutralHadron_fBits);
-   fChain->SetBranchAddress("EFlowNeutralHadron.ET", &EFlowNeutralHadron_ET, &b_EFlowNeutralHadron_ET);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Eta", &EFlowNeutralHadron_Eta, &b_EFlowNeutralHadron_Eta);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Phi", &EFlowNeutralHadron_Phi, &b_EFlowNeutralHadron_Phi);
-   fChain->SetBranchAddress("EFlowNeutralHadron.E", &EFlowNeutralHadron_E, &b_EFlowNeutralHadron_E);
-   fChain->SetBranchAddress("EFlowNeutralHadron.T", &EFlowNeutralHadron_T, &b_EFlowNeutralHadron_T);
-   fChain->SetBranchAddress("EFlowNeutralHadron.NTimeHits", &EFlowNeutralHadron_NTimeHits, &b_EFlowNeutralHadron_NTimeHits);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Eem", &EFlowNeutralHadron_Eem, &b_EFlowNeutralHadron_Eem);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Ehad", &EFlowNeutralHadron_Ehad, &b_EFlowNeutralHadron_Ehad);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Edges[4]", &EFlowNeutralHadron_Edges, &b_EFlowNeutralHadron_Edges);
-   fChain->SetBranchAddress("EFlowNeutralHadron.Particles", &EFlowNeutralHadron_Particles, &b_EFlowNeutralHadron_Particles);
+   fChain->SetBranchAddress("EFlowNeutralHadron.fUniqueID", EFlowNeutralHadron_fUniqueID, &b_EFlowNeutralHadron_fUniqueID);
+   fChain->SetBranchAddress("EFlowNeutralHadron.fBits", EFlowNeutralHadron_fBits, &b_EFlowNeutralHadron_fBits);
+   fChain->SetBranchAddress("EFlowNeutralHadron.ET", EFlowNeutralHadron_ET, &b_EFlowNeutralHadron_ET);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Eta", EFlowNeutralHadron_Eta, &b_EFlowNeutralHadron_Eta);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Phi", EFlowNeutralHadron_Phi, &b_EFlowNeutralHadron_Phi);
+   fChain->SetBranchAddress("EFlowNeutralHadron.E", EFlowNeutralHadron_E, &b_EFlowNeutralHadron_E);
+   fChain->SetBranchAddress("EFlowNeutralHadron.T", EFlowNeutralHadron_T, &b_EFlowNeutralHadron_T);
+   fChain->SetBranchAddress("EFlowNeutralHadron.NTimeHits", EFlowNeutralHadron_NTimeHits, &b_EFlowNeutralHadron_NTimeHits);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Eem", EFlowNeutralHadron_Eem, &b_EFlowNeutralHadron_Eem);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Ehad", EFlowNeutralHadron_Ehad, &b_EFlowNeutralHadron_Ehad);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Edges[4]", EFlowNeutralHadron_Edges, &b_EFlowNeutralHadron_Edges);
+   fChain->SetBranchAddress("EFlowNeutralHadron.Particles", EFlowNeutralHadron_Particles, &b_EFlowNeutralHadron_Particles);
    fChain->SetBranchAddress("EFlowNeutralHadron_size", &EFlowNeutralHadron_size, &b_EFlowNeutralHadron_size);
    fChain->SetBranchAddress("GenJet", &GenJet_, &b_GenJet_);
    fChain->SetBranchAddress("GenJet.fUniqueID", GenJet_fUniqueID, &b_GenJet_fUniqueID);
@@ -861,6 +884,13 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("GenJet.Area.fP.fZ", GenJet_Area_fP_fZ, &b_GenJet_Area_fP_fZ);
    fChain->SetBranchAddress("GenJet.Area.fE", GenJet_Area_fE, &b_GenJet_Area_fE);
    fChain->SetBranchAddress("GenJet_size", &GenJet_size, &b_GenJet_size);
+   fChain->SetBranchAddress("GenMissingET", &GenMissingET_, &b_GenMissingET_);
+   fChain->SetBranchAddress("GenMissingET.fUniqueID", GenMissingET_fUniqueID, &b_GenMissingET_fUniqueID);
+   fChain->SetBranchAddress("GenMissingET.fBits", GenMissingET_fBits, &b_GenMissingET_fBits);
+   fChain->SetBranchAddress("GenMissingET.MET", GenMissingET_MET, &b_GenMissingET_MET);
+   fChain->SetBranchAddress("GenMissingET.Eta", GenMissingET_Eta, &b_GenMissingET_Eta);
+   fChain->SetBranchAddress("GenMissingET.Phi", GenMissingET_Phi, &b_GenMissingET_Phi);
+   fChain->SetBranchAddress("GenMissingET_size", &GenMissingET_size, &b_GenMissingET_size);
    fChain->SetBranchAddress("Jet", &Jet_, &b_Jet_);
    fChain->SetBranchAddress("Jet.fUniqueID", Jet_fUniqueID, &b_Jet_fUniqueID);
    fChain->SetBranchAddress("Jet.fBits", Jet_fBits, &b_Jet_fBits);
@@ -906,21 +936,21 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("Jet.Area.fE", Jet_Area_fE, &b_Jet_Area_fE);
    fChain->SetBranchAddress("Jet_size", &Jet_size, &b_Jet_size);
    fChain->SetBranchAddress("Electron", &Electron_, &b_Electron_);
-   fChain->SetBranchAddress("Electron.fUniqueID", &Electron_fUniqueID, &b_Electron_fUniqueID);
-   fChain->SetBranchAddress("Electron.fBits", &Electron_fBits, &b_Electron_fBits);
-   fChain->SetBranchAddress("Electron.PT", &Electron_PT, &b_Electron_PT);
-   fChain->SetBranchAddress("Electron.Eta", &Electron_Eta, &b_Electron_Eta);
-   fChain->SetBranchAddress("Electron.Phi", &Electron_Phi, &b_Electron_Phi);
-   fChain->SetBranchAddress("Electron.T", &Electron_T, &b_Electron_T);
-   fChain->SetBranchAddress("Electron.Charge", &Electron_Charge, &b_Electron_Charge);
-   fChain->SetBranchAddress("Electron.EhadOverEem", &Electron_EhadOverEem, &b_Electron_EhadOverEem);
-   fChain->SetBranchAddress("Electron.Particle", &Electron_Particle, &b_Electron_Particle);
-   fChain->SetBranchAddress("Electron.IsolationVar", &Electron_IsolationVar, &b_Electron_IsolationVar);
-   fChain->SetBranchAddress("Electron.IsolationVarRhoCorr", &Electron_IsolationVarRhoCorr, &b_Electron_IsolationVarRhoCorr);
-   fChain->SetBranchAddress("Electron.SumPtCharged", &Electron_SumPtCharged, &b_Electron_SumPtCharged);
-   fChain->SetBranchAddress("Electron.SumPtNeutral", &Electron_SumPtNeutral, &b_Electron_SumPtNeutral);
-   fChain->SetBranchAddress("Electron.SumPtChargedPU", &Electron_SumPtChargedPU, &b_Electron_SumPtChargedPU);
-   fChain->SetBranchAddress("Electron.SumPt", &Electron_SumPt, &b_Electron_SumPt);
+   fChain->SetBranchAddress("Electron.fUniqueID", Electron_fUniqueID, &b_Electron_fUniqueID);
+   fChain->SetBranchAddress("Electron.fBits", Electron_fBits, &b_Electron_fBits);
+   fChain->SetBranchAddress("Electron.PT", Electron_PT, &b_Electron_PT);
+   fChain->SetBranchAddress("Electron.Eta", Electron_Eta, &b_Electron_Eta);
+   fChain->SetBranchAddress("Electron.Phi", Electron_Phi, &b_Electron_Phi);
+   fChain->SetBranchAddress("Electron.T", Electron_T, &b_Electron_T);
+   fChain->SetBranchAddress("Electron.Charge", Electron_Charge, &b_Electron_Charge);
+   fChain->SetBranchAddress("Electron.EhadOverEem", Electron_EhadOverEem, &b_Electron_EhadOverEem);
+   fChain->SetBranchAddress("Electron.Particle", Electron_Particle, &b_Electron_Particle);
+   fChain->SetBranchAddress("Electron.IsolationVar", Electron_IsolationVar, &b_Electron_IsolationVar);
+   fChain->SetBranchAddress("Electron.IsolationVarRhoCorr", Electron_IsolationVarRhoCorr, &b_Electron_IsolationVarRhoCorr);
+   fChain->SetBranchAddress("Electron.SumPtCharged", Electron_SumPtCharged, &b_Electron_SumPtCharged);
+   fChain->SetBranchAddress("Electron.SumPtNeutral", Electron_SumPtNeutral, &b_Electron_SumPtNeutral);
+   fChain->SetBranchAddress("Electron.SumPtChargedPU", Electron_SumPtChargedPU, &b_Electron_SumPtChargedPU);
+   fChain->SetBranchAddress("Electron.SumPt", Electron_SumPt, &b_Electron_SumPt);
    fChain->SetBranchAddress("Electron_size", &Electron_size, &b_Electron_size);
    fChain->SetBranchAddress("Photon", &Photon_, &b_Photon_);
    fChain->SetBranchAddress("Photon.fUniqueID", Photon_fUniqueID, &b_Photon_fUniqueID);
@@ -940,20 +970,20 @@ void DelphesTree::Init(TTree *tree)
    fChain->SetBranchAddress("Photon.SumPt", Photon_SumPt, &b_Photon_SumPt);
    fChain->SetBranchAddress("Photon_size", &Photon_size, &b_Photon_size);
    fChain->SetBranchAddress("Muon", &Muon_, &b_Muon_);
-   fChain->SetBranchAddress("Muon.fUniqueID", &Muon_fUniqueID, &b_Muon_fUniqueID);
-   fChain->SetBranchAddress("Muon.fBits", &Muon_fBits, &b_Muon_fBits);
-   fChain->SetBranchAddress("Muon.PT", &Muon_PT, &b_Muon_PT);
-   fChain->SetBranchAddress("Muon.Eta", &Muon_Eta, &b_Muon_Eta);
-   fChain->SetBranchAddress("Muon.Phi", &Muon_Phi, &b_Muon_Phi);
-   fChain->SetBranchAddress("Muon.T", &Muon_T, &b_Muon_T);
-   fChain->SetBranchAddress("Muon.Charge", &Muon_Charge, &b_Muon_Charge);
-   fChain->SetBranchAddress("Muon.Particle", &Muon_Particle, &b_Muon_Particle);
-   fChain->SetBranchAddress("Muon.IsolationVar", &Muon_IsolationVar, &b_Muon_IsolationVar);
-   fChain->SetBranchAddress("Muon.IsolationVarRhoCorr", &Muon_IsolationVarRhoCorr, &b_Muon_IsolationVarRhoCorr);
-   fChain->SetBranchAddress("Muon.SumPtCharged", &Muon_SumPtCharged, &b_Muon_SumPtCharged);
-   fChain->SetBranchAddress("Muon.SumPtNeutral", &Muon_SumPtNeutral, &b_Muon_SumPtNeutral);
-   fChain->SetBranchAddress("Muon.SumPtChargedPU", &Muon_SumPtChargedPU, &b_Muon_SumPtChargedPU);
-   fChain->SetBranchAddress("Muon.SumPt", &Muon_SumPt, &b_Muon_SumPt);
+   fChain->SetBranchAddress("Muon.fUniqueID", Muon_fUniqueID, &b_Muon_fUniqueID);
+   fChain->SetBranchAddress("Muon.fBits", Muon_fBits, &b_Muon_fBits);
+   fChain->SetBranchAddress("Muon.PT", Muon_PT, &b_Muon_PT);
+   fChain->SetBranchAddress("Muon.Eta", Muon_Eta, &b_Muon_Eta);
+   fChain->SetBranchAddress("Muon.Phi", Muon_Phi, &b_Muon_Phi);
+   fChain->SetBranchAddress("Muon.T", Muon_T, &b_Muon_T);
+   fChain->SetBranchAddress("Muon.Charge", Muon_Charge, &b_Muon_Charge);
+   fChain->SetBranchAddress("Muon.Particle", Muon_Particle, &b_Muon_Particle);
+   fChain->SetBranchAddress("Muon.IsolationVar", Muon_IsolationVar, &b_Muon_IsolationVar);
+   fChain->SetBranchAddress("Muon.IsolationVarRhoCorr", Muon_IsolationVarRhoCorr, &b_Muon_IsolationVarRhoCorr);
+   fChain->SetBranchAddress("Muon.SumPtCharged", Muon_SumPtCharged, &b_Muon_SumPtCharged);
+   fChain->SetBranchAddress("Muon.SumPtNeutral", Muon_SumPtNeutral, &b_Muon_SumPtNeutral);
+   fChain->SetBranchAddress("Muon.SumPtChargedPU", Muon_SumPtChargedPU, &b_Muon_SumPtChargedPU);
+   fChain->SetBranchAddress("Muon.SumPt", Muon_SumPt, &b_Muon_SumPt);
    fChain->SetBranchAddress("Muon_size", &Muon_size, &b_Muon_size);
    fChain->SetBranchAddress("MissingET", &MissingET_, &b_MissingET_);
    fChain->SetBranchAddress("MissingET.fUniqueID", MissingET_fUniqueID, &b_MissingET_fUniqueID);
