@@ -58,7 +58,7 @@ if __name__ == '__main__':
     if outDir[0]!='/':
         outDir = pwd+'/'+outDir
         
-    delphesCard = 'cards/delphes_card_CMS_CPena.tcl'
+    delphesCard = 'cards/delphes_card_CMS_Cpena.tcl'
 
     
     #create the SLHA card from template    
