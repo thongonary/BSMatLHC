@@ -29,7 +29,9 @@ if __name__ == '__main__':
     mLSP = options.mLSP
     
     obsArray = array('d')
-    cmsArray = array('d')
+    expArray = array('d')
+    cmsObsArray = array('d')
+    cmsExpArray = array('d')
     expp1sigmaArray = array('d')
     expm1sigmaArray = array('d')
     expp2sigmaArray = array('d')
@@ -42,7 +44,7 @@ if __name__ == '__main__':
     massArray3 = array('d')
     
     for mNLSP in range(120,215,5):
-        for line in open('chipmchi08TeV.txt','r'):
+        for line in open('BSMApp/data/chipmchi08TeV.txt','r'):
             line = line.replace('\n','')
             if str(int(mNLSP))==line.split(',')[0]:
                 massArray.append(mNLSP)
@@ -52,17 +54,18 @@ if __name__ == '__main__':
     zeroArray = array('d',[0 for mNLSP in massArray])
                 
     for mNLSP in range(120,215,5):
-        for line in open('xsec.txt','r'):
+        for line in open('BSMApp/data/SUS14017xsec.txt','r'):
             line = line.replace('\n','')
             if str(int(mNLSP))==line.split(',')[0]:
                 massArray3.append(mNLSP)
-                cmsArray.append(float(line.split(',')[1]))
+                cmsExpArray.append(float(line.split(',')[1]))
+                cmsObsArray.append(float(line.split(',')[2]))
                 
            
     for mNLSP in range(120,215,5):
         print '%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)
         if not glob.glob('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)):
-            print 'no file %s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)
+            #print 'no file %s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)
             continue
         tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP))
         try:
@@ -72,16 +75,27 @@ if __name__ == '__main__':
         limit = tfile.Get('RazorInclusiveEfficiency')
         limit.Draw('>>elist','','entrylist')
         limit.GetEntry(0)
-        exec('mylimit = limit.xsecUL%s'%box)
-        obsArray.append(mylimit)
+        exec('obslimit = limit.xsecUL%s'%box)
+        obsArray.append(obslimit)
+        exec('explimit = limit.xsecULExp%s'%box)
+        expArray.append(explimit)
         massArray2.append(mNLSP)
 
+    expGraph = rt.TGraph(len(massArray2),massArray2,expArray)
+    expGraph.SetLineStyle(2)
+    expGraph.SetLineWidth(2)
+    
     obsGraph = rt.TGraph(len(massArray2),massArray2,obsArray)
-    obsGraph.SetLineStyle(2)
     obsGraph.SetLineWidth(2)
     
-    cmsGraph = rt.TGraph(len(massArray3),massArray3,cmsArray)
-    cmsGraph.SetLineWidth(2)
+    cmsObsGraph = rt.TGraph(len(massArray3),massArray3,cmsObsArray)
+    cmsObsGraph.SetLineWidth(2)
+    cmsObsGraph.SetLineColor(rt.kRed+1)
+    
+    cmsExpGraph = rt.TGraph(len(massArray3),massArray3,cmsExpArray)
+    cmsExpGraph.SetLineWidth(2)
+    cmsExpGraph.SetLineStyle(2)
+    cmsExpGraph.SetLineColor(rt.kRed+1)    
     
     xsecGraphErr = rt.TGraphErrors(len(massArray),massArray,xsecArray,zeroArray,xsec1sigmaArray)
     xsecGraphErr.SetFillStyle(1001)
@@ -95,11 +109,12 @@ if __name__ == '__main__':
     xsecGraph.SetLineColor(rt.kOrange)
     
     h_limit = rt.TMultiGraph()
-    c = rt.TCanvas('c','c',500,360)
+    c = rt.TCanvas('c','c',500,364)
     c.SetLogy(1)
     h_limit.Add(xsecGraphErr)
     h_limit.Add(obsGraph)
-    h_limit.Add(cmsGraph)
+    h_limit.Add(cmsObsGraph)
+    h_limit.Add(cmsExpGraph)
     h_limit.Draw("a3")
     h_limit.GetXaxis().SetLimits(123,207)
     h_limit.GetXaxis().SetTitle("m_{#chi^{#pm}_{1}} [GeV]")
@@ -109,7 +124,9 @@ if __name__ == '__main__':
     h_limit.Draw("a3")
     
     obsGraph.Draw("l same")
-    cmsGraph.Draw("l same")
+    expGraph.Draw("l same")
+    cmsObsGraph.Draw("l same")
+    cmsExpGraph.Draw("l same")
     xsecGraph.Draw("l same")
         
     rt.gPad.Update()
@@ -136,7 +153,9 @@ if __name__ == '__main__':
     if model=="TChiwh":
         leg.AddEntry(xsecGraphErr, "#sigma_{NLO+NLL} (#tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}) #pm 1 #sigma (theory)","lf")
     leg.AddEntry(obsGraph, "observed (emulation)","l")
-    leg.AddEntry(cmsGraph, "observed (CMS)","l")
+    leg.AddEntry(expGraph, "expected (emulation)","l")
+    leg.AddEntry(cmsObsGraph, "observed (CMS)","l")
+    leg.AddEntry(cmsExpGraph, "expected (CMS)","l")
 
     leg.Draw()
 
