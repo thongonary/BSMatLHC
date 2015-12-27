@@ -10,7 +10,8 @@ Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 8000
 
 ! 3) Settings for SUSY and the hard-process generation
-!SUSY:all = on                      ! Switches on ALL (~400) SUSY processesSUSY:gg2squarkantisquark  = on
+!SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
+SUSY:gg2squarkantisquark  = on
 SUSY:qqbar2squarkantisquark = on
 !SUSY:qq2squarksquark = on
 SUSY:idA = 1000005
