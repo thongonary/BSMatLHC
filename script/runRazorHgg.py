@@ -106,7 +106,7 @@ if __name__ == '__main__':
     
     # Run GenPythia to generate events:
     pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
-    command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s'%(pythiaCard,pythiaOut)
+    command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s --filter'%(pythiaCard,pythiaOut)
     os.chdir(susygendir)
     exec_me(command,options.dryRun)
     exec_me('cp %s/*_GenTree.root %s'%(tmpDir, outDir),options.dryRun)

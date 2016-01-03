@@ -42,32 +42,46 @@ if __name__ == '__main__':
     massArray = array('d')
     massArray2 = array('d')
     massArray3 = array('d')
-    
-    for mNLSP in range(120,215,5):
-        for line in open('BSMApp/data/chipmchi08TeV.txt','r'):
-            line = line.replace('\n','')
-            if str(int(mNLSP))==line.split(',')[0]:
-                massArray.append(mNLSP)
-                xsecArray.append(float(line.split(',')[1]))
-                xsec1sigmaArray.append(float(line.split(',')[2]))
+
+    if model=="TChiwh":
+        mParentRange = range(120,215,5)
+    if model=="T2bh":
+        mParentRange = range(300,800,5)
+        
+    if model=="TChiwh":
+        for mParent in mParentRange:
+            for line in open('BSMApp/data/chipmchi08TeV.txt','r'):
+                line = line.replace('\n','')
+                if str(int(mParent))==line.split(',')[0]:
+                    massArray.append(mParent)
+                    xsecArray.append(float(line.split(',')[1]))
+                    xsec1sigmaArray.append(float(line.split(',')[2]))
+                    
+        for mParent in mParentRange:
+            for line in open('BSMApp/data/SUS14017xsec.txt','r'):
+                line = line.replace('\n','')
+                if str(int(mParent))==line.split(',')[0]:
+                    massArray3.append(mParent)
+                    cmsExpArray.append(float(line.split(',')[1]))
+                    cmsObsArray.append(float(line.split(',')[2]))
                 
-    zeroArray = array('d',[0 for mNLSP in massArray])
+    if model=="T2bh":
+        rootFile = rt.TFile.Open('BSMApp/data/stop.root','r')
+        h_xsec = rootFile.Get("stop")
+        for i in range(0,N_xsec):
+            if h_xsec.GetBinContent(i+1) <= 0.0: continue
+            massArray.append(h_xsec.GetXaxis().GetBinCenter(i+1))
+            xsecArray.append(h_xsec.GetBinContent(i+1))
+            xsec1sigmaArray.append(h_xsec.GetBinError(i+1))
                 
-    for mNLSP in range(120,215,5):
-        for line in open('BSMApp/data/SUS14017xsec.txt','r'):
-            line = line.replace('\n','')
-            if str(int(mNLSP))==line.split(',')[0]:
-                massArray3.append(mNLSP)
-                cmsExpArray.append(float(line.split(',')[1]))
-                cmsObsArray.append(float(line.split(',')[2]))
                 
            
-    for mNLSP in range(120,215,5):
-        print '%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)
-        if not glob.glob('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)):
-            #print 'no file %s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP)
+    for mParent in mParentRange:
+        #print '%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP)
+        if not glob.glob('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP)):
+            #print 'no file %s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP)
             continue
-        tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mNLSP,mLSP))
+        tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP))
         try:
             tfile.Print('v')
         except:
@@ -79,7 +93,7 @@ if __name__ == '__main__':
         obsArray.append(obslimit)
         exec('explimit = limit.xsecULExp%s'%box)
         expArray.append(explimit)
-        massArray2.append(mNLSP)
+        massArray2.append(mParent)
 
     expGraph = rt.TGraph(len(massArray2),massArray2,expArray)
     expGraph.SetLineStyle(2)
@@ -88,15 +102,17 @@ if __name__ == '__main__':
     obsGraph = rt.TGraph(len(massArray2),massArray2,obsArray)
     obsGraph.SetLineWidth(2)
     
-    cmsObsGraph = rt.TGraph(len(massArray3),massArray3,cmsObsArray)
-    cmsObsGraph.SetLineWidth(2)
-    cmsObsGraph.SetLineColor(rt.kRed+1)
+    if model=='TChiwh':
+        cmsObsGraph = rt.TGraph(len(massArray3),massArray3,cmsObsArray)
+        cmsObsGraph.SetLineWidth(2)
+        cmsObsGraph.SetLineColor(rt.kRed+1)
+        
+        cmsExpGraph = rt.TGraph(len(massArray3),massArray3,cmsExpArray)
+        cmsExpGraph.SetLineWidth(2)
+        cmsExpGraph.SetLineStyle(2)
+        cmsExpGraph.SetLineColor(rt.kRed+1)    
     
-    cmsExpGraph = rt.TGraph(len(massArray3),massArray3,cmsExpArray)
-    cmsExpGraph.SetLineWidth(2)
-    cmsExpGraph.SetLineStyle(2)
-    cmsExpGraph.SetLineColor(rt.kRed+1)    
-    
+    zeroArray = array('d',[0 for mParent in massArray])
     xsecGraphErr = rt.TGraphErrors(len(massArray),massArray,xsecArray,zeroArray,xsec1sigmaArray)
     xsecGraphErr.SetFillStyle(1001)
     xsecGraphErr.SetLineColor(rt.kOrange)
@@ -113,11 +129,15 @@ if __name__ == '__main__':
     c.SetLogy(1)
     h_limit.Add(xsecGraphErr)
     h_limit.Add(obsGraph)
-    h_limit.Add(cmsObsGraph)
-    h_limit.Add(cmsExpGraph)
+    if model=="TChiwh":
+        h_limit.Add(cmsObsGraph)
+        h_limit.Add(cmsExpGraph)
     h_limit.Draw("a3")
-    h_limit.GetXaxis().SetLimits(123,207)
-    h_limit.GetXaxis().SetTitle("m_{#chi^{#pm}_{1}} [GeV]")
+    h_limit.GetXaxis().SetLimits(123,207)    
+    if model=="TChiwh":
+        h_limit.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}} [GeV]")
+    if model=="T2bH":
+        h_limit.GetXaxis().SetTitle("m_{#tilde{b}} [GeV]")
     h_limit.GetYaxis().SetTitle("95% C.L. Upper Limit Cross Section [pb]")
     h_limit.SetMaximum(100)
     h_limit.SetMinimum(0.01)
@@ -125,8 +145,9 @@ if __name__ == '__main__':
     
     obsGraph.Draw("l same")
     expGraph.Draw("l same")
-    cmsObsGraph.Draw("l same")
-    cmsExpGraph.Draw("l same")
+    if model=="TChiwh":
+        cmsObsGraph.Draw("l same")
+        cmsExpGraph.Draw("l same")
     xsecGraph.Draw("l same")
         
     rt.gPad.Update()
@@ -144,7 +165,11 @@ if __name__ == '__main__':
     l.SetTextFont(42)
     if model=="TChiwh":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}, #tilde{#chi}_{1}^{#pm}#rightarrowW^{#pm}#tilde{#chi}^{0}_{1},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
-    leg = rt.TLegend(0.5,0.65,0.85,0.8)
+        l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
+    if model=="T2bH":
+        l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
+        l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
+    leg = rt.TLegend(0.5,0.15,0.85,0.4)
     leg.SetTextFont(42)
     leg.SetFillColor(rt.kWhite)
     leg.SetLineColor(rt.kWhite)
@@ -152,14 +177,31 @@ if __name__ == '__main__':
         
     if model=="TChiwh":
         leg.AddEntry(xsecGraphErr, "#sigma_{NLO+NLL} (#tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}) #pm 1 #sigma (theory)","lf")
+    if model=="T2bH":
+        leg.AddEntry(xsecGraphErr, "#sigma_{NLO+NLL} (#tilde{b}#tilde{b}) #pm 1 #sigma (theory)","lf")
     leg.AddEntry(obsGraph, "observed (emulation)","l")
     leg.AddEntry(expGraph, "expected (emulation)","l")
-    leg.AddEntry(cmsObsGraph, "observed (CMS)","l")
-    leg.AddEntry(cmsExpGraph, "expected (CMS)","l")
+    
+    if model=="TChiwh":
+        leg.AddEntry(cmsObsGraph, "observed (CMS)","l")
+        leg.AddEntry(cmsExpGraph, "expected (CMS)","l")
 
     leg.Draw()
 
     c.Print("%s/xsecUL_%s_%s.pdf"%(options.outDir,model,box))
     c.Print("%s/xsecUL_%s_%s.C"%(options.outDir,model,box))
 
-
+    if model!="TChiwh": sys.exit()
+    
+    expRatio = []
+    commMasses = [] 
+    obsRatio = []
+    for i in range(0,len(massArray3)):       
+        for j in range(0,len(massArray2)):        
+            if massArray3[i]==massArray2[j]:
+                commMasses.append(massArray2[j])
+                expRatio.append(expArray[j]/cmsExpArray[i])
+                obsRatio.append(obsArray[j]/cmsObsArray[i])
+    print 'masses  ', commMasses
+    print 'expRatio', expRatio
+    print 'obsRatio', obsRatio

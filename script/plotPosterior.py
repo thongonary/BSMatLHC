@@ -25,7 +25,8 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args()
 
     tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(options.inDir,options.model,options.mParent,options.mLSP))
-    boxes = ['HighPt','HighRes','Hbb','Zbb','Total']
+    #boxes = ['HighPt','HighRes','Hbb','Zbb','Total']
+    boxes = ['HighPt','HighRes','Total']
     colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'Hbb': rt.kGreen, 'Zbb': rt.kMagenta, 'Total': rt.kBlack}
     hists = {}
     histsFill = {}
