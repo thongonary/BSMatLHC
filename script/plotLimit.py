@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     if model=="TChiwh":
         mParentRange = range(120,215,5)
-    if model=="T2bh":
-        mParentRange = range(300,800,5)
+    if model=="T2bH":
+        mParentRange = range(250,805,5)
         
     if model=="TChiwh":
         for mParent in mParentRange:
@@ -65,9 +65,10 @@ if __name__ == '__main__':
                     cmsExpArray.append(float(line.split(',')[1]))
                     cmsObsArray.append(float(line.split(',')[2]))
                 
-    if model=="T2bh":
+    if model=="T2bH":
         rootFile = rt.TFile.Open('BSMApp/data/stop.root','r')
         h_xsec = rootFile.Get("stop")
+        N_xsec = h_xsec.GetNbinsX()
         for i in range(0,N_xsec):
             if h_xsec.GetBinContent(i+1) <= 0.0: continue
             massArray.append(h_xsec.GetXaxis().GetBinCenter(i+1))
@@ -132,12 +133,13 @@ if __name__ == '__main__':
     if model=="TChiwh":
         h_limit.Add(cmsObsGraph)
         h_limit.Add(cmsExpGraph)
-    h_limit.Draw("a3")
-    h_limit.GetXaxis().SetLimits(123,207)    
+    h_limit.Draw("a3")   
     if model=="TChiwh":
         h_limit.GetXaxis().SetTitle("m_{#tilde{#chi}^{#pm}_{1}} [GeV]")
+        h_limit.GetXaxis().SetLimits(123,207) 
     if model=="T2bH":
         h_limit.GetXaxis().SetTitle("m_{#tilde{b}} [GeV]")
+        h_limit.GetXaxis().SetLimits(250,800) 
     h_limit.GetYaxis().SetTitle("95% C.L. Upper Limit Cross Section [pb]")
     h_limit.SetMaximum(100)
     h_limit.SetMinimum(0.01)
@@ -166,10 +168,11 @@ if __name__ == '__main__':
     if model=="TChiwh":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}, #tilde{#chi}_{1}^{#pm}#rightarrowW^{#pm}#tilde{#chi}^{0}_{1},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
+        leg = rt.TLegend(0.5,0.15,0.85,0.4)
     if model=="T2bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
-    leg = rt.TLegend(0.5,0.15,0.85,0.4)
+        leg = rt.TLegend(0.5,0.25,0.85,0.4)
     leg.SetTextFont(42)
     leg.SetFillColor(rt.kWhite)
     leg.SetLineColor(rt.kWhite)
