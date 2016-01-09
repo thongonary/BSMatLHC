@@ -39,7 +39,7 @@ OUTLIB	         = ./lib/
 .SUFFIXES: .cc,.C, .hh
 .PREFIXES: ./lib/
 
-all:  lib GenPythia STDHEPConverter LHEGen SMGen SUSYDecay
+all:  lib GenPythia STDHEPConverter LHEGen LHEGenMLM SMGen SUSYDecay
 
 lib: 	$(OUTLIB)GenTreeColumn.o \
 	$(OUTLIB)GenTree.o \
@@ -98,6 +98,17 @@ STDHEPConverter:$(SRCDIR)STDHEPConverter.C
 
 LHEGen:$(SRCDIR)LHEGen.C 
 	$(CXX) $(CXXFLAGS) -o LHEGen $< \
+	-I$(INCLUDEDIR) \
+	-I$(HEPMCDIR)include/ \
+	-I$(PYTHIADIR)include/ \
+	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
+	$(LIBS) \
+	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(HEPMCLIB) -lHepMC  \
+	$(GLIBS) $ 
+
+LHEGenMLM:$(SRCDIR)LHEGenMLM.C 
+	$(CXX) $(CXXFLAGS) -o LHEGenMLM $< \
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
