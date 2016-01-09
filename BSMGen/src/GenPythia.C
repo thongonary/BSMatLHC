@@ -20,9 +20,9 @@ using namespace Pythia8;
 int main(int argc, char* argv[]) {
 
   // Check that correct number of command-line arguments
-  if (argc != 3) {
+  if (argc < 3) {
     cerr << " To run the code provide the name of the input pythia card and the output LHE file. \n"
-	 << " example: ./GenPythia data/pythiaCards/EXO/RSGraviton_gg_EXAMPLE.pythia outFile \n" << endl;
+	 << " example: ./GenPythia data/pythiaCards/EXO/RSGraviton_gg_EXAMPLE.pythia outFile [--filter] \n" << endl;
     return 1;
   }
 
@@ -47,6 +47,13 @@ int main(int argc, char* argv[]) {
   
   std::string cfg = argv[1];
   std::string outfilename = argv[2];
+  bool boolFilter = false;
+  for (int i = 3; i < argc; i++){    
+    if (strncmp(argv[i],"--filter",8)==0) {
+      boolFilter = true;
+    }
+  }
+  cout << " boolFilter = " << boolFilter << endl;
   
   // Specify file where HepMC events will be stored.
   char hepmcname[256];
@@ -155,7 +162,7 @@ int main(int argc, char* argv[]) {
     //cout << "number of final state photons from Higgs = " << filter.size() << endl;
     if (filter.size()<2) {
       //cout << "< 2 final state photons from Higgs; not saving" << endl;
-      continue;
+      if (boolFilter) continue;
     }
     
     iFilteredEvent++;
