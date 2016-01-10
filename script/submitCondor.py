@@ -52,10 +52,10 @@ if __name__ == '__main__':
 
     model = 'T2bH'
     xsec = 8
-    nevents = 10
+    nevents = 100
     
-    for mLSP in [100]:
-       for mParent in [800]: 
+    for mParent in [800]:
+       for mLSP in [100]: 
             outputName = "%s_%i_%i"%(model,mParent,mLSP)
-            writeScript(outputName,pwd,model,mLSP,mParent,xsec,nevents)
+            writeScript(outputName,pwd,model,mParent,mLSP,xsec,nevents)
             exec_me('condor_submit %s.sub'%outputName,True)
