@@ -32,7 +32,7 @@ if __name__ == '__main__':
                   help="value to replace LSP in all templates")
     parser.add_option('--mParent',dest="mParent", default=130,type="int",
                   help="value to replace Parent mass in all templates")
-    parser.add_option('--xsec',dest="xsecMax", default=20,type="int",
+    parser.add_option('--xsec',dest="xsecMax", default=20,type="float",
                   help="max xsec for priors, etc.")
     parser.add_option('-m','--model',dest="model",type="string",default="TChiwh",
                   help="model name")
