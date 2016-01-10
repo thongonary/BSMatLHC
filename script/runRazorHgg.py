@@ -109,9 +109,9 @@ if __name__ == '__main__':
     command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s --filter'%(pythiaCard,pythiaOut)
     os.chdir(susygendir)
     exec_me(command,options.dryRun)
-    exec_me('cp %s/*_GenTree.root %s'%(tmpDir, outDir),options.dryRun)
-    exec_me('cp %s/*.hepmc %s'%(tmpDir, outDir),options.dryRun)
-    exec_me('cp %s/*.lhe %s'%(tmpDir, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%i.%i_GenTree.root %s'%(tmpDir, model, mParent, mLSP, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%i.%i.hepmc %s'%(tmpDir, model, mParent, mLSP, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%i.%i.lhe %s'%(tmpDir, model, mParent, mLSP, outDir),options.dryRun)
 
     # Get gen-level filter information
     if options.dryRun:
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOut,filtereff,options.lumi,options.xsecMax,options.sqrts)    
     os.chdir(susyappdir)
     exec_me(command,options.dryRun)
-    exec_me('cp %s/*_cmsapp.root %s'%(tmpDir, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s.%s_cmsapp.root %s'%(tmpDir, model,mParent,mLSP,outDir),options.dryRun)
     
-    exec_me('rm -rf %s'%(tmpDir),options.dryRun)
+    exec_me('rm -f %s/simplifiedModel.%s.%i.%i*'%(tmpDir,model,mParent,mLSP),options.dryRun)
  
