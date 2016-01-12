@@ -98,6 +98,9 @@ if __name__ == '__main__':
     if options.model=="T2bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{b}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mParent,options.mLSP))
+    if options.model=="T21bH":
+        l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}_{1}#tilde{b}_{2}, #tilde{b}_{2}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
+        l.DrawLatex(0.52,0.78,"m_{#tilde{b}_{2}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mParent,options.mLSP))
     if len(boxes)==5:
         leg = rt.TLegend(0.7,0.45,0.89,0.7)
     elif len(boxes)==4:

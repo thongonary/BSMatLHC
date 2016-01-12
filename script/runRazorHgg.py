@@ -71,8 +71,13 @@ if __name__ == '__main__':
             slhaFile.write(newline)
         elif 'SBOTTOM' in line and options.model=="T2bH":
             newline = line.replace('SBOTTOM','%i'%options.mParent)
+        elif 'SBOTTOM2' in line and options.model=="T21bH":
+            newline = line.replace('SBOTTOM2','%i'%options.mParent)
             slhaFile.write(newline)
-        elif 'NLSP' in line and options.model=="T2bH":
+        elif 'SBOTTOM1' in line and options.model=="T21bH":
+            newline = line.replace('SBOTTOM1','%i'%(options.mLSP+30))
+            slhaFile.write(newline)
+        elif 'NLSP' in line and (options.model=="T2bH" or options.model=="T21bH"):
             newline = line.replace('NLSP','%i'%(options.mLSP+130))
             slhaFile.write(newline)
         elif 'LSP' in line:
@@ -121,7 +126,7 @@ if __name__ == '__main__':
         infoTree = genTreeFile.Get('infoTree')
         infoTree.GetEntry(0)
         filtereff = infoTree.filtereff
-    if options.model=='TChiwh':
+    if options.model=='TChiwh' or options.model=="T21bH":
         filtereff *= 0.002
 
     # Run Delphes to simulate the CMS detector
