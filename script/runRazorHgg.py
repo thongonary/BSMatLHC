@@ -127,7 +127,7 @@ if __name__ == '__main__':
         infoTree.GetEntry(0)
         filtereff = infoTree.filtereff
     if options.model=='TChiwh' or options.model=="T21bH":
-        filtereff *= 0.002
+        filtereff *= 2.28E-03 # for 125/126 GeV from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR3#Higgs_2_gauge_bosons
 
     # Run Delphes to simulate the CMS detector
     delphesOut = pythiaOut+'_delphes.root'

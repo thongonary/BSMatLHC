@@ -786,6 +786,18 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbExpZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, true);
+  
+  TH1D* xsecProbHighPtWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHighPt,0.3);
+  TH1D* xsecProbHbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHbb,0.3);
+  TH1D* xsecProbZbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbZbb,0.3);
+  TH1D* xsecProbHighResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHighRes,0.3);
+  TH1D* xsecProbTotalWithSignalSYS = _statTools->LogNormHistoConv(xsecProbTotal,0.3);
+  
+  TH1D* xsecProbExpHighPtWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighPt,0.3);
+  TH1D* xsecProbExpHbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHbb,0.3);
+  TH1D* xsecProbExpZbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpZbb,0.3);
+  TH1D* xsecProbExpHighResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighRes,0.3);
+  TH1D* xsecProbExpTotalWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpTotal,0.3);
   // Open Output file again 
   file->cd();
   
@@ -800,6 +812,18 @@ void CMSRazorHgg::Loop(string outFileName) {
   double xsecULExpZbb = _statTools->FindUL(xsecProbExpZbb, 0.95, 1.);
   double xsecULExpHighRes = _statTools->FindUL(xsecProbExpHighRes, 0.95, 1.);
   double xsecULExpTotal = _statTools->FindUL(xsecProbExpTotal, 0.95, 1.);
+  
+  double xsecULHighPtWithSignalSYS = _statTools->FindUL(xsecProbHighPtWithSignalSYS, 0.95, 1.);
+  double xsecULHbbWithSignalSYS = _statTools->FindUL(xsecProbHbbWithSignalSYS, 0.95, 1.);
+  double xsecULZbbWithSignalSYS = _statTools->FindUL(xsecProbZbbWithSignalSYS, 0.95, 1.);
+  double xsecULHighResWithSignalSYS = _statTools->FindUL(xsecProbHighResWithSignalSYS, 0.95, 1.);
+  double xsecULTotalWithSignalSYS = _statTools->FindUL(xsecProbTotalWithSignalSYS, 0.95, 1.);
+  
+  double xsecULExpHighPtWithSignalSYS = _statTools->FindUL(xsecProbExpHighPtWithSignalSYS, 0.95, 1.);
+  double xsecULExpHbbWithSignalSYS = _statTools->FindUL(xsecProbExpHbbWithSignalSYS, 0.95, 1.);
+  double xsecULExpZbbWithSignalSYS = _statTools->FindUL(xsecProbExpZbbWithSignalSYS, 0.95, 1.);
+  double xsecULExpHighResWithSignalSYS = _statTools->FindUL(xsecProbExpHighResWithSignalSYS, 0.95, 1.);
+  double xsecULExpTotalWithSignalSYS = _statTools->FindUL(xsecProbExpTotalWithSignalSYS, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
   effTree->Branch("_noPhotonCut", &_noPhotonCut, "_noPhotonCut/I");
@@ -820,7 +844,17 @@ void CMSRazorHgg::Loop(string outFileName) {
   effTree->Branch("xsecULExpHbb", &xsecULExpHbb, "xsecULExpHbb/D");
   effTree->Branch("xsecULExpZbb", &xsecULExpZbb, "xsecULExpZbb/D");
   effTree->Branch("xsecULExpHighRes", &xsecULExpHighRes, "xsecULExpHighRes/D");
-  effTree->Branch("xsecULExpTotal", &xsecULExpTotal, "xsecULExpTotal/D");
+  effTree->Branch("xsecULExpTotal", &xsecULExpTotal, "xsecULExpTotal/D");  
+  effTree->Branch("xsecULHighPtWithSignalSYS", &xsecULHighPtWithSignalSYS, "xsecULHighPtWithSignalSYS/D");
+  effTree->Branch("xsecULHbbWithSignalSYS", &xsecULHbbWithSignalSYS, "xsecULHbbWithSignalSYS/D");
+  effTree->Branch("xsecULZbbWithSignalSYS", &xsecULZbbWithSignalSYS, "xsecULZbbWithSignalSYS/D");
+  effTree->Branch("xsecULHighResWithSignalSYS", &xsecULHighResWithSignalSYS, "xsecULHighResWithSignalSYS/D");
+  effTree->Branch("xsecULTotalWithSignalSYS", &xsecULTotalWithSignalSYS, "xsecULTotalWithSignalSYS/D");
+  effTree->Branch("xsecULExpHighPtWithSignalSYS", &xsecULExpHighPtWithSignalSYS, "xsecULExpHighPtWithSignalSYS/D");
+  effTree->Branch("xsecULExpHbbWithSignalSYS", &xsecULExpHbbWithSignalSYS, "xsecULExpHbbWithSignalSYS/D");
+  effTree->Branch("xsecULExpZbbWithSignalSYS", &xsecULExpZbbWithSignalSYS, "xsecULExpZbbWithSignalSYS/D");
+  effTree->Branch("xsecULExpHighResWithSignalSYS", &xsecULExpHighResWithSignalSYS, "xsecULExpHighResWithSignalSYS/D");
+  effTree->Branch("xsecULExpTotalWithSignalSYS", &xsecULExpTotalWithSignalSYS, "xsecULExpTotalWithSignalSYS/D");
   effTree->Fill();
   effTree->Write();
 
@@ -834,6 +868,17 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbExpZbb->Write();
   xsecProbExpHighRes->Write();
   xsecProbExpTotal->Write();
+  
+  xsecProbHighPtWithSignalSYS->Write();
+  xsecProbHbbWithSignalSYS->Write();
+  xsecProbZbbWithSignalSYS->Write();
+  xsecProbHighResWithSignalSYS->Write();
+  xsecProbTotalWithSignalSYS->Write();
+  xsecProbExpHighPtWithSignalSYS->Write();
+  xsecProbExpHbbWithSignalSYS->Write();
+  xsecProbExpZbbWithSignalSYS->Write();
+  xsecProbExpHighResWithSignalSYS->Write();
+  xsecProbExpTotalWithSignalSYS->Write();
   //std::cout << "before malloc" << std::endl;
   file->Close();
   //std::cout << "after malloc" << std::endl;

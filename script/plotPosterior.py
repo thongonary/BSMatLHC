@@ -21,6 +21,8 @@ if __name__ == '__main__':
                   help="Input directory")
     parser.add_option('--expected',dest='expected',default=False,action='store_true',
                   help="expected")
+    parser.add_option('--no-signal-sys',dest="noSignalSys",default=False,action='store_true',
+                  help="no signal systematic (for bayesian result)")
     
     (options,args) = parser.parse_args()
 
@@ -33,17 +35,20 @@ if __name__ == '__main__':
     xsecUL = {}
     maxBox = boxes[0]
     maxVal = 0
-    
+
+    signalSys = "WithSignalSYS"
+    if options.noSignalSys:
+        signalSys = ""
     limit = tfile.Get('RazorInclusiveEfficiency')
     limit.GetEntry(0)
     for box in boxes:
         if options.expected:            
-            hist = tfile.Get("probVecExp"+box)
+            hist = tfile.Get("probVecExp"+box+signalSys)
         else:
-            hist = tfile.Get("probVec"+box)
+            hist = tfile.Get("probVec"+box+signalSys)
         hist.SetLineColor(colors[box])
         hists[box] = hist
-        exec('mylimit = float(limit.xsecUL%s)'%box)
+        exec('mylimit = float(limit.xsecUL%s%s)'%(box,signalSys))
         xsecUL[box] = mylimit
         if hist.GetBinContent(hist.GetMaximumBin()) > maxVal:
             maxVal = hist.GetBinContent(hist.GetMaximumBin())
@@ -55,7 +60,12 @@ if __name__ == '__main__':
     
     c = rt.TCanvas('c','c',500,360)
     #c.SetLogy()
-    hists[maxBox].GetXaxis().SetTitle("Cross Section [pb]")
+    if options.model=="T2bH":
+        hists[maxBox].GetXaxis().SetTitle("Cross Section #sigma(#tilde{b}#tilde{b}) [pb]")
+    if options.model=="T21bH":
+        hists[maxBox].GetXaxis().SetTitle("Cross Section #sigma(#tilde{b}_{1}#tilde{b}_{2}) [pb]")
+    if options.model=="TChiwh":
+        hists[maxBox].GetXaxis().SetTitle("Cross Section #sigma(#tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}) [pb]")
     #hists[maxBox].GetXaxis().SetRangeUser(0,10)
     if options.expected:
         hists[maxBox].GetYaxis().SetTitle("Expected Posterior Probability")

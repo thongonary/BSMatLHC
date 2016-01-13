@@ -18,7 +18,9 @@ if __name__ == '__main__':
     parser.add_option('-d','--dir',dest="outDir",default="./",type="string",
                   help="Output directory to store plots")
     parser.add_option('-i','--indir',dest="inDir",default="./",type="string",
-                  help="Input directory")
+                  help="Input directory")    
+    parser.add_option('--no-signal-sys',dest="noSignalSys",default=False,action='store_true',
+                  help="no signal systematic (for bayesian result)")
     parser.add_option('--freq',dest="freq",default=False,action='store_true',
                   help="Use frequentist (asymptotic CLs) result")
     
@@ -115,9 +117,12 @@ if __name__ == '__main__':
                 continue
             limit = tfile.Get('RazorInclusiveEfficiency')
             limit.GetEntry(0)
-            exec('obslimit = limit.xsecUL%s'%box)
+            signalSys = 'WithSignalSYS'
+            if options.noSignalSys:
+                signalSys = ''
+            exec('obslimit = limit.xsecUL%s%s'%(box,signalSys))
             obsArray.append(obslimit)
-            exec('explimit = limit.xsecULExp%s'%box)
+            exec('explimit = limit.xsecULExp%s%s'%(box,signalSys))
             expArray.append(explimit)
             massArray2.append(mParent)
 
@@ -198,16 +203,20 @@ if __name__ == '__main__':
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}, #tilde{#chi}_{1}^{#pm}#rightarrowW^{#pm}#tilde{#chi}^{0}_{1},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
         leg = rt.TLegend(0.5,0.45,0.85,0.7)
+        h_limit.SetMinimum(0.5)
+        h_limit.SetMaximum(100)
     if model=="T2bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
         leg = rt.TLegend(0.5,0.55,0.85,0.7)
-        h_limit.SetMinimum(0.01)
+        h_limit.SetMinimum(0.005)
+        #h_limit.SetMaximum(100)
     if model=="T21bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}_{1}#tilde{b}_{2}, #tilde{b}_{2}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
         leg = rt.TLegend(0.5,0.55,0.85,0.7)
-        h_limit.SetMinimum(0.01)
+        h_limit.SetMinimum(0.005)
+        #h_limit.SetMaximum(100)
     leg.SetTextFont(42)
     leg.SetFillColor(rt.kWhite)
     leg.SetLineColor(rt.kWhite)

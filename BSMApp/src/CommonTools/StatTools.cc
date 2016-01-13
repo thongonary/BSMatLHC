@@ -114,7 +114,7 @@ TH1D* StatTools::LogNormHistoConv(TH1D* histo, double sigma) {
   for(int i=1; i<=ibin; i++) {
     double s = smin+(i-0.5)/ibin*(smax-smin);
     // integrate numerically over the systematic error
-    for(int j=0; j<1000; j++) {
+    for(int j=0; j<100000; j++) {
       double thisSignal = s*pow(1+sigma, gRandom->Gaus(0., 1.));
       histoOUT->Fill(thisSignal, histo->GetBinContent(histo->FindBin(s)));
     }

@@ -51,7 +51,7 @@ void EventFilter::filter(Event& event) {
     if (etaMax > 0 && abs(event[i].eta()) > etaMax) continue;
 
     // Skip if too small pT.
-    if       (event[i].pT() < pTmin) continue;
+    if       (pTmin > 0 && event[i].pT() < pTmin) continue;
 
     // Add particle to vectors of indices and pointers.
     keptIndx.push_back( i );

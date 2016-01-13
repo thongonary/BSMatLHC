@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
   int    pdgId   = 22; //ask for photons
   int    pdgMothId   = 25; //ask for Higgs mother
   double etaMax   = -1; //no requirement on eta
-  double pTmin = 0; //no requirement on pt
+  double pTmin = -1; //no requirement on pt
 
   // Declare Event Filter according to specification.
   EventFilter filter( pdgId, pdgMothId, etaMax, pTmin );
@@ -157,11 +157,13 @@ int main(int argc, char* argv[]) {
     nUnfilteredEvent++;    
 
     // Find final state photons
-    filter.filter( pythia.event);
+    filter.filter( pythia.process);
     
     //cout << "number of final state photons from Higgs = " << filter.size() << endl;
     if (filter.size()<2) {
       //cout << "< 2 final state photons from Higgs; not saving" << endl;
+      //filter.list();
+      //pythia.process.list();
       if (boolFilter) continue;
     }
     
