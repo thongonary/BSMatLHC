@@ -71,6 +71,7 @@ if __name__ == '__main__':
             slhaFile.write(newline)
         elif 'SBOTTOM' in line and options.model=="T2bH":
             newline = line.replace('SBOTTOM','%i'%options.mParent)
+            slhaFile.write(newline)
         elif 'SBOTTOM2' in line and options.model=="T21bH":
             newline = line.replace('SBOTTOM2','%i'%options.mParent)
             slhaFile.write(newline)
