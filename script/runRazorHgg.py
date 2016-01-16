@@ -27,11 +27,13 @@ if __name__ == '__main__':
     parser.add_option('-s','--sqrts',dest="sqrts", default=8000,type="float",
                   help="CM energy")
     parser.add_option('-l','--lumi',dest="lumi", default=19800,type="float",
-                  help="CM energy")
+                  help="integrated luminosity")
     parser.add_option('--mLSP',dest="mLSP", default=1,type="int",
                   help="value to replace LSP in all templates")
     parser.add_option('--mParent',dest="mParent", default=130,type="int",
-                  help="value to replace Parent mass in all templates")
+                  help="value to replace parent mass in all templates")
+    parser.add_option('--mOtherParent',dest="mOtherParent", default=130,type="int",
+                  help="value to replace other parent mass in all templates")
     parser.add_option('--xsec',dest="xsecMax", default=20,type="float",
                   help="max xsec for priors, etc.")
     parser.add_option('-m','--model',dest="model",type="string",default="TChiwh",
@@ -59,10 +61,14 @@ if __name__ == '__main__':
         outDir = pwd+'/'+outDir
         
     delphesCard = 'cards/delphes_card_CMS_Cpena.tcl'
-
+    
+    massPoint = '%i.%i'%(options.mParent,options.mLSP)
+    if options.model=="T21bH":
+        massPoint = '%i.%i.%i'%(options.mParent,options.mOtherParent,options.mLSP)
+        
     
     #create the SLHA card from template    
-    slha = options.slhaTemplate.replace(options.model,'%s.%i.%i'%(options.model,options.mParent,options.mLSP))
+    slha = options.slhaTemplate.replace(options.model,'%s.%s'%(options.model,massPoint))
     slhaFile = open(slha, 'w')
     slhaTemplateFile = open(options.slhaTemplate,'r')
     for line in slhaTemplateFile:
@@ -76,7 +82,7 @@ if __name__ == '__main__':
             newline = line.replace('SBOTTOM2','%i'%options.mParent)
             slhaFile.write(newline)
         elif 'SBOTTOM1' in line and options.model=="T21bH":
-            newline = line.replace('SBOTTOM1','%i'%(options.mLSP+30))
+            newline = line.replace('SBOTTOM1','%i'%(options.mOtherParent))
             slhaFile.write(newline)
         elif 'NLSP' in line and (options.model=="T2bH" or options.model=="T21bH"):
             newline = line.replace('NLSP','%i'%(options.mLSP+130))
@@ -90,7 +96,7 @@ if __name__ == '__main__':
     slhaTemplateFile.close()
 
     #create the PYTHIA8 card from template
-    pythiaCard = options.pythiaCardTemplate.replace(options.model,'%s.%i.%i'%(options.model,options.mParent,options.mLSP))
+    pythiaCard = options.pythiaCardTemplate.replace(options.model,'%s.%s'%(options.model,massPoint))
     pythiaCardFile = open(pythiaCard, "w")
     pythiaCardTemplateFile = open(options.pythiaCardTemplate,"r")
     for line in pythiaCardTemplateFile:
@@ -115,9 +121,9 @@ if __name__ == '__main__':
     command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s --filter'%(pythiaCard,pythiaOut)
     os.chdir(susygendir)
     exec_me(command,options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%i.%i_GenTree.root %s'%(tmpDir, options.model, options.mParent, options.mLSP, outDir),options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%i.%i.hepmc %s'%(tmpDir, options.model, options.mParent, options.mLSP, outDir),options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%i.%i.lhe %s'%(tmpDir, options.model, options.mParent, options.mLSP, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s_GenTree.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s.hepmc %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s.lhe %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
 
     # Get gen-level filter information
     if options.dryRun:
@@ -142,7 +148,7 @@ if __name__ == '__main__':
     command = "./CMSApp %s --hggrazor --delphes --output=%s --filter=%f --lumi=%f --xsec=%f --sqrts=%f" %(delphesOut,cmsOut,filtereff,options.lumi,options.xsecMax,options.sqrts)    
     os.chdir(susyappdir)
     exec_me(command,options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%s.%s_cmsapp.root %s'%(tmpDir, options.model, options.mParent, options.mLSP, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s_cmsapp.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
     
-    exec_me('rm -f %s/simplifiedModel.%s.%i.%i*'%(tmpDir, options.model, options.mParent, options.mLSP),options.dryRun)
+    exec_me('rm -f %s/simplifiedModel.%s.%s*'%(tmpDir, options.model, massPoint),options.dryRun)
  

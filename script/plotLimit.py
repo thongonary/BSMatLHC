@@ -15,6 +15,8 @@ if __name__ == '__main__':
                   help="signal model name")
     parser.add_option('--mLSP',dest="mLSP", default=1,type="float",
                   help="mass of LSP")
+    parser.add_option('--mOtherParent',dest="mOtherParent", default=130,type="float",
+                  help="mass of other parent")
     parser.add_option('-d','--dir',dest="outDir",default="./",type="string",
                   help="Output directory to store plots")
     parser.add_option('-i','--indir',dest="inDir",default="./",type="string",
@@ -91,6 +93,11 @@ if __name__ == '__main__':
                 
            
     for mParent in mParentRange:
+        
+        massPoint = '%i.%i'%(mParent,options.mLSP)
+        if model=="T21bH":
+            massPoint = '%i.%i.%i'%(mParent,options.mOtherParent,options.mLSP)
+    
         if options.freq:
             if not glob.glob('%s/higgsCombine%s_%i_%i_%s.Asymptotic.mH120.root'%(inDir,model,mParent,mLSP,box)):
                 continue
@@ -108,9 +115,9 @@ if __name__ == '__main__':
             expArray.append(explimit)
             massArray2.append(mParent)            
         else:
-            if not glob.glob('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP)):
+            if not glob.glob('%s/simplifiedModel.%s.%s_cmsapp.root'%(inDir,model,massPoint)):
                 continue
-            tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(inDir,model,mParent,mLSP))
+            tfile = rt.TFile.Open('%s/simplifiedModel.%s.%s_cmsapp.root'%(inDir,model,massPoint))
             try:
                 tfile.Print('v')
             except:
@@ -202,19 +209,20 @@ if __name__ == '__main__':
     if model=="TChiwh":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{#chi}^{#pm}_{1}#tilde{#chi}^{0}_{2}, #tilde{#chi}_{1}^{#pm}#rightarrowW^{#pm}#tilde{#chi}^{0}_{1},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
         l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
-        leg = rt.TLegend(0.5,0.45,0.85,0.7)
+        leg = rt.TLegend(0.5,0.43,0.85,0.68)
         h_limit.SetMinimum(0.5)
         h_limit.SetMaximum(100)
     if model=="T2bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}#tilde{b}, #tilde{b}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
-        l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
-        leg = rt.TLegend(0.5,0.55,0.85,0.7)
+        l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{2}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP+130,options.mLSP))
+        leg = rt.TLegend(0.5,0.53,0.85,0.68)
         h_limit.SetMinimum(0.005)
         #h_limit.SetMaximum(100)
     if model=="T21bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}_{1}#tilde{b}_{2}, #tilde{b}_{2}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
-        l.DrawLatex(0.52,0.78,"m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP))
-        leg = rt.TLegend(0.5,0.55,0.85,0.7)
+        l.DrawLatex(0.52,0.78,"m_{#tilde{b}_{1}} = %i GeV"%(options.mOtherParent))
+        l.DrawLatex(0.52,0.72,"m_{#tilde{#chi}^{0}_{2}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP+130,options.mLSP))
+        leg = rt.TLegend(0.5,0.53,0.85,0.68)
         h_limit.SetMinimum(0.005)
         #h_limit.SetMaximum(100)
     leg.SetTextFont(42)
@@ -237,9 +245,18 @@ if __name__ == '__main__':
 
     leg.Draw()
 
-    c.Print("%s/xsecUL_%s_%s.pdf"%(options.outDir,model,box))
-    c.Print("%s/xsecUL_%s_%s.C"%(options.outDir,model,box))
+    massPoint = '%i'%(mLSP)
+    if model=="T21bH":
+        massPoint = '%i_%i'%(options.mOtherParent,mLSP)
+        
+    c.Print("%s/xsecUL_%s_%s_%s.pdf"%(options.outDir,model,massPoint,box))
+    c.Print("%s/xsecUL_%s_%s_%s.C"%(options.outDir,model,massPoint,box))
 
+    print 'masses  ', massArray2
+    print 'expArray', expArray
+    print 'obsArray', obsArray
+
+    
     if model!="TChiwh": sys.exit()
     
     expRatio = []

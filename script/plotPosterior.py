@@ -14,7 +14,9 @@ if __name__ == '__main__':
     parser.add_option('--mLSP',dest="mLSP", default=1,type="float",
                   help="mass of LSP")
     parser.add_option('--mParent',dest="mParent", default=1,type="float",
-                  help="mass of Parent")
+                  help="mass of parent")
+    parser.add_option('--mOtherParent',dest="mOtherParent", default=130,type="float",
+                  help="mass of other parent")
     parser.add_option('-d','--dir',dest="outDir",default="./",type="string",
                   help="Output directory to store plots")
     parser.add_option('-i','--indir',dest="inDir",default="./",type="string",
@@ -26,9 +28,14 @@ if __name__ == '__main__':
     
     (options,args) = parser.parse_args()
 
-    tfile = rt.TFile.Open('%s/simplifiedModel.%s.%i.%i_cmsapp.root'%(options.inDir,options.model,options.mParent,options.mLSP))
+    massPoint = '%i.%i'%(options.mParent,options.mLSP)
+    if options.model=="T21bH":
+        massPoint = '%i.%i.%i'%(options.mParent,options.mOtherParent,options.mLSP)
+        
+    tfile = rt.TFile.Open('%s/simplifiedModel.%s.%s_cmsapp.root'%(options.inDir,options.model,massPoint))
+    
     #boxes = ['HighPt','HighRes','Hbb','Zbb','Total']
-    boxes = ['HighPt','HighRes','Total']
+    boxes = ['HighPt','HighRes','Hbb','Total']
     colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'Hbb': rt.kGreen, 'Zbb': rt.kMagenta, 'Total': rt.kBlack}
     hists = {}
     histsFill = {}
@@ -110,17 +117,18 @@ if __name__ == '__main__':
         l.DrawLatex(0.52,0.78,"m_{#tilde{b}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mParent,options.mLSP))
     if options.model=="T21bH":
         l.DrawLatex(0.52,0.84,"pp #rightarrow #tilde{b}_{1}#tilde{b}_{2}, #tilde{b}_{2}#rightarrowb#tilde{#chi}^{0}_{2},  #tilde{#chi}_{2}^{0}#rightarrowH#tilde{#chi}^{0}_{1}")
-        l.DrawLatex(0.52,0.78,"m_{#tilde{b}_{2}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mParent,options.mLSP))
+        l.DrawLatex(0.52,0.78,"m_{#tilde{b}_{2}} = %i GeV, m_{#tilde{b}_{1}} = %i GeV"%(options.mParent,options.mOtherParent))
+        l.DrawLatex(0.52,0.72,"m_{#tilde{#chi}^{0}_{2}} = %i GeV, m_{#tilde{#chi}^{0}_{1}} = %i GeV"%(options.mLSP+130, options.mLSP))
     if len(boxes)==5:
-        leg = rt.TLegend(0.7,0.45,0.89,0.7)
+        leg = rt.TLegend(0.7,0.4,0.89,0.65)
     elif len(boxes)==4:
-        leg = rt.TLegend(0.7,0.5,0.89,0.7)
+        leg = rt.TLegend(0.7,0.45,0.89,0.65)
     elif len(boxes)==3:
-        leg = rt.TLegend(0.7,0.55,0.89,0.7)
+        leg = rt.TLegend(0.7,0.5,0.89,0.65)
     elif len(boxes)==2:
-        leg = rt.TLegend(0.7,0.6,0.89,0.7)
+        leg = rt.TLegend(0.7,0.55,0.89,0.65)
     elif len(boxes)==1:
-        leg = rt.TLegend(0.7,0.65,0.89,0.7)
+        leg = rt.TLegend(0.7,0.6,0.89,0.65)
     
         
     #leg = rt.TLegend(0.7,0.5,0.89,0.7)
@@ -133,9 +141,13 @@ if __name__ == '__main__':
 
     leg.Draw()
 
+    massPoint = '%i_%i'%(options.mParent,options.mLSP)
+    if options.model=="T21bH":
+        massPoint = '%i_%i_%i'%(options.mParent,options.mOtherParent,options.mLSP)
+
     if options.expected:        
-        c.Print("%s/posterior_expected_%s_%i_%i.pdf"%(options.outDir,options.model,options.mParent,options.mLSP))
-        c.Print("%s/posterior_expected_%s_%i_%i.C"%(options.outDir,options.model,options.mParent,options.mLSP))
+        c.Print("%s/posterior_expected_%s_%s.pdf"%(options.outDir,options.model,massPoint))
+        c.Print("%s/posterior_expected_%s_%s.C"%(options.outDir,options.model,massPoint))
     else:
-        c.Print("%s/posterior_%s_%i_%i.pdf"%(options.outDir,options.model,options.mParent,options.mLSP))
-        c.Print("%s/posterior_%s_%i_%i.C"%(options.outDir,options.model,options.mParent,options.mLSP))
+        c.Print("%s/posterior_%s_%s.pdf"%(options.outDir,options.model,massPoint))
+        c.Print("%s/posterior_%s_%s.C"%(options.outDir,options.model,massPoint))
