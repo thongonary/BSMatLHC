@@ -65,6 +65,9 @@ int main(int argc, char* argv[]) {
   CMSRazorLikelihood cmsRazorLikelihoodHighRes("data/ExpectedObserved_RazorHgg_HighRes_Summer2015.root", "hOBS", "hEXP");
   cmsRazorLikelihoodHighRes.CreatePosteriors("data/CMSRazorHgg_HighResLik_SUS_14_017.root","HighRes");
   
+  CMSRazorLikelihood cmsRazorLikelihoodLowRes("data/ExpectedObserved_RazorHgg_LowRes_Summer2015.root", "hOBS", "hEXP");
+  cmsRazorLikelihoodLowRes.CreatePosteriors("data/CMSRazorHgg_LowResLik_SUS_14_017.root","LowRes");
+  
   CMSRazorLikelihood cmsRazorLikelihoodHighPt("data/ExpectedObserved_RazorHgg_HighPt_Summer2015.root", "hOBS", "hEXP");
   cmsRazorLikelihoodHighPt.CreatePosteriors("data/CMSRazorHgg_HighPtLik_SUS_14_017.root","HighPt");
   

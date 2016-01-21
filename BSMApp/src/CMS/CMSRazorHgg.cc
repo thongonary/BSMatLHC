@@ -15,6 +15,7 @@
 #include <fastjet/tools/Pruner.hh>
 
 
+
 #define _debug 0
 
 CMSRazorHgg::CMSRazorHgg(TTree *tree, double Lumi, double filterEff, double xsecMax, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
@@ -145,7 +146,8 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* pdfHbb = new TH1D("pdfHbb","pdfHbb",3,0,3);
   TH1D* pdfZbb = new TH1D("pdfZbb","pdfZbb",3,0,3);
   TH1D* pdfHighRes = new TH1D("pdfHighRes","pdfHighRes",10,0,10);
-  TH1D* pdfTotal = new TH1D("pdfTotal","pdfTotal",31,0,31);
+  TH1D* pdfLowRes = new TH1D("pdfLowRes","pdfLowRes",15,0,15);
+  TH1D* pdfTotal = new TH1D("pdfTotal","pdfTotal",46,0,46);
   
   double xedge[5] = {150, 250, 400, 1400, 3000};
   double yedge[5] = {0, 0.05, 0.10, 0.15, 1.0};
@@ -646,10 +648,16 @@ void CMSRazorHgg::Loop(string outFileName) {
     RSQ = pow(CalcMRT(j1, j2, PFMET),2.)/MR/MR;
     if ( _debug ) std::cout << "[DEBUG]: numBox-> "<< numBox << std::endl;
 
+    double sigmaEff_HighPt = 2.*1.56;
+    double sigmaEff_HighRes = 2.*1.46;
+    double sigmaEff_LowRes = 2.*2.50;
+    double sigmaEff_Hbb = 2.*2.00;
     
-    double highPt_SR[2] = {121.88, 129.12};
-    double hbb_SR[2]= {121., 130.};
-    double highRes_SR[2]= {122.08, 128.92};
+    
+    double highPt_SR[2] = {125.-2.*sigmaEff_HighPt, 126.+2.*sigmaEff_HighPt};
+    double highRes_SR[2]= {125.-2.*sigmaEff_HighRes, 126.+2.*sigmaEff_HighRes};
+    double lowRes_SR[2]= {125.-2.*sigmaEff_LowRes, 126.+2.*sigmaEff_LowRes};
+    double hbb_SR[2]= {125.-2.*sigmaEff_Hbb, 126.+2.*sigmaEff_Hbb};
     //---------------------------------------
     //M a k i n g   B o x   H i e r a r c h y
     //---------------------------------------
@@ -686,11 +694,22 @@ void CMSRazorHgg::Loop(string outFileName) {
 	    numBox = -1;
 	  }
       }
-    else
+    else if ( _statTools->HitOrMiss(0.7) ) 
       {
 	if ( higgsMass > highRes_SR[0] && higgsMass < highRes_SR[1] )
 	  {
 	    numBox = 3;
+	  }
+	else
+	  {
+	    numBox = -1;
+	  }
+      }
+    else 
+      {
+	if ( higgsMass > lowRes_SR[0] && higgsMass < lowRes_SR[1] )
+	  {
+	    numBox = 4;
 	  }
 	else
 	  {
@@ -732,7 +751,7 @@ void CMSRazorHgg::Loop(string outFileName) {
     }
     if(numBox == 3) {
       pdfHighResRsqMR->Fill(MR,RSQ);
-      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) { pdfHighRes->Fill(0); pdfTotal->Fill(21); }
+      if (MR>=150 && MR<250 && RSQ>=0.00 && RSQ<0.05) { pdfHighRes->Fill(0); pdfTotal->Fill(21); }
       else if (MR>=150 && MR<250 && RSQ>=0.05 && RSQ<0.10) { pdfHighRes->Fill(1); pdfTotal->Fill(22); }
       else if (MR>=150 && MR<250 && RSQ>=0.10 && RSQ<0.15) { pdfHighRes->Fill(2); pdfTotal->Fill(23); }
       else if (MR>=150 && MR<250 && RSQ>=0.15 && RSQ<1.00) { pdfHighRes->Fill(3); pdfTotal->Fill(24); }
@@ -743,6 +762,24 @@ void CMSRazorHgg::Loop(string outFileName) {
       else if (MR>=400 && MR<1400 && RSQ>=0.05 && RSQ<1.00) { pdfHighRes->Fill(8); pdfTotal->Fill(29); }
       else if (MR>=1400 && MR<3000 && RSQ>=0 && RSQ<1.00) { pdfHighRes->Fill(9); pdfTotal->Fill(30); }
     }
+    if(numBox == 4) {
+      if (MR>=150 && MR<200 && RSQ>=0.00 && RSQ<0.05) { pdfLowRes->Fill(0); pdfTotal->Fill(31); }
+      else if (MR>=150 && MR<200 && RSQ>=0.05 && RSQ<0.10) { pdfLowRes->Fill(1); pdfTotal->Fill(32); }
+      else if (MR>=150 && MR<200 && RSQ>=0.10 && RSQ<0.15) { pdfLowRes->Fill(2); pdfTotal->Fill(33); }
+      else if (MR>=150 && MR<200 && RSQ>=0.15 && RSQ<0.20) { pdfLowRes->Fill(3); pdfTotal->Fill(34); }
+      else if (MR>=150 && MR<200 && RSQ>=0.20 && RSQ<1.00) { pdfLowRes->Fill(4); pdfTotal->Fill(35); }
+      else if (MR>=200 && MR<250 && RSQ>=0.00 && RSQ<0.05) { pdfLowRes->Fill(5); pdfTotal->Fill(36); }
+      else if (MR>=200 && MR<250 && RSQ>=0.05 && RSQ<0.10) { pdfLowRes->Fill(6); pdfTotal->Fill(37); }
+      else if (MR>=200 && MR<250 && RSQ>=0.10 && RSQ<0.15) { pdfLowRes->Fill(7); pdfTotal->Fill(38); }
+      else if (MR>=200 && MR<250 && RSQ>=0.15 && RSQ<1.00) { pdfLowRes->Fill(8); pdfTotal->Fill(39); }
+      else if (MR>=250 && MR<400 && RSQ>=0.00 && RSQ<0.05) { pdfLowRes->Fill(9); pdfTotal->Fill(40); }
+      else if (MR>=250 && MR<400 && RSQ>=0.05 && RSQ<0.10) { pdfLowRes->Fill(10); pdfTotal->Fill(41); }
+      else if (MR>=250 && MR<400 && RSQ>=0.10 && RSQ<1.00) { pdfLowRes->Fill(11); pdfTotal->Fill(42); }
+      else if (MR>=400 && MR<1200 && RSQ>=0.00 && RSQ<0.05) { pdfLowRes->Fill(12); pdfTotal->Fill(43); }
+      else if (MR>=400 && MR<1200 && RSQ>=0.05 && RSQ<1.00) { pdfLowRes->Fill(13); pdfTotal->Fill(44); }
+      else if (MR>=1200 && MR<3000 && RSQ>=0.00 && RSQ<1.00) { pdfLowRes->Fill(14); pdfTotal->Fill(45); }
+    }
+    
     
   }
 
@@ -755,6 +792,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   double effHbb = _filterEff*pdfHbb->Integral()/double(nentries);
   double effZbb = _filterEff*pdfZbb->Integral()/double(nentries);
   double effHighRes = _filterEff*pdfHighRes->Integral()/double(nentries);
+  double effLowRes = _filterEff*pdfLowRes->Integral()/double(nentries);
   double effTotal = _filterEff*pdfTotal->Integral()/double(nentries);
   
   // normalize the PDFs
@@ -762,6 +800,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   if(pdfHbb->Integral()>0)  pdfHbb->Scale(1./pdfHbb->Integral());
   if(pdfZbb->Integral()>0)  pdfZbb->Scale(1./pdfZbb->Integral());
   if(pdfHighRes->Integral()>0)  pdfHighRes->Scale(1./pdfHighRes->Integral());
+  if(pdfLowRes->Integral()>0)  pdfLowRes->Scale(1./pdfLowRes->Integral());
   if(pdfTotal->Integral()>0)  pdfTotal->Scale(1./pdfTotal->Integral());
   
   // write the PDFs
@@ -769,6 +808,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   pdfHbb->Write();
   pdfZbb->Write();
   pdfHighRes->Write();
+  pdfLowRes->Write();
   pdfTotal->Write();
   
   pdfHighResRsqMR->Write();
@@ -779,24 +819,28 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, false);
   TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, false);
   TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, false);
+  TH1D* xsecProbLowRes = XsecProb(pdfLowRes, effHighRes, outname, "LowRes", 100, 0., _xsecMax, false);
   TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, false);
   
   TH1D* xsecProbExpHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, true);
+  TH1D* xsecProbExpLowRes = XsecProb(pdfLowRes, effLowRes, outname, "LowRes", 100, 0., _xsecMax, true);
   TH1D* xsecProbExpTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, true);
   
   TH1D* xsecProbHighPtWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHighPt,0.3);
   TH1D* xsecProbHbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHbb,0.3);
   TH1D* xsecProbZbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbZbb,0.3);
   TH1D* xsecProbHighResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbHighRes,0.3);
+  TH1D* xsecProbLowResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbLowRes,0.3);
   TH1D* xsecProbTotalWithSignalSYS = _statTools->LogNormHistoConv(xsecProbTotal,0.3);
   
   TH1D* xsecProbExpHighPtWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighPt,0.3);
   TH1D* xsecProbExpHbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHbb,0.3);
   TH1D* xsecProbExpZbbWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpZbb,0.3);
   TH1D* xsecProbExpHighResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighRes,0.3);
+  TH1D* xsecProbExpLowResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpLowRes,0.3);
   TH1D* xsecProbExpTotalWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpTotal,0.3);
   // Open Output file again 
   file->cd();
@@ -805,24 +849,28 @@ void CMSRazorHgg::Loop(string outFileName) {
   double xsecULHbb = _statTools->FindUL(xsecProbHbb, 0.95, 1.);
   double xsecULZbb = _statTools->FindUL(xsecProbZbb, 0.95, 1.);
   double xsecULHighRes = _statTools->FindUL(xsecProbHighRes, 0.95, 1.);
+  double xsecULLowRes = _statTools->FindUL(xsecProbLowRes, 0.95, 1.);
   double xsecULTotal = _statTools->FindUL(xsecProbTotal, 0.95, 1.);
   
   double xsecULExpHighPt = _statTools->FindUL(xsecProbExpHighPt, 0.95, 1.);
   double xsecULExpHbb = _statTools->FindUL(xsecProbExpHbb, 0.95, 1.);
   double xsecULExpZbb = _statTools->FindUL(xsecProbExpZbb, 0.95, 1.);
   double xsecULExpHighRes = _statTools->FindUL(xsecProbExpHighRes, 0.95, 1.);
+  double xsecULExpLowRes = _statTools->FindUL(xsecProbExpLowRes, 0.95, 1.);
   double xsecULExpTotal = _statTools->FindUL(xsecProbExpTotal, 0.95, 1.);
   
   double xsecULHighPtWithSignalSYS = _statTools->FindUL(xsecProbHighPtWithSignalSYS, 0.95, 1.);
   double xsecULHbbWithSignalSYS = _statTools->FindUL(xsecProbHbbWithSignalSYS, 0.95, 1.);
   double xsecULZbbWithSignalSYS = _statTools->FindUL(xsecProbZbbWithSignalSYS, 0.95, 1.);
   double xsecULHighResWithSignalSYS = _statTools->FindUL(xsecProbHighResWithSignalSYS, 0.95, 1.);
+  double xsecULLowResWithSignalSYS = _statTools->FindUL(xsecProbLowResWithSignalSYS, 0.95, 1.);
   double xsecULTotalWithSignalSYS = _statTools->FindUL(xsecProbTotalWithSignalSYS, 0.95, 1.);
   
   double xsecULExpHighPtWithSignalSYS = _statTools->FindUL(xsecProbExpHighPtWithSignalSYS, 0.95, 1.);
   double xsecULExpHbbWithSignalSYS = _statTools->FindUL(xsecProbExpHbbWithSignalSYS, 0.95, 1.);
   double xsecULExpZbbWithSignalSYS = _statTools->FindUL(xsecProbExpZbbWithSignalSYS, 0.95, 1.);
   double xsecULExpHighResWithSignalSYS = _statTools->FindUL(xsecProbExpHighResWithSignalSYS, 0.95, 1.);
+  double xsecULExpLowResWithSignalSYS = _statTools->FindUL(xsecProbExpLowResWithSignalSYS, 0.95, 1.);
   double xsecULExpTotalWithSignalSYS = _statTools->FindUL(xsecProbExpTotalWithSignalSYS, 0.95, 1.);
   
   TTree* effTree = new TTree("RazorInclusiveEfficiency","RazorInclusiveEfficiency");
@@ -834,26 +882,31 @@ void CMSRazorHgg::Loop(string outFileName) {
   effTree->Branch("effHbb", &effHbb, "effHbb/D");
   effTree->Branch("effZbb", &effZbb, "effZbb/D");
   effTree->Branch("effHighRes", &effHighRes, "effHighRes/D");
+  effTree->Branch("effLowRes", &effLowRes, "effLowRes/D");
   effTree->Branch("effTotal", &effTotal, "effTotal/D");
   effTree->Branch("xsecULHighPt", &xsecULHighPt, "xsecULHighPt/D");
   effTree->Branch("xsecULHbb", &xsecULHbb, "xsecULHbb/D");
   effTree->Branch("xsecULZbb", &xsecULZbb, "xsecULZbb/D");
   effTree->Branch("xsecULHighRes", &xsecULHighRes, "xsecULHighRes/D");
+  effTree->Branch("xsecULLowRes", &xsecULLowRes, "xsecULLowRes/D");
   effTree->Branch("xsecULTotal", &xsecULTotal, "xsecULTotal/D");
   effTree->Branch("xsecULExpHighPt", &xsecULExpHighPt, "xsecULExpHighPt/D");
   effTree->Branch("xsecULExpHbb", &xsecULExpHbb, "xsecULExpHbb/D");
   effTree->Branch("xsecULExpZbb", &xsecULExpZbb, "xsecULExpZbb/D");
   effTree->Branch("xsecULExpHighRes", &xsecULExpHighRes, "xsecULExpHighRes/D");
+  effTree->Branch("xsecULExpLowRes", &xsecULExpLowRes, "xsecULExpLowRes/D");
   effTree->Branch("xsecULExpTotal", &xsecULExpTotal, "xsecULExpTotal/D");  
   effTree->Branch("xsecULHighPtWithSignalSYS", &xsecULHighPtWithSignalSYS, "xsecULHighPtWithSignalSYS/D");
   effTree->Branch("xsecULHbbWithSignalSYS", &xsecULHbbWithSignalSYS, "xsecULHbbWithSignalSYS/D");
   effTree->Branch("xsecULZbbWithSignalSYS", &xsecULZbbWithSignalSYS, "xsecULZbbWithSignalSYS/D");
   effTree->Branch("xsecULHighResWithSignalSYS", &xsecULHighResWithSignalSYS, "xsecULHighResWithSignalSYS/D");
+  effTree->Branch("xsecULLowResWithSignalSYS", &xsecULLowResWithSignalSYS, "xsecULLowResWithSignalSYS/D");
   effTree->Branch("xsecULTotalWithSignalSYS", &xsecULTotalWithSignalSYS, "xsecULTotalWithSignalSYS/D");
   effTree->Branch("xsecULExpHighPtWithSignalSYS", &xsecULExpHighPtWithSignalSYS, "xsecULExpHighPtWithSignalSYS/D");
   effTree->Branch("xsecULExpHbbWithSignalSYS", &xsecULExpHbbWithSignalSYS, "xsecULExpHbbWithSignalSYS/D");
   effTree->Branch("xsecULExpZbbWithSignalSYS", &xsecULExpZbbWithSignalSYS, "xsecULExpZbbWithSignalSYS/D");
   effTree->Branch("xsecULExpHighResWithSignalSYS", &xsecULExpHighResWithSignalSYS, "xsecULExpHighResWithSignalSYS/D");
+  effTree->Branch("xsecULExpLowResWithSignalSYS", &xsecULExpLowResWithSignalSYS, "xsecULExpLowResWithSignalSYS/D");
   effTree->Branch("xsecULExpTotalWithSignalSYS", &xsecULExpTotalWithSignalSYS, "xsecULExpTotalWithSignalSYS/D");
   effTree->Fill();
   effTree->Write();
@@ -862,22 +915,27 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbHbb->Write();
   xsecProbZbb->Write();
   xsecProbHighRes->Write();
+  xsecProbLowRes->Write();
   xsecProbTotal->Write();
   xsecProbExpHighPt->Write();
   xsecProbExpHbb->Write();
   xsecProbExpZbb->Write();
   xsecProbExpHighRes->Write();
+  xsecProbExpLowRes->Write();
+  xsecProbExpLowRes->Write();
   xsecProbExpTotal->Write();
   
   xsecProbHighPtWithSignalSYS->Write();
   xsecProbHbbWithSignalSYS->Write();
   xsecProbZbbWithSignalSYS->Write();
   xsecProbHighResWithSignalSYS->Write();
+  xsecProbLowResWithSignalSYS->Write();
   xsecProbTotalWithSignalSYS->Write();
   xsecProbExpHighPtWithSignalSYS->Write();
   xsecProbExpHbbWithSignalSYS->Write();
   xsecProbExpZbbWithSignalSYS->Write();
   xsecProbExpHighResWithSignalSYS->Write();
+  xsecProbExpLowResWithSignalSYS->Write();
   xsecProbExpTotalWithSignalSYS->Write();
   //std::cout << "before malloc" << std::endl;
   file->Close();
