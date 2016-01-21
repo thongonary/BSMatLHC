@@ -40,6 +40,8 @@ if __name__ == '__main__':
                   help="model name")
     parser.add_option('--dry-run',dest='dryRun',default=False,action='store_true',
                   help="dry run")
+    parser.add_option('--no-gen',dest='noGen',default=False,action='store_true',
+                  help="no generation (GenPythia) step")
 
 
     (options,args) = parser.parse_args()
@@ -115,15 +117,22 @@ if __name__ == '__main__':
 
     pythiaCard = pwd+'/'+pythiaCard
     slha = pwd+'/'+slha
-    
-    # Run GenPythia to generate events:
-    pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
-    command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s --filter'%(pythiaCard,pythiaOut)
-    os.chdir(susygendir)
-    exec_me(command,options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%s_GenTree.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%s.hepmc %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%s.lhe %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+
+    if options.noGen:
+        # copy GenPythia output to tmpdir:
+        exec_me('cp %s/simplifiedModel.%s.%s_GenTree.root %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s.hepmc %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s.lhe %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
+        pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
+    else:            
+        # Run GenPythia to generate events:
+        pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
+        command = 'source ../script/ToBuild/setupHepmc.sh; source setup.sh; ./GenPythia %s %s --filter'%(pythiaCard,pythiaOut)
+        os.chdir(susygendir)
+        exec_me(command,options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s_GenTree.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s.hepmc %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s.lhe %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
 
     # Get gen-level filter information
     if options.dryRun:
