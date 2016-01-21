@@ -819,7 +819,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, false);
   TH1D* xsecProbZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, false);
   TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, false);
-  TH1D* xsecProbLowRes = XsecProb(pdfLowRes, effHighRes, outname, "LowRes", 100, 0., _xsecMax, false);
+  TH1D* xsecProbLowRes = XsecProb(pdfLowRes, effLowRes, outname, "LowRes", 100, 0., _xsecMax, false);
   TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, false);
   
   TH1D* xsecProbExpHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax, true);
@@ -921,7 +921,6 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbExpHbb->Write();
   xsecProbExpZbb->Write();
   xsecProbExpHighRes->Write();
-  xsecProbExpLowRes->Write();
   xsecProbExpLowRes->Write();
   xsecProbExpTotal->Write();
   
