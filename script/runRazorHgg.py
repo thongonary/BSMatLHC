@@ -150,7 +150,7 @@ if __name__ == '__main__':
     command = './DelphesHepMC %s %s %s'%(delphesCard,delphesOut,pythiaOut+'.hepmc')
     os.chdir(delphesdir)
     exec_me(command,options.dryRun)
-    exec_me('cp %s/*_delphes.root %s'%(tmpDir, outDir),options.dryRun)
+    exec_me('cp %s/simplifiedModel.%s.%s_delphes.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
 
     # Run CMSApp to do apply the CMS analyses to the generated sample
     cmsOut = delphesOut.replace('_delphes.root','_cmsapp.root')
@@ -159,5 +159,6 @@ if __name__ == '__main__':
     exec_me(command,options.dryRun)
     exec_me('cp %s/simplifiedModel.%s.%s_cmsapp.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
     
-    exec_me('rm -f %s/simplifiedModel.%s.%s*'%(tmpDir, options.model, massPoint),options.dryRun)
+    exec_me('rm -f %s/simplifiedModel.%s.%s.*'%(tmpDir, options.model, massPoint),options.dryRun)
+    exec_me('rm -f %s/simplifiedModel.%s.%s_*'%(tmpDir, options.model, massPoint),options.dryRun)
  
