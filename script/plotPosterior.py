@@ -35,8 +35,8 @@ if __name__ == '__main__':
     tfile = rt.TFile.Open('%s/simplifiedModel.%s.%s_cmsapp.root'%(options.inDir,options.model,massPoint))
     
     #boxes = ['HighPt','HighRes','Hbb','Zbb','Total']
-    boxes = ['HighPt','HighRes','Hbb','Total']
-    colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'Hbb': rt.kGreen, 'Zbb': rt.kMagenta, 'Total': rt.kBlack}
+    boxes = ['HighPt','HighRes','LowRes','Total']
+    colors = {'HighPt': rt.kBlue, 'HighRes': rt.kRed, 'LowRes': rt.kViolet, 'Hbb': rt.kGreen, 'Zbb': rt.kMagenta, 'Total': rt.kBlack}
     hists = {}
     histsFill = {}
     xsecUL = {}

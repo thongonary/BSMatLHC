@@ -42,6 +42,8 @@ if __name__ == '__main__':
                   help="dry run")
     parser.add_option('--no-gen',dest='noGen',default=False,action='store_true',
                   help="no generation (GenPythia) step")
+    parser.add_option('--no-sim',dest='noSim',default=False,action='store_true',
+                  help="no simulation (Delphes) step")
 
 
     (options,args) = parser.parse_args()
@@ -120,10 +122,7 @@ if __name__ == '__main__':
 
     if options.noGen:
         # copy GenPythia output to tmpdir:
-        exec_me('cp %s/simplifiedModel.%s.%s_GenTree.root %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
-        exec_me('cp %s/simplifiedModel.%s.%s.hepmc %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
-        exec_me('cp %s/simplifiedModel.%s.%s.lhe %s'%(outDir, options.model, massPoint, tmpDir),options.dryRun)
-        pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
+        pythiaOut = outDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
     else:            
         # Run GenPythia to generate events:
         pythiaOut = tmpDir+'/'+pythiaCard.split('/')[-1].replace(".pythia","")
@@ -145,12 +144,15 @@ if __name__ == '__main__':
     if options.model=='TChiwh' or options.model=="T21bH":
         filtereff *= 2.28E-03 # for 125/126 GeV from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/CERNYellowReportPageBR3#Higgs_2_gauge_bosons
 
-    # Run Delphes to simulate the CMS detector
-    delphesOut = pythiaOut+'_delphes.root'
-    command = './DelphesHepMC %s %s %s'%(delphesCard,delphesOut,pythiaOut+'.hepmc')
-    os.chdir(delphesdir)
-    exec_me(command,options.dryRun)
-    exec_me('cp %s/simplifiedModel.%s.%s_delphes.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
+    if options.noSim:        
+        delphesOut = pythiaOut.replace(tmpDir,outDir)+'_delphes.root'
+    else:
+        # Run Delphes to simulate the CMS detector
+        delphesOut = pythiaOut.replace(outDir,tmpDir)+'_delphes.root'
+        command = './DelphesHepMC %s %s %s'%(delphesCard,delphesOut,pythiaOut+'.hepmc')
+        os.chdir(delphesdir)
+        exec_me(command,options.dryRun)
+        exec_me('cp %s/simplifiedModel.%s.%s_delphes.root %s'%(tmpDir, options.model, massPoint, outDir),options.dryRun)
 
     # Run CMSApp to do apply the CMS analyses to the generated sample
     cmsOut = delphesOut.replace('_delphes.root','_cmsapp.root')
