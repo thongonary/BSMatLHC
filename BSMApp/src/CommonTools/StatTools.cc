@@ -80,9 +80,10 @@ TH1D* StatTools::LogNormPoissonConv(TString name, double n, Double_t CenB, Doubl
     
     // integrate numerically over b using 1D Num Int
     //PoissonGaussian func;
-    PoissonLogNormal func;
+    //PoissonLogNormal func;
+    PoissonGamma func;
     double params[4];
-    params[0] = CenB;  params[1] = SigB;
+    params[0] = CenB;  params[1] = 2.*SigB;
     params[2] = s;     params[3] = n;
     func.SetParameters(params);
     //ROOT::Math::Integrator ig(ROOT::Math::IntegrationOneDim::kADAPTIVESINGULAR,1E-13,1E-13);

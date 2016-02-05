@@ -164,3 +164,67 @@ public:
 
 
 #endif
+
+
+#ifndef PoissonGamma_h
+#define PoissonGamma_h
+
+#include "Math/IFunction.h"
+#include "Math/IParamFunction.h"
+ 
+class PoissonGamma: public ROOT::Math::IParametricFunctionOneDim
+{
+private:
+   const double *pars;
+ 
+public:
+   double DoEvalPar(double x,const double* p) const
+   {
+     double b = x;
+     double CenB = p[0];
+     double SigB = p[1];
+     double s = p[2];
+     double n = p[3];
+     
+     double beta = (CenB + TMath::Sqrt(CenB*CenB+4*SigB*SigB)) / (2*SigB*SigB) ;
+     double alpha = 1 + beta*CenB;
+     return TMath::Poisson(n, s+b)*TMath::GammaDist(b,alpha,0,1./beta);
+   }
+   
+   double DoEval(double x) const
+   {     
+     double b = x;
+     double CenB = pars[0];
+     double SigB = pars[1];
+     double s = pars[2];
+     double n = pars[3];
+     
+     double beta = (CenB + TMath::Sqrt(CenB*CenB+4*SigB*SigB)) / (2*SigB*SigB) ;
+     double alpha = 1 + beta*CenB;     
+     return TMath::Poisson(n, s+b)*TMath::GammaDist(b,alpha,0,1./beta);
+   }
+ 
+   ROOT::Math::IBaseFunctionOneDim* Clone() const
+   {
+      return new PoissonGamma();
+   }
+ 
+   const double* Parameters() const
+   {
+      return pars;
+   }
+ 
+   void SetParameters(const double* p)
+   {
+      pars = p;
+   }
+ 
+   unsigned int NPar() const
+   {
+      return 4;
+   }
+};
+
+
+#endif
+

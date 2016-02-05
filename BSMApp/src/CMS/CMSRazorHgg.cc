@@ -821,7 +821,7 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbHighRes = XsecProb(pdfHighRes, effHighRes, outname, "HighRes", 100, 0., _xsecMax, false, false);
   TH1D* xsecProbLowRes = XsecProb(pdfLowRes, effLowRes, outname, "LowRes", 100, 0., _xsecMax, false, false);
   TH1D* xsecProbTotal = XsecProb(pdfTotal, effTotal, outname, "Total", 100, 0., _xsecMax, false, false);
-  
+
   TH1D* xsecProbExpHighPt = XsecProb(pdfHighPt, effHighPt, outname, "HighPt", 100, 0., _xsecMax, true, false);
   TH1D* xsecProbExpHbb = XsecProb(pdfHbb, effHbb, outname, "Hbb", 100, 0., _xsecMax, true, false);
   TH1D* xsecProbExpZbb = XsecProb(pdfZbb, effZbb, outname, "Zbb", 100, 0., _xsecMax, true, false);
@@ -842,7 +842,6 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbExpHighResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighRes,0.3);
   TH1D* xsecProbExpLowResWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpLowRes,0.3);
   TH1D* xsecProbExpTotalWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpTotal,0.3);
-
  
   char outname2xErr[256];
   sprintf(outname2xErr,"data/%s_DoubleError.root", _analysis.c_str());
@@ -873,6 +872,32 @@ void CMSRazorHgg::Loop(string outFileName) {
   TH1D* xsecProbExpHighRes2xErrWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpHighRes2xErr,0.3);
   TH1D* xsecProbExpLowRes2xErrWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpLowRes2xErr,0.3);
   TH1D* xsecProbExpTotal2xErrWithSignalSYS = _statTools->LogNormHistoConv(xsecProbExpTotal2xErr,0.3);
+
+
+  TH1D* localBayesHighRes = LocalBayesFactor(xsecProbHighRes);
+  TH1D* localBayesTotal = LocalBayesFactor(xsecProbTotal);
+  
+  TH1D* localBayesExpHighRes = LocalBayesFactor(xsecProbExpHighRes);
+  TH1D* localBayesExpTotal = LocalBayesFactor(xsecProbExpTotal);
+  
+  TH1D* localBayesHighResWithSignalSYS = LocalBayesFactor(xsecProbHighResWithSignalSYS);
+  TH1D* localBayesTotalWithSignalSYS = LocalBayesFactor(xsecProbTotalWithSignalSYS);
+  
+  TH1D* localBayesExpHighResWithSignalSYS = LocalBayesFactor(xsecProbExpHighResWithSignalSYS);
+  TH1D* localBayesExpTotalWithSignalSYS = LocalBayesFactor(xsecProbExpTotalWithSignalSYS);
+  
+  TH1D* localBayesHighRes2xErr = LocalBayesFactor(xsecProbHighRes2xErr);
+  TH1D* localBayesTotal2xErr = LocalBayesFactor(xsecProbTotal2xErr);
+  
+  TH1D* localBayesExpHighRes2xErr = LocalBayesFactor(xsecProbExpHighRes2xErr);
+  TH1D* localBayesExpTotal2xErr = LocalBayesFactor(xsecProbExpTotal2xErr);
+  
+  TH1D* localBayesHighRes2xErrWithSignalSYS = LocalBayesFactor(xsecProbHighRes2xErrWithSignalSYS);
+  TH1D* localBayesTotal2xErrWithSignalSYS = LocalBayesFactor(xsecProbTotal2xErrWithSignalSYS);
+  
+  TH1D* localBayesExpHighRes2xErrWithSignalSYS = LocalBayesFactor(xsecProbExpHighRes2xErrWithSignalSYS);
+  TH1D* localBayesExpTotal2xErrWithSignalSYS = LocalBayesFactor(xsecProbExpTotal2xErrWithSignalSYS);
+
 
   
   // Open Output file again 
@@ -1048,6 +1073,30 @@ void CMSRazorHgg::Loop(string outFileName) {
   xsecProbExpHighRes2xErrWithSignalSYS->Write();
   xsecProbExpLowRes2xErrWithSignalSYS->Write();
   xsecProbExpTotal2xErrWithSignalSYS->Write();
+
+  localBayesHighRes->Write();
+  localBayesTotal->Write();
+  
+  localBayesExpHighRes->Write();
+  localBayesExpTotal->Write();
+
+  localBayesHighResWithSignalSYS->Write();
+  localBayesTotalWithSignalSYS->Write();
+  
+  localBayesExpHighResWithSignalSYS->Write();
+  localBayesExpTotalWithSignalSYS->Write();
+  
+  localBayesHighRes2xErr->Write();
+  localBayesTotal2xErr->Write();
+  
+  localBayesExpHighRes2xErr->Write();
+  localBayesExpTotal2xErr->Write();
+
+  localBayesHighRes2xErrWithSignalSYS->Write();
+  localBayesTotal2xErrWithSignalSYS->Write();
+  
+  localBayesExpHighRes2xErrWithSignalSYS->Write();
+  localBayesExpTotal2xErrWithSignalSYS->Write();
   
   //std::cout << "before malloc" << std::endl;
   file->Close();
@@ -1083,12 +1132,14 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string di
   gROOT->cd();
   // a loop over xsec should go here... 
   for(int i=0; i<ibin; i++) {
-    double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
+    //center of bin
+    //double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
+    //left edge of bin
+    double xsec = xmin + (1.*i)/ibin*(xmax-xmin);
     double prob = 1;
     double logProb = 0;
     for(int ix=0; ix<ibinX; ix++) {
       for(int iy=0; iy<ibinY; iy++) {
-	//if (!((ix==8) && iy==0)) continue; //just using the bin with the excess
 	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
 	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
 	char name[256];
@@ -1102,21 +1153,35 @@ TH1D* CMSRazorHgg::XsecProb(TH1D* sigPdf, double eff, string Filename, string di
 	  cout << "FindBin returns: " << binProb->FindBin(sBin) << endl;
 	  cout << "bin prob returns: " << binProb->GetBinContent(binProb->FindBin(sBin)) << endl;
 	}
-	//if(prob < 10.e-30) prob = 0.;
-	//if(prob <= 0) continue;
 	logProb += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
 	prob *= binProb->GetBinContent(binProb->FindBin(sBin)); 
-	//cout << "logProb = " << logProb << endl;
-	//cout << "prob = " << prob << endl;
 	delete binProb;
       }
     }
-    //cout << "prob = " << prob << endl;
-    //cout << "exp(logprob) = " << TMath::Exp(logprob) << endl;
-    //probVec->SetBinContent(i+1,prob);
     probVec->SetBinContent(i+1,TMath::Exp(logProb));
   }
   probVec->Scale(1./probVec->Integral());
   likFile->Close();
   return probVec;
+}
+
+
+TH1D* CMSRazorHgg::LocalBayesFactor(TH1D* probVec) {  
+  int ibin = probVec->GetXaxis()->GetNbins();
+  double xmin = probVec->GetXaxis()->GetXmin();
+  double xmax = probVec->GetXaxis()->GetXmax();  
+
+  string name = probVec->GetName();
+  name = name.substr(7,name.size());
+  name = "localBayes"+name;  
+  
+  TH1D* localBayes = new TH1D(name.c_str(), name.c_str(), ibin, xmin, xmax);
+  
+  gROOT->cd();
+  for(int i=0; i<ibin; i++) {
+    double prob = 1;
+    double logProb = TMath::Log(probVec->GetBinContent(i+1))-TMath::Log(probVec->GetBinContent(1));
+    localBayes->SetBinContent(i+1,TMath::Sign(TMath::Sqrt(2.*TMath::Abs(logProb)),logProb));
+  }
+  return localBayes;
 }

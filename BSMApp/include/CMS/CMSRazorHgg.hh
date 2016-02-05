@@ -38,6 +38,8 @@ private:
   /// Return the posterior distribution for the inclusive xsec,
   /// given a pdf and efficiency for one of the boxes;
   TH1D* XsecProb(TH1D* sigPdf, double eff, string Filename, string directory, int ibin, double xmin, double xmax, bool expected, bool doubleErr);
+  // Local Bayes Factor
+  TH1D* LocalBayesFactor(TH1D* probVec);
   /// Luminosity
   double _Lumi;
   // Gen-level filter efficiency
