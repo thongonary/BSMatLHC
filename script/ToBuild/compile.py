@@ -38,7 +38,7 @@ BSMDIR = os.environ['PWD']
 os.chdir(BSMDIR)
 
 #get external code: boost_1_63_0
-os.system("cp extraCode/boost_1_63_0.tar .; tar -xf boost_1_63_0.tar; rm boost_1_63_0.tar")
+os.system("curl -L https://sourceforge.net/projects/boost/files/boost/1.63.0/boost_1_63_0.tar.gz > boost_1_63_0.tar.gz; tar -zxf boost_1_63_0.tar.gz; rm boost_1_63_0.tar.gz")
 os.system("mv boost_1_63_0 boost")
 #get external code: LHAPDF 6.1
 os.system("cp extraCode/LHAPDF-6.1.5.tar.gz .; tar -xzf LHAPDF-6.1.5.tar.gz; rm LHAPDF-6.1.5.tar.gz")
