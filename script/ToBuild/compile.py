@@ -33,11 +33,16 @@ sourcedir = os.environ['PWD']+"/hepmc/HepMC-2.06.08"
 builddir = os.environ['PWD']+"/hepmc/build"
 os.system("cmake -m64 -DCMAKE_INSTALL_PREFIX=%s %s -Dmomentum:STRING=GEV -Dlength:STRING=MM" %(builddir, sourcedir))
 os.system("make; make install")
+BSMDIR = os.environ['PWD']
+#print "BSMDIR: ", BSMDIR
 os.chdir(BSMDIR)
 
+#get external code: boost_1_63_0
+os.system("cp extraCode/boost_1_63_0.tar .; tar -xf boost_1_63_0.tar; rm boost_1_63_0.tar")
+os.system("mv boost_1_63_0 boost")
 #get external code: LHAPDF 6.1
 os.system("cp extraCode/LHAPDF-6.1.5.tar.gz .; tar -xzf LHAPDF-6.1.5.tar.gz; rm LHAPDF-6.1.5.tar.gz")
-os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR+"/lhapdf/; make; make install; cd ..; rm -r LHAPDF-6.1.5")
+os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR+"/lhapdf/ --with-boost="+BSMDIR+"/boost/; make; make install; cd ..; rm -r LHAPDF-6.1.5")
 
 #get external code: PYTHIA 8.210
 os.system("cp extraCode/pythia8210.tgz .; tar -xzf pythia8210.tgz; rm pythia8210.tgz")

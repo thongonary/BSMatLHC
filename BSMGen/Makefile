@@ -11,6 +11,9 @@ LIBDIRARCH    = $(PYTHIADIR)lib/
 HEPMCDIR      = $(PWD)/../hepmc/build/
 HEPMCLIB      = $(HEPMCDIR)lib/
 
+LHAPDFDIR     = $(PWD)/../lhapdf/
+LHAPDFLIB     = $(LHAPDFDIR)/lib/
+
 FXX           = gfortran 
 CXX           = g++ 
 CXXFLAGS      = -fPIC -Wno-deprecated -O -ansi -D_GNU_SOURCE -O2
@@ -70,7 +73,7 @@ GenPythia:$(SRCDIR)GenPythia.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/EventFilter.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8  -lLHAPDF   \
+	-L$(LIBDIRARCH) -lpythia8  -L$(LHAPDFLIB) -lLHAPDF   \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
 
@@ -81,7 +84,7 @@ SMGen:$(SRCDIR)SMGen.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -92,7 +95,7 @@ STDHEPConverter:$(SRCDIR)STDHEPConverter.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
 
@@ -103,7 +106,7 @@ LHEGen:$(SRCDIR)LHEGen.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -114,7 +117,7 @@ LHEGenMLM:$(SRCDIR)LHEGenMLM.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/STDHEP.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -123,7 +126,7 @@ ZJetsGen:$(SRCDIR)ZJetsGen.C
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $ 
 
@@ -132,7 +135,7 @@ SUSYDecay:$(SRCDIR)SUSYDecay.C
 	-I$(INCLUDEDIR) \
 	-I$(HEPMCDIR)include/ \
 	-I$(PYTHIADIR)include/ \
-	-L$(LIBDIRARCH) -lpythia8 -lLHAPDF  \
+	-L$(LIBDIRARCH) -lpythia8 -L$(LHAPDFLIB) -lLHAPDF  \
 	-L$(HEPMCLIB) -lHepMC  \
 	$(GLIBS) $
 
