@@ -19,18 +19,18 @@
 #define _debug 0
 
 CMSRazorTChannel::CMSRazorTChannel(TTree *tree, double Lumi, double filterEff, double xsecMax, string analysis, bool delphesFormat) : CMSReco(tree, delphesFormat) {
-  _Lumi = Lumi;
-  _statTools = new StatTools(-99);
-  _analysis = analysis;
-  _delphesFormat = delphesFormat;
+    _Lumi = Lumi;
+    _statTools = new StatTools(-99);
+    _analysis = analysis;
+    _delphesFormat = delphesFormat;
 }
 
 CMSRazorTChannel::~CMSRazorTChannel(){
-  std::cout << "CMSRazorTChannel destructor" << std::endl;
+    std::cout << "CMSRazorTChannel destructor" << std::endl;
 }
 
 void CMSRazorTChannel::SetSqrts(double sqrts) {
-  _sqrts = sqrts;
+    _sqrts = sqrts;
 }
 
 // loop over events - real analysis
@@ -192,7 +192,7 @@ void CMSRazorTChannel::Loop(string outFileName) {
             //-----------------------------------
             int i = 0;
             for (auto tmp : pfJets)
-            {
+            {   
                 jetPt[i]  = tmp.Pt();
                 jetEta[i] = tmp.Eta();
                 jetPhi[i] = tmp.Phi();
@@ -234,9 +234,9 @@ void CMSRazorTChannel::Loop(string outFileName) {
         //--------------------------
         // At least 2 jets above 80 GeV
         //--------------------------
-        if( numJetsAbove80GeV < 2 || Jets4Vector.size() < 2 )
+        if (numJetsAbove80GeV < 2)
         {
-            if( _debug ) std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
+            if (_debug) std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
             continue;
         }
 
@@ -289,84 +289,84 @@ void CMSRazorTChannel::Loop(string outFileName) {
 }
 
 double CMSRazorTChannel::DeltaPhi(TLorentzVector jet1, TLorentzVector jet2) {
-  double deltaPhi = jet1.Phi() - jet2.Phi();
-  while (deltaPhi > M_PI) deltaPhi -= 2*M_PI;
-  while (deltaPhi <= -M_PI) deltaPhi += 2*M_PI;
-  return deltaPhi;
+    double deltaPhi = jet1.Phi() - jet2.Phi();
+    while (deltaPhi > M_PI) deltaPhi -= 2*M_PI;
+    while (deltaPhi <= -M_PI) deltaPhi += 2*M_PI;
+    return deltaPhi;
 }
 
 
 TH1D* CMSRazorTChannel::XsecProb(TH1D* sigPdf, double eff, string Filename, string directory, int ibin, double xmin, double xmax, bool expected, bool doubleErr) {
-  
-  int ibinX = sigPdf->GetXaxis()->GetNbins();
-  int ibinY = sigPdf->GetYaxis()->GetNbins();
-  
-  char histname[256];
-  if (doubleErr)
+
+    int ibinX = sigPdf->GetXaxis()->GetNbins();
+    int ibinY = sigPdf->GetYaxis()->GetNbins();
+
+    char histname[256];
+    if (doubleErr)
     {      
-    if (expected) sprintf(histname, "%s%s%s","probVecExp", directory.c_str(), "2xErr");
-    else sprintf(histname, "%s%s%s","probVec", directory.c_str(),"2xErr");
+        if (expected) sprintf(histname, "%s%s%s","probVecExp", directory.c_str(), "2xErr");
+        else sprintf(histname, "%s%s%s","probVec", directory.c_str(),"2xErr");
     }
-  else {
-    if (expected) sprintf(histname, "%s%s","probVecExp", directory.c_str());
-    else sprintf(histname, "%s%s","probVec", directory.c_str());
-  }
-  TH1D* probVec = new TH1D(histname, histname, ibin, xmin, xmax);
-  
-  TFile* likFile = new TFile(TString(Filename));  
-  gROOT->cd();
-  // a loop over xsec should go here... 
-  for(int i=0; i<ibin; i++) {
-    //center of bin
-    //double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
-    //left edge of bin
-    double xsec = xmin + (1.*i)/ibin*(xmax-xmin);
-    double prob = 1;
-    double logProb = 0;
-    for(int ix=0; ix<ibinX; ix++) {
-      for(int iy=0; iy<ibinY; iy++) {
-	if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
-	double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
-	char name[256];
-	if (expected) sprintf(name, "%s/exp_%i_%i", directory.c_str(), ix, iy);
-	else sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
-	
-	TH1D* binProb = (TH1D*) likFile->Get(name);
-	double yieldmax = binProb->GetXaxis()->GetXmax();
-	if (sBin >= yieldmax) {
-	  cout << "Note: signal events exceed " << yieldmax << "! sBin = " << sBin << endl;
-	  cout << "FindBin returns: " << binProb->FindBin(sBin) << endl;
-	  cout << "bin prob returns: " << binProb->GetBinContent(binProb->FindBin(sBin)) << endl;
-	}
-	logProb += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
-	prob *= binProb->GetBinContent(binProb->FindBin(sBin)); 
-	delete binProb;
-      }
+    else {
+        if (expected) sprintf(histname, "%s%s","probVecExp", directory.c_str());
+        else sprintf(histname, "%s%s","probVec", directory.c_str());
     }
-    probVec->SetBinContent(i+1,TMath::Exp(logProb));
-  }
-  probVec->Scale(1./probVec->Integral());
-  likFile->Close();
-  return probVec;
+    TH1D* probVec = new TH1D(histname, histname, ibin, xmin, xmax);
+
+    TFile* likFile = new TFile(TString(Filename));  
+    gROOT->cd();
+    // a loop over xsec should go here... 
+    for(int i=0; i<ibin; i++) {
+        //center of bin
+        //double xsec = xmin + (i+0.5)/ibin*(xmax-xmin);
+        //left edge of bin
+        double xsec = xmin + (1.*i)/ibin*(xmax-xmin);
+        double prob = 1;
+        double logProb = 0;
+        for(int ix=0; ix<ibinX; ix++) {
+            for(int iy=0; iy<ibinY; iy++) {
+                if (sigPdf->GetBinContent(ix+1,iy+1)<=0.) continue;
+                double sBin = _Lumi*xsec*eff*sigPdf->GetBinContent(ix+1,iy+1);	
+                char name[256];
+                if (expected) sprintf(name, "%s/exp_%i_%i", directory.c_str(), ix, iy);
+                else sprintf(name, "%s/lik_%i_%i", directory.c_str(), ix, iy);
+
+                TH1D* binProb = (TH1D*) likFile->Get(name);
+                double yieldmax = binProb->GetXaxis()->GetXmax();
+                if (sBin >= yieldmax) {
+                    cout << "Note: signal events exceed " << yieldmax << "! sBin = " << sBin << endl;
+                    cout << "FindBin returns: " << binProb->FindBin(sBin) << endl;
+                    cout << "bin prob returns: " << binProb->GetBinContent(binProb->FindBin(sBin)) << endl;
+                }
+                logProb += TMath::Log(binProb->GetBinContent(binProb->FindBin(sBin)));
+                prob *= binProb->GetBinContent(binProb->FindBin(sBin)); 
+                delete binProb;
+            }
+        }
+        probVec->SetBinContent(i+1,TMath::Exp(logProb));
+    }
+    probVec->Scale(1./probVec->Integral());
+    likFile->Close();
+    return probVec;
 }
 
 
 TH1D* CMSRazorTChannel::LocalBayesFactor(TH1D* probVec) {  
-  int ibin = probVec->GetXaxis()->GetNbins();
-  double xmin = probVec->GetXaxis()->GetXmin();
-  double xmax = probVec->GetXaxis()->GetXmax();  
+    int ibin = probVec->GetXaxis()->GetNbins();
+    double xmin = probVec->GetXaxis()->GetXmin();
+    double xmax = probVec->GetXaxis()->GetXmax();  
 
-  string name = probVec->GetName();
-  name = name.substr(7,name.size());
-  name = "localBayes"+name;  
-  
-  TH1D* localBayes = new TH1D(name.c_str(), name.c_str(), ibin, xmin, xmax);
-  
-  gROOT->cd();
-  for(int i=0; i<ibin; i++) {
-    double prob = 1;
-    double logProb = TMath::Log(probVec->GetBinContent(i+1))-TMath::Log(probVec->GetBinContent(1));
-    localBayes->SetBinContent(i+1,TMath::Sign(TMath::Sqrt(2.*TMath::Abs(logProb)),logProb));
-  }
-  return localBayes;
+    string name = probVec->GetName();
+    name = name.substr(7,name.size());
+    name = "localBayes"+name;  
+
+    TH1D* localBayes = new TH1D(name.c_str(), name.c_str(), ibin, xmin, xmax);
+
+    gROOT->cd();
+    for(int i=0; i<ibin; i++) {
+        double prob = 1;
+        double logProb = TMath::Log(probVec->GetBinContent(i+1))-TMath::Log(probVec->GetBinContent(1));
+        localBayes->SetBinContent(i+1,TMath::Sign(TMath::Sqrt(2.*TMath::Abs(logProb)),logProb));
+    }
+    return localBayes;
 }
