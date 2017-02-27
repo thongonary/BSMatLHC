@@ -15,7 +15,7 @@ Beams:eCM = 13000.                  ! CM energy of collision
 ! 3) Settings for SUSY and the hard-process generation
 SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
 SLHA:file = data/pythiaCards/thong/simplifiedModel.tChannelDM.slha ! SLHA file
-SLHA:verbose = 1                  ! verbosity 
+SLHA:verbose = 0                  ! verbosity 
 SLHA:readFrom = 2                  ! read in from the SLHA:file
 SLHA:keepSM   = on                 ! SM particles setting in SLHA file ignored [change for full scan]
 SLHA:useDecayTable = on            ! Read in SLHA DECAY tables [change for full scan]

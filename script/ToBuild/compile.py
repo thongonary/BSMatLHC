@@ -54,7 +54,7 @@ os.system("mv MG5_aMC_v2_3_2 madgraph; cp -r BSMGen/data/madgraphModels/* madgra
 
 # get external code: DELPHES 3
 #os.system("cp extraCode/delphes-master.tar.gz .; tar xvzf delphes-master.tar.gz; rm delphes-master.tar.gz; mv delphes-master delphes")
-os.system("git clone https://github.com/jmduarte/delphes")
+os.system("git clone git@github.com:thongonary/delphes.git")
 os.system("cd delphes; make")
 
 #Compile BSMGen
