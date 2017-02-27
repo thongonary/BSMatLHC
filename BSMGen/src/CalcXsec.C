@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fstream>
 
 using namespace Pythia8; 
 
@@ -88,7 +89,7 @@ int main(int argc, char* argv[]) {
   for(int i=0; i<100; i++) {
     // set new mass
     double thisValue = xMin + (i+0.5)/100.*(xMax-xMin);
-    sprintf(command,"%s=%d",argv[3], thisValue);
+    sprintf(command,"%s=%f",argv[3], thisValue);
     pythia.readString(command);
     // re-initialize pythia
     pythia.init();
@@ -121,6 +122,16 @@ int main(int argc, char* argv[]) {
   TFile* out = new TFile(argv[2], "RECREATE");
   xsec->Write();
   out->Close();
+
+  std::string textout = argv[2].replace(argv[2].find(".root"), 5, ".txt")
+  ofstream textfile;
+  textfile.open(textout);
+  textfile << "Mass       xs\n";
+  for (int i = 0; i<100; i++)
+  {
+      textfile << xsec->GetBinLowEdge(i+1) << "    " << xsecVal[i] << "\n";
+  }
+  textfile.close();
   // Done.
   return 0;
 }
