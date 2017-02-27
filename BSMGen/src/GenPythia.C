@@ -92,12 +92,12 @@ int main(int argc, char* argv[]) {
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
   //int nList    = pythia.mode("Main:numberToList");
-  int nShow    = pythia.mode("Main:timesToShow");
+  int nShow    = pythia.mode("Next:numberCount");
   int nAbort   = pythia.mode("Main:timesAllowErrors"); 
   //bool showCS  = pythia.flag("Main:showChangedSettings");
-  bool showAS  = pythia.flag("Main:showAllSettings");
-  bool showCPD = pythia.flag("Main:showChangedParticleData");
-  bool showAPD = pythia.flag("Main:showAllParticleData");  
+  bool showAS  = pythia.flag("Init:showAllSettings");
+  bool showCPD = pythia.flag("Init:showChangedParticleData");
+  bool showAPD = pythia.flag("Init:showAllParticleData");  
 
   // List settings.
   //if (showCS) pythia.settings.listChanged();
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
   int nUnfilteredEvent = 0;
   
   // Begin event loop.
-  int nPace = max(1, nEvent / max(1, nShow) ); 
+  int nPace = max(1, nShow); 
   int iAbort = 0;
   for (int iEvent = 0; ; ++iEvent) {
     
