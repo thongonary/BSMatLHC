@@ -27,6 +27,7 @@
 #include "CMS/CMSSubstructure.hh"
 #include "CMS/CMSRazorHgg.hh"
 #include "CMS/CMSRazorHggHbb.hh"
+#include "CMS/CMSRazorTChannel.hh"
 
 using namespace std;
 
@@ -46,6 +47,7 @@ int main(int argc, char* argv[]) {
     cout << "--susyvars      Razor, alpha_T, MT2, etc" << endl;
     cout << "--monojet       Run MonoJet Analysis" << endl;
     cout << "--darkmatter    Run Dark Matter future study" << endl;
+    cout << "--tchannel      Razor t-channel" << endl;
     cout << "--substructure  Run Substructure tagger analysis on jets" << endl;
     cout << "--ssdilepbtag   Run the SS dilepton btag Analysis" << endl;
     cout << "--displaced     Run DSisplaced Jet Analysis" << endl;
@@ -75,6 +77,7 @@ int main(int argc, char* argv[]) {
   bool displaced = false;
   bool razorhgg = false;
   bool razorhgghbb = false;
+  bool tchannel = false;
   bool delphesFormat = false;
   double sqrts = 13000.;
   double filter = 1.;
@@ -109,6 +112,7 @@ int main(int argc, char* argv[]) {
       if (strncmp(argv[i],"--razor13",9)==0) razor13 = true;
       else razor = true;
     }
+    if (strncmp(argv[i],"--tchannel",10)==0)        tchannel = true;
     if (strncmp(argv[i],"--susyvars",10)==0)        susyvars = true;
     if (strncmp(argv[i],"--hggrazor",10)==0)        razorhgg = true;
     if (strncmp(argv[i],"--hgghbbrazor",13)==0)        razorhgghbb = true;
@@ -196,6 +200,19 @@ int main(int argc, char* argv[]) {
       cmsrazorhgghbb.Loop(outFileName);
     }
     
+    // t-channel
+    if(tchannel)
+    {
+        CMSRazorTChannel* cmstchannel = new CMSRazorTChannel(cmsChain, lumi, filter, xsecMax, "CMSTChannel_EXO_XX", delphesFormat);
+        if(!writeOut){
+            cout << "please specify output file" << endl;
+            return 0;
+        }
+        if(verbose) cmstchannel->SetVerbose(true);
+        cmstchannel->SetSqrts(sqrts);
+        cmstchannel->Loop(outFileName);
+        //delete cmstchannel;
+    }
     /*    
     // EXO-11-059: MonoJet analysis
     if(monojet) {
