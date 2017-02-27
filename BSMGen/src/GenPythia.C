@@ -91,10 +91,10 @@ int main(int argc, char* argv[]) {
   
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
-  //int nList    = pythia.mode("Main:numberToList");
+  //int nList    = pythia.mode("Next:numberShowEvent");
   int nShow    = pythia.mode("Next:numberCount");
   int nAbort   = pythia.mode("Main:timesAllowErrors"); 
-  //bool showCS  = pythia.flag("Main:showChangedSettings");
+  //bool showCS  = pythia.flag("Init:showChangedSettings");
   bool showAS  = pythia.flag("Init:showAllSettings");
   bool showCPD = pythia.flag("Init:showChangedParticleData");
   bool showAPD = pythia.flag("Init:showAllParticleData");  

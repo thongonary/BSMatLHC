@@ -84,13 +84,13 @@ int main(int argc, char* argv[]) {
 
   // Extract settings to be used in the main program.
   int nEvent   = pythia.mode("Main:numberOfEvents");
-  int nList    = pythia.mode("Main:numberToList");
-  int nShow    = pythia.mode("Main:timesToShow");
+  int nList    = pythia.mode("Next:numberShowEvent");
+  int nShow    = pythia.mode("Next:numberCount");
   int nAbort   = pythia.mode("Main:timesAllowErrors"); 
-  bool showCS  = pythia.flag("Main:showChangedSettings");
-  bool showAS  = pythia.flag("Main:showAllSettings");
-  bool showCPD = pythia.flag("Main:showChangedParticleData");
-  bool showAPD = pythia.flag("Main:showAllParticleData");
+  bool showCS  = pythia.flag("Init:showChangedSettings");
+  bool showAS  = pythia.flag("Init:showAllSettings");
+  bool showCPD = pythia.flag("Init:showChangedParticleData");
+  bool showAPD = pythia.flag("Init:showAllParticleData");
   
 
   // List settings.
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
   GenCandidateFiller* particleFiller = new GenCandidateFiller(myTree,"Particle");
 
   // Begin event loop.
-  int nPace = max(1, nEvent / max(1, nShow) ); 
+  int nPace = max(1, nShow ); 
   int iAbort = 0;
   for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
     if (nShow > 0 && iEvent%nPace == 0) 
