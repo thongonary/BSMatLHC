@@ -42,7 +42,7 @@ OUTLIB	         = ./lib/
 .SUFFIXES: .cc,.C, .hh
 .PREFIXES: ./lib/
 
-all:  lib GenPythia STDHEPConverter LHEGen LHEGenMLM SMGen SUSYDecay
+all:  lib CalcXsec GenPythia STDHEPConverter LHEGen LHEGenMLM SMGen SUSYDecay
 
 lib: 	$(OUTLIB)GenTreeColumn.o \
 	$(OUTLIB)GenTree.o \
@@ -66,6 +66,7 @@ $(OUTLIB)STDHEP.o: $(SRCDIR)STDHEP.cc $(OUTLIB)GenTree.o $(OUTLIB)GenCandidateFi
 $(OUTLIB)EventFilter.o: $(SRCDIR)EventFilter.cc 
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -I$(PYTHIADIR)include/ -o	$(OUTLIB)EventFilter.o $<
 
+
 GenPythia:$(SRCDIR)GenPythia.C 
 	$(CXX) $(CXXFLAGS) -o GenPythia $< \
 	-I$(INCLUDEDIR) \
@@ -76,6 +77,16 @@ GenPythia:$(SRCDIR)GenPythia.C
 	-L$(LIBDIRARCH) -lpythia8  -L$(LHAPDFLIB) -lLHAPDF   \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
+
+CalcXsec:$(SRCDIR)CalcXsec.C
+	$(CXX) $(CXXFLAGS) -o CalcXsec $< \
+	-I$(INCLUDEDIR) \
+	-I$(HEPMCDIR)include/ \
+	-I$(PYTHIADIR)include/ \
+    $(LIBS) \
+	-L$(LIBDIRARCH) -lpythia8  -L$(LHAPDFLIB) -lLHAPDF \
+	-L$(HEPMCLIB) -lHepMC \
+	$(GLIBS) $
 
 SMGen:$(SRCDIR)SMGen.C 
 	$(CXX) $(CXXFLAGS) -o SMGen $< \
@@ -141,4 +152,4 @@ SUSYDecay:$(SRCDIR)SUSYDecay.C
 
 clean:
 	rm -f $(OUTLIB)*.o 
-	rm -f GenPythia LHEGen SUSYDecay STDHEPConverter SMGen SLHAGen
+	rm -f CalcXsec GenPythia LHEGen SUSYDecay STDHEPConverter SMGen SLHAGen
