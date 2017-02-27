@@ -77,7 +77,7 @@ void CMSReco::MuReco() {
 }
 
 void CMSReco::PFReco() {
-
+/*
   if (_delphesFormat) {    
     // list of gmuons
     for(int i=0; i<Muon_size; i++) {    
@@ -132,6 +132,7 @@ void CMSReco::PFReco() {
     }  
   }
   else {
+*/
     // list of gen muons
     for(int i=0; i<Muon; i++) {
       fastjet::PseudoJet p(MuonPx[i], MuonPy[i], MuonPz[i], MuonE[i]);
@@ -172,7 +173,7 @@ void CMSReco::PFReco() {
       }
     }
     // smear each particle category
-  }
+ // }
 
 }
 
