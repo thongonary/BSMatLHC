@@ -102,7 +102,7 @@ bool GenCandidateFiller::isSUSY(HepMC::GenParticle* p) {
   bool isSUSY = false;
   int pdgId = p->pdg_id();
   // added in more SUSY particles
-  if(abs(pdgId) >= 1000001 && abs(pdgId) <= 1000039 || abs(pdgId) >= 2000001 && abs(pdgId) <= 2000015) isSUSY = true;
+  if((abs(pdgId) >= 1000001 && abs(pdgId) <= 1000039) || (abs(pdgId) >= 2000001 && abs(pdgId) <= 2000015)) isSUSY = true;
   return isSUSY;
 }
 
