@@ -41,58 +41,60 @@ int main(int argc, char* argv[]) {
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
- 
-  // Generator. 
-  Pythia pythia;
 
-  // Read in commands from external file.
-  pythia.readFile(argv[1]);    
-
-  // set seed
-  int jobpid = getpid();
-  TDatime *now = new TDatime();
-  int today = now->GetDate();
-  int clock = now->GetTime();
-  int myseed = today+clock+jobpid*1000;
-  if(myseed>900000000) myseed = myseed - 900000000;
-  pythia.readString("Random:setSeed=on");
-  char command[512];
-  sprintf(command,"Random:seed=%i",myseed);
-  pythia.readString(command);
-
-  // Initialize. Beam parameters set in .pythia file.
-  pythia.init();
-
-  // Extract settings to be used in the main program.
-  int nEvent   = 1000;
-  int nList    = pythia.mode("Next:numberShowEvent");
-  int nShow    = pythia.mode("Next:numberCount");
-  int nAbort   = pythia.mode("Main:timesAllowErrors"); 
-  bool showCS  = pythia.flag("Init:showChangedSettings");
-  bool showAS  = pythia.flag("Init:showAllSettings");
-  bool showCPD = pythia.flag("Init:showChangedParticleData");
-  bool showAPD = pythia.flag("Init:showAllParticleData");
-  
-  // List settings.
-  if (showCS) pythia.settings.listChanged();
-  if (showAS) pythia.settings.listAll();
-
-  // List particle data.  
-  if (showCPD) pythia.particleData.listChanged();
-  if (showAPD) pythia.particleData.listAll();
-  
   float xMin = atof(argv[4]);
   float xMax = atof(argv[5]);
   double xsecVal[100];
   double errXsec[100];
 
   for(int i=0; i<100; i++) {
+ 
+    // Generator. 
+    Pythia pythia;
+
+    // Read in commands from external file.
+    pythia.readFile(argv[1]);    
+
+    // set seed
+    int jobpid = getpid();
+    TDatime *now = new TDatime();
+    int today = now->GetDate();
+    int clock = now->GetTime();
+    int myseed = today+clock+jobpid*1000;
+    if(myseed>900000000) myseed = myseed - 900000000;
+    pythia.readString("Random:setSeed=on");
+    char command[512];
+    sprintf(command,"Random:seed=%i",myseed);
+    pythia.readString(command);
+
+    // Initialize. Beam parameters set in .pythia file.
+    pythia.init();
+
+    // Extract settings to be used in the main program.
+    int nEvent   = 300;
+    int nList    = pythia.mode("Next:numberShowEvent");
+    int nShow    = pythia.mode("Next:numberCount");
+    int nAbort   = pythia.mode("Main:timesAllowErrors"); 
+    bool showCS  = pythia.flag("Init:showChangedSettings");
+    bool showAS  = pythia.flag("Init:showAllSettings");
+    bool showCPD = pythia.flag("Init:showChangedParticleData");
+    bool showAPD = pythia.flag("Init:showAllParticleData");
+  
+    // List settings.
+    //  if (showCS) pythia.settings.listChanged();
+    //  if (showAS) pythia.settings.listAll();
+    
+    // List particle data.  
+    //  if (showCPD) pythia.particleData.listChanged();
+    //  if (showAPD) pythia.particleData.listAll();
+  
     // set new mass
     double thisValue = xMin + (i+0.5)/100.*(xMax-xMin);
     sprintf(command,"%s=%f",argv[3], thisValue);
+    //    cout << "READTHIS " << command << endl;
     pythia.readString(command);
     // re-initialize pythia
-    pythia.init();
+    //    pythia.init();
 
     // Begin event loop.
     int nPace = max(1, nShow ); 
@@ -111,6 +113,8 @@ int main(int argc, char* argv[]) {
     }
     xsecVal[i] = pythia.info.sigmaGen();
     errXsec[i] = pythia.info.sigmaErr();
+    ParticleData& pdt = pythia.particleData;
+//    cout << "READTHIS " << xsecVal[i] << " " << errXsec[i] << " " << pdt.m0(1000022) << endl;
   }
   
   TH1D* xsec = new TH1D("xsec", "", 100,  xMin, xMax);
@@ -123,15 +127,15 @@ int main(int argc, char* argv[]) {
   xsec->Write();
   out->Close();
 
-  std::string textout = argv[2].replace(argv[2].find(".root"), 5, ".txt")
-  ofstream textfile;
-  textfile.open(textout);
-  textfile << "Mass       xs\n";
-  for (int i = 0; i<100; i++)
-  {
-      textfile << xsec->GetBinLowEdge(i+1) << "    " << xsecVal[i] << "\n";
-  }
-  textfile.close();
+//  std::string textout = argv[2].replace(argv[2].find(".root"), 5, ".txt")
+//  ofstream textfile;
+//  textfile.open(textout);
+//  textfile << "Mass       xs\n";
+//  for (int i = 0; i<100; i++)
+//  {
+//      textfile << xsec->GetBinLowEdge(i+1) << "    " << xsecVal[i] << "\n";
+//  }
+//  textfile.close();
   // Done.
   return 0;
 }
