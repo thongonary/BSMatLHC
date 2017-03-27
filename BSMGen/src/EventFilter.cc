@@ -45,7 +45,7 @@ void EventFilter::filter(Event& event) {
     // Skip if particle kind selection criteria not fulfilled.
     if (!event[i].isFinal()) continue;
     if (abs(event[i].id()) != pdgId) continue;
-    if (abs(event.at(event.at(i).mother1()).id()) != pdgMothId) continue;
+    //if (abs(event.at(event.at(i).mother1()).id()) != pdgMothId) continue;
 
     // Skip if too large pseudorapidity.
     if (etaMax > 0 && abs(event[i].eta()) > etaMax) continue;
@@ -56,7 +56,6 @@ void EventFilter::filter(Event& event) {
     // Add particle to vectors of indices and pointers.
     keptIndx.push_back( i );
     keptPtrs.push_back( &event[i] );
-
   // End of particle loop. Done.
   }
 

@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define _debug 1
+
 using namespace Pythia8; 
 
 int main(int argc, char* argv[]) {
@@ -59,32 +61,37 @@ int main(int argc, char* argv[]) {
   char hepmcname[256];
   sprintf(hepmcname,"%s.hepmc", outfilename.c_str());  
   HepMC::IO_GenEvent ascii_io(hepmcname, std::ios::out);
-  
+ 
+  if (_debug) cout << "[DEBUG] Prepare the generator...\n";
   // Generator. 
   Pythia pythia;
 
   // Read in commands from external file.
+  if (_debug) cout << "[DEBUG] Reading from " << cfg << endl;
   pythia.readFile(cfg);  
   
   // Initialize Les Houches Event File run. List initialization information.
+  if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
   LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
   
   // Open a file on which LHEF events should be stored, and write header.  
   char lhename[256];
   sprintf(lhename,"%s.lhe", outfilename.c_str());
+  if (_debug) cout << "[DEBUG] Opening LHEF file " << lhename << endl;
   myLHA.openLHEF(lhename);
 
   // Initialize. Beam parameters set in .pythia file.
+  if (_debug) cout << "[DEBUG] Initializing pythia... " << cfg << endl;
   pythia.init();
   
   //pythia.particleData.doForceWidth(1000005,true);
   //pythia.particleData.mayDecay(1000005, false);
   
   // Values for filter.
-  int    pdgId   = 22; //ask for photons
-  int    pdgMothId   = 25; //ask for Higgs mother
-  double etaMax   = -1; //no requirement on eta
-  double pTmin = -1; //no requirement on pt
+  int    pdgId   = 1000022; // ask for neutralinos
+  int    pdgMothId   = 100001; // ask for squarks mother. (Disabled)
+  double etaMax   = -1; // no requirement on eta
+  double pTmin = 50; // MET > 100 GeV
 
   // Declare Event Filter according to specification.
   EventFilter filter( pdgId, pdgMothId, etaMax, pTmin );
@@ -159,9 +166,9 @@ int main(int argc, char* argv[]) {
     // Find final state photons
     filter.filter( pythia.process);
     
-    //cout << "number of final state photons from Higgs = " << filter.size() << endl;
+    //cout << "number of final state neutralinos = " << filter.size() << endl;
     if (filter.size()<2) {
-      //cout << "< 2 final state photons from Higgs; not saving" << endl;
+      //cout << "< 2 final state neutralinos; not saving" << endl;
       //filter.list();
       //pythia.process.list();
       if (boolFilter) continue;

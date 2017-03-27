@@ -117,7 +117,8 @@ int main(int argc, char* argv[]) {
     if (strncmp(argv[i],"--hggrazor",10)==0)        razorhgg = true;
     if (strncmp(argv[i],"--hgghbbrazor",13)==0)        razorhgghbb = true;
   }
-  
+ 
+  std::cout << "[INFO]: input file --> " << inputCMS << std::endl; 
   std::cout << "[INFO]: output file --> " << outFileName << std::endl;
   std::cout << "[INFO]: center of mass energy --> " << sqrts << std::endl;
   std::cout << "[INFO]: isDelphes? --> " << delphesFormat << std::endl;
@@ -129,6 +130,7 @@ int main(int argc, char* argv[]) {
     if (delphesFormat) cmsChain = new TChain("Delphes");
     else cmsChain = new TChain("GenEvent");
     cmsChain->Add(inputCMS);
+    cmsChain->GetListOfFiles();
 
     // Open Output file
     if(writeOut) {

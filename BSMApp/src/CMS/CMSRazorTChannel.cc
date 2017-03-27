@@ -112,8 +112,16 @@ void CMSRazorTChannel::Loop(string outFileName) {
     // loop over entries
     Long64_t nbytes = 0, nb = 0;
     Long64_t nentries = 0;
-    if (_delphesFormat) nentries = DelphesTree::fChain->GetEntries();
-    else nentries = DetectorBase::fChain->GetEntries();
+    if (_delphesFormat) 
+    {
+        nentries = DelphesTree::fChain->GetEntries();
+        std::cout << DelphesTree::fChain->GetCurrentFile() << std::endl;
+    }
+    else 
+    {
+        nentries = DetectorBase::fChain->GetEntries();
+        std::cout << DetectorBase::fChain->GetCurrentFile() << std::endl;
+    }
     std::cout << "[INFO]: Number of entries = " << nentries << std::endl;
 
     // set the by-event weight
@@ -235,9 +243,15 @@ void CMSRazorTChannel::Loop(string outFileName) {
         // At least 2 jets above 80 GeV
         //--------------------------
         if (numJetsAbove80GeV < 2)
+        //if (numJets < 2)
         {
-            if (_debug) std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
-            continue;
+            if (_debug) 
+            {
+                std::cout << "[DEBUG]: Not enough objects for razor computation" << std::endl;
+                std::cout << "[DEBUG]: Number of jets: " << numJets << std::endl;
+                std::cout << "[DEBUG]: Number of jets above 80 GeV: " << numJetsAbove80GeV << std::endl;
+            }
+                continue;
         }
 
         if ( _debug ) std::cout << "--> before CMSHEM" << std::endl;

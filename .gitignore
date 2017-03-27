@@ -50,7 +50,6 @@ SUSYDecay
 # Pythia 
 *.hepmc
 *.lhe
-*.root
 
 # External packages
 boost/

@@ -18,6 +18,7 @@
 // Header file for the classes stored in the TTree if any.
 #include "TClonesArray.h"
 #include "TObject.h"
+#include <iostream>
 
 class DelphesTree {
 public :
@@ -681,10 +682,11 @@ DelphesTree::DelphesTree(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+   std::cout << "[DEBUG] " << tree << std::endl;
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("test.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("delphesTreeTemplate.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("test.root");
+         f = new TFile("delphesTreeTemplate.root");
       }
       f->GetObject("Delphes",tree);
 

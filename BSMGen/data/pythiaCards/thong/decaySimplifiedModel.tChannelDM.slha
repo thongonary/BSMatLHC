@@ -50,13 +50,13 @@ Block MASS  # Mass spectrum
    2000015     1.00000000E+07   # ~tau_2
    1000016     1.00000000E+07   # ~nu_tauL
    1000021     1.00000000E+07   # ~g
-   1000022     300              # ~chi_10
+   1000022     120              # ~chi_10
    1000023     1.00000000E+07   # ~chi_20
    1000024     1.00000000E+07   # ~chi_1+
    1000025     1.00000000E+07   # ~chi_30
    1000035     1.00000000E+07   # ~chi_40
    1000037     1.00000000E+07   # ~chi_2+
-   1000039     10               # ~G
+   1000039     1.00000000E+07   # ~G
 
 # /
 BLOCK NMIX  # Neutralino Mixing Matrix
@@ -153,7 +153,6 @@ BLOCK MSOFT Q=  2.90528802E+02  # The soft SUSY breaking masses at the scale Q
 # DECAY TABLE
 #         PDG            Width
 DECAY   25       0.00000000E+00   # higgs decay
-DECAY   1000001     0.00000000E+00   # sdown_L decays
 DECAY   2000001     0.00000000E+00   # sdown_R decays
 DECAY   1000002     0.00000000E+00   # sup_L decays
 DECAY   2000002     0.00000000E+00   # sup_R decays
@@ -180,4 +179,9 @@ DECAY   1000024     0.10000000E+00   # chargino1+ decays
 DECAY   1000025     0.00000000E+00   # neutralino3 decays
 DECAY   1000035     0.00000000E+00   # neutralino4 decays
 DECAY   1000037     0.00000000E+00   # chargino2+ decays
+#
+DECAY   1000001     0.00000000E+00   # sdown_L decays
+#          BR         NDA      ID1       ID2
+     1.000000E+00    1     1000022       1
+#
 #DECAY   1000022     1.10000000E+00   # neutralino2 decays
