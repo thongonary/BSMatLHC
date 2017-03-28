@@ -17,8 +17,12 @@ if __name__ == '__main__':
     existing = f.readlines()
     f.close()
 
-    os.system("mkdir %s" %args.joblabel)
-    os.system("mkdir /eos/cms/store/group/phys_susy/razor/tchannel/Delphes/%s/\n" %args.joblabel)
+    if not os.path.isdir(args.joblabel): 
+        os.system("mkdir %s" %args.joblabel)
+    if not os.path.isdir('/eos/cms/store/group/phys_susy/razor/tchannel/Delphes/'+args.joblabel):
+        os.system("mkdir /eos/cms/store/group/phys_susy/razor/tchannel/Delphes/%s/\n" %args.joblabel)
+    if not os.path.isdir('/eos/cms/store/group/phys_susy/razor/tchannel/ntuples/'+args.joblabel):
+        os.system("mkdir /eos/cms/store/group/phys_susy/razor/tchannel/ntuples/%s/\n" %args.joblabel)
     os.system("chmod 777 /eos/cms/store/group/phys_susy/razor/tchannel/Delphes/%s/\n" %args.joblabel) # So that batch can write, apparently
     for i in range(args.njob):
         myfile = "%s_%i.root\n" %(args.joblabel, i)
@@ -33,9 +37,13 @@ if __name__ == '__main__':
         script.write("./GenPythia %s /tmp/qnguyen/%s/%s_%i \n" %(args.input, args.joblabel, args.joblabel, i))
         script.write("cd /afs/cern.ch/user/q/qnguyen/BSMatLHC/delphes\n")
         script.write("./DelphesHepMC cards/CMS_PhaseII/CMS_PhaseII_0PU.tcl /tmp/qnguyen/%s/%s_%i.root /tmp/qnguyen/%s/%s_%i.hepmc\n" %(args.joblabel, args.joblabel, i,args.joblabel, args.joblabel, i)) 
+        script.write("cd /afs/cern.ch/user/q/qnguyen/BSMatLHC/BSMApp\n")
         script.write("cp /tmp/qnguyen/%s/%s_%i.root /eos/cms/store/group/phys_susy/razor/tchannel/Delphes/%s\n" %(args.joblabel, args.joblabel, i,args.joblabel))
+        script.write("./CMSApp  /tmp/qnguyen/%s/%s_%i.root --output=/tmp/qnguyen/%s/tchannel_%s_%i.root --tchannel --delphes\n" % (args.joblabel, args.joblabel, i, args.joblabel, args.joblabel, i))
+        script.write("cp /tmp/qnguyen/%s/tchannel_%s_%i.root /eos/cms/store/group/phys_susy/razor/tchannel/ntuples/%s\n" %(args.joblabel, args.joblabel, i,args.joblabel))
         script.write("rm /tmp/qnguyen/%s/%s_%i.hepmc\n" %(args.joblabel, args.joblabel, i))
         script.write("rm /tmp/qnguyen/%s/%s_%i.root\n" %(args.joblabel, args.joblabel, i))
+        script.write("rm /tmp/qnguyen/%s/tchannel_%s_%i.root\n" %(args.joblabel, args.joblabel, i))
         script.close()
         os.system("bsub -q %s -o %s/%s_%i.log -J %s_%i < %s/%s_%i.src" %(args.queue, args.joblabel, args.joblabel, i, args.joblabel, i, args.joblabel, args.joblabel, i));
         print "Submitting job n. %i to the queue %s...\n" %(i,args.queue)
