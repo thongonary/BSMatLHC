@@ -101,10 +101,12 @@ void CMSRazorTChannel::Loop(string outFileName) {
     outTree->Branch("numBJets", &numBJets, "numBJets/I");
     outTree->Branch("pthat", &pthat, "pthat/D");
 
-    double xedge[5] = {150, 250, 400, 1400, 3000};
-    double yedge[10] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.70, 0.90, 1.2, 2.0};
+//    double xedge[5] = {150, 250, 400, 1400, 3000};
+//    double yedge[10] = {0, 0.05, 0.15, 0.25, 0.40, 0.55, 0.70, 0.90, 1.2, 2.0};
 
-    TH2D* pdfHighResRsqMR = new TH2D("pdfHighResRsqMR","pdfHighResRsqMR",4,xedge,9,yedge);
+    TH2D* pdfHighResRsqMR = new TH2D("pdfHighResRsqMR",";M_{R};R^{2}",60,0,3000,60,0,2.0);
+    TH1D* pdfHighResRsq = new TH1D("pdfHighResRsq",";R^{2}",100,0,2.0);
+    TH1D* pdfHighResMR = new TH1D("pdfHighResMR",";R^{2}",100,0,3000);
 
 
     std::cout << "[INFO]: getting number of entries" << std::endl;
@@ -289,6 +291,8 @@ void CMSRazorTChannel::Loop(string outFileName) {
         RSQ = pow(CalcMRT(j1, j2, PFMET),2.)/MR/MR;
         if ( _debug ) std::cout << "[DEBUG]: numBox-> "<< numBox << std::endl;
         pdfHighResRsqMR->Fill(MR,RSQ);
+        pdfHighResRsq->Fill(RSQ);
+        pdfHighResMR->Fill(MR);
         outTree->Fill();
 
         char outname[256];
@@ -298,6 +302,8 @@ void CMSRazorTChannel::Loop(string outFileName) {
     // Open Output file again 
     file->cd();
     pdfHighResRsqMR->Write();
+    pdfHighResMR->Write();
+    pdfHighResRsq->Write();
     outTree->Write();
     file->Close();
 }
