@@ -8,6 +8,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TDatime.h>
 #include <GenTree.hh>
 #include <GenCandidateFiller.hh>
 #include <EventFilter.hh>
@@ -70,6 +71,18 @@ int main(int argc, char* argv[]) {
   if (_debug) cout << "[DEBUG] Reading from " << cfg << endl;
   pythia.readFile(cfg);  
   
+  // set seed                                                                                                             
+  int jobpid = getpid();
+  TDatime *now = new TDatime();
+  int today = now->GetDate();
+  int clock = now->GetTime();
+  int myseed = today+clock+jobpid*1000;
+  if(myseed>900000000) myseed = myseed - 900000000;
+  pythia.readString("Random:setSeed=on");
+  char command[512];
+  sprintf(command,"Random:seed=%i",myseed);
+  pythia.readString(command);
+
   // Initialize Les Houches Event File run. List initialization information.
   if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
   LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
