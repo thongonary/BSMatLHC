@@ -45,7 +45,7 @@ os.system("cp extraCode/LHAPDF-6.1.5.tar.gz .; tar -xzf LHAPDF-6.1.5.tar.gz; rm 
 os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR+"/lhapdf/ --with-boost="+BSMDIR+"/boost/; make; make install; cd ..; rm -r LHAPDF-6.1.5")
 
 #get external code: PYTHIA 8.223
-os.system("cp extraCode/pythia8223 .; tar -xvf pythia8223.tar; rm pythia8223.tar")
+os.system("cp extraCode/pythia8223.tar .; tar -xvf pythia8223.tar; rm pythia8223.tar")
 os.system("mv pythia8223 pythia; cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/ --with-lhapdf6="+BSMDIR+"/lhapdf/; make")
 
 # get external code: MADGRAPH 5
