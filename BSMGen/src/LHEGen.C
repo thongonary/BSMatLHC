@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   HepMC::Pythia8ToHepMC ToHepMC;
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
-  ToHepMC.set_free_parton_warnings(false);
+  ToHepMC.set_free_parton_exception(false);
    
   // Specify file where HepMC events will be stored.
   char hepmcname[256];

@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
   HepMC::Pythia8ToHepMC ToHepMC;
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
-  ToHepMC.set_free_parton_warnings(false);
+  ToHepMC.set_free_parton_exception(false);
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
