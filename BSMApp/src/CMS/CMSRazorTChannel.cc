@@ -50,10 +50,13 @@ void CMSRazorTChannel::Loop(string outFileName) {
     int _twoJetCut    = 0;
 
     double MR, RSQ;
+    
+    Float_t Scale;
 
     double jetPt[50];
     double jetEta[50];
     double jetPhi[50];
+    double jetM[50];
 
     double pho1Pt, pho2Pt;
     double pho1Eta, pho2Eta;
@@ -87,12 +90,14 @@ void CMSRazorTChannel::Loop(string outFileName) {
     TTree* outTree = new TTree("RazorInclusive","RazorInclusive");
     outTree->Branch("MR", &MR, "MR/D");
     outTree->Branch("RSQ", &RSQ, "RSQ/D");
+    outTree->Branch("Scale", &Scale, "Scale/F");
     outTree->Branch("numJets", &numJets, "numJets/I");
     outTree->Branch("numJetsAbove80GeV", &numJetsAbove80GeV, "numJetsAbove80GeV/I");
     outTree->Branch("numPhotons", &numPhotons, "numPhotons/I");
     outTree->Branch("jetPt", jetPt, "jetPt[numJets]/D");
     outTree->Branch("jetEta", jetEta, "jetEta[numJets]/D");
     outTree->Branch("jetPhi", jetPhi, "jetPhi[numJets]/D");
+    outTree->Branch("jetM", jetM, "jetM[numJets]/D");
     outTree->Branch("numBox", &numBox, "numBox/I");
     outTree->Branch("MET", &MET, "MET/D");
     outTree->Branch("HT", &HT, "HT/D");
@@ -149,12 +154,15 @@ void CMSRazorTChannel::Loop(string outFileName) {
         numJets = 0;
         numJetsAbove80GeV = 0;
         numBJets = 0;
-        MET = 0.; 
-        HT = 0.;
+        MET = -1.; 
+        HT = -1.;
+        Scale = -1.;
+
         for(int i = 0; i < 50; i++){
             jetPt[i] = -1;
             jetEta[i] = -999;
             jetPhi[i] = -999;
+            jetM[i] = -999;
         }
 
         // AK4 jets    
@@ -198,7 +206,7 @@ void CMSRazorTChannel::Loop(string outFileName) {
         if( _delphesFormat )
         {
             //-----------------------------------
-            //D e l p h e s  j e t s + h i g  g s
+            //D e l p h e s  j e t s 
             //-----------------------------------
             int i = 0;
             for (auto tmp : pfJets)
@@ -206,6 +214,7 @@ void CMSRazorTChannel::Loop(string outFileName) {
                 jetPt[i]  = tmp.Pt();
                 jetEta[i] = tmp.Eta();
                 jetPhi[i] = tmp.Phi();
+                jetM[i] = tmp.M();
                 HT += tmp.Pt();
                 Jets4Vector.push_back(tmp);
                 i++;
@@ -222,13 +231,14 @@ void CMSRazorTChannel::Loop(string outFileName) {
         else
         {
             //-----------------------------------
-            //P y t h i a  j e t s + h i g  g s
+            //P y t h i a  j e t s 
             //-----------------------------------
             for (int i = 0; i < pfAK04.size(); i++)
             {
                 jetPt[i]  = pfAK04[i].pt();
                 jetEta[i] = pfAK04[i].eta();
                 jetPhi[i] = pfAK04[i].phi();
+                jetM[i] = pfAK04[i].m();
                 HT += pfAK04[i].pt();
                 Jets4Vector.push_back(ConvertTo4Vector(pfAK04[i]));
                 i++;
@@ -239,6 +249,9 @@ void CMSRazorTChannel::Loop(string outFileName) {
             GenMET();
             PFMET = genMET;
             MET = PFMET.pt();
+            
+            // Pythia Scale
+            Scale = Event_Scale[0];
         }
 
         //--------------------------
