@@ -82,6 +82,9 @@ int main(int argc, char* argv[]) {
   char command[512];
   sprintf(command,"Random:seed=%i",myseed);
   pythia.readString(command);
+  pythia.readString("Next:numberShowInfo = 1");
+  pythia.readString("Next:numberShowProcess = 1");
+  pythia.readString("Next:numberShowEvent = 1");
 
   // Initialize Les Houches Event File run. List initialization information.
   if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
