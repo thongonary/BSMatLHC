@@ -58,6 +58,11 @@ void CMSRazorTChannel::Loop(string outFileName) {
     double jetPhi[50];
     double jetM[50];
 
+    double squarkPt[2];
+    double squarkEta[2];
+    double squarkPhi[2];
+    double squarkM[2];
+
     double pho1Pt, pho2Pt;
     double pho1Eta, pho2Eta;
     double pho1Phi, pho2Phi;
@@ -98,6 +103,10 @@ void CMSRazorTChannel::Loop(string outFileName) {
     outTree->Branch("jetEta", jetEta, "jetEta[numJets]/D");
     outTree->Branch("jetPhi", jetPhi, "jetPhi[numJets]/D");
     outTree->Branch("jetM", jetM, "jetM[numJets]/D");
+    outTree->Branch("squarkPt", squarkPt, "squarkPt[2]/D");
+    outTree->Branch("squarkEta", squarkEta, "squarkEta[2]/D");
+    outTree->Branch("squarkPhi", squarkPhi, "squarkPhi[2]/D");
+    outTree->Branch("squarkM", squarkM, "squarkM[2]/D");
     outTree->Branch("numBox", &numBox, "numBox/I");
     outTree->Branch("MET", &MET, "MET/D");
     outTree->Branch("HT", &HT, "HT/D");
@@ -157,6 +166,16 @@ void CMSRazorTChannel::Loop(string outFileName) {
         MET = -1.; 
         HT = -1.;
         Scale = -1.;
+        
+        squarkPt[0] = -1.;
+        squarkEta[0] = -999.;
+        squarkPhi[0] = -999.;
+        squarkM[0] = -999.;
+        
+        squarkPt[1] = -1.;
+        squarkEta[1] = -999.;
+        squarkPhi[1] = -999.;
+        squarkM[1] = -999.;
 
         for(int i = 0; i < 50; i++){
             jetPt[i] = -1;
@@ -190,6 +209,27 @@ void CMSRazorTChannel::Loop(string outFileName) {
                     pfJetsBtag.push_back( jet );
                 }
             }
+
+            for (int iParticle = 0; iParticle < sizeof(Particle_PID)/sizeof(Int_t); iParticle++)
+            {
+                if (abs(Particle_PID[iParticle]) > 1000000 && Particle_M1[iParticle] == 0 && Particle_M2[iParticle] == 2) // this is squark
+                {
+                    if (Particle_PID[iParticle] > 0) 
+                    {
+                        squarkPt[0] = Particle_PT[iParticle];
+                        squarkEta[0] = Particle_Eta[iParticle];
+                        squarkPhi[0] = Particle_Phi[iParticle];
+                        squarkM[0] = Particle_Mass[iParticle];
+                    }
+                    else
+                    {
+                        squarkPt[1] = Particle_PT[iParticle];
+                        squarkEta[1] = Particle_Eta[iParticle];
+                        squarkPhi[1] = Particle_Phi[iParticle];
+                        squarkM[1] = Particle_Mass[iParticle];
+                    }
+                }
+            }
         }
         else {
             vector<fastjet::PseudoJet> empty;
@@ -198,6 +238,9 @@ void CMSRazorTChannel::Loop(string outFileName) {
             fastjet::ClusterSequence pfAK04ClusterSequence = JetMaker(JetsConst, AK04_def);
             pfAK04 = SelectByAcceptance(fastjet::sorted_by_pt(pfAK04ClusterSequence.inclusive_jets()),40., 3.0); //only cluster jets with > 40 GeV, eta < 3.0
         }
+        
+        // Pythia Scale
+        Scale = Event_Scale[0];
 
         //---------------------------------------
         //I n p u t   t o   H e m i s p h e r e s
@@ -249,9 +292,6 @@ void CMSRazorTChannel::Loop(string outFileName) {
             GenMET();
             PFMET = genMET;
             MET = PFMET.pt();
-            
-            // Pythia Scale
-            Scale = Event_Scale[0];
         }
 
         //--------------------------
