@@ -2,8 +2,8 @@
 ! Lines not beginning with a letter or digit are comments.
 
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 1000        ! number of events to generate
-Main:timesAllowErrors = 40         ! max number of allowed errors
+Main:numberOfEvents = 100        ! number of events to generate
+Main:timesAllowErrors = 100         ! max number of allowed errors
 Init:showChangedSettings = on      ! print changed flags/modes/parameters
 Init:showChangedParticleData = on  ! print changed particle and decay data
 
@@ -14,8 +14,9 @@ Beams:eCM = 13000.                  ! CM energy of collision
 
 ! 3) Settings for SUSY and the hard-process generation
 SUSY:all = off                      ! Switches on ALL (~400) SUSY processes
-SUSY:qqbar2chi0chi0 = on
-SLHA:file = data/pythiaCards/thong/decaySimplifiedModel.tChannelDM.slha ! SLHA file
+! ! SUSY:qqbar2squarkantisquark = on
+! SUSY:qqbar2chi0chi0 = on
+SLHA:file = data/pythiaCards/thong/decaySimplifiedModel.tChannelDM_m_squark_110_m_neutralino_100.slha ! SLHA file
 ! SLHA:file = data/pythiaCards/thong/simplifiedModel.tChannelDM.slha ! SLHA file
 SLHA:verbose = 0                  ! verbosity 
 SLHA:readFrom = 2                  ! read in from the SLHA:file
