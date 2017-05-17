@@ -85,7 +85,7 @@ GenPythiaLHE:$(SRCDIR)GenPythiaLHE.C
 	-I$(PYTHIADIR)include/ \
 	$(OUTLIB)/GenTree.o $(OUTLIB)/GenTreeColumn.o $(OUTLIB)/GenCandidateFiller.o $(OUTLIB)/EventFilter.o \
 	$(LIBS) \
-	-L$(LIBDIRARCH) -lpythia8  -L$(LHAPDFLIB) -lLHAPDF   \
+	-L$(LIBDIRARCH) -lpythia8   \
 	-L$(HEPMCLIB) -lHepMC \
 	$(GLIBS) $ 
 

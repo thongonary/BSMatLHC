@@ -1,16 +1,16 @@
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 10        ! number of events to generate
-Main:timesAllowErrors = 4         ! max number of allowed errors
+Main:numberOfEvents = 2000        ! number of events to generate
+Main:timesAllowErrors = 20        ! max number of allowed errors
 Init:showChangedSettings = on      ! print changed flags/modes/parameters
 Init:showChangedParticleData = on  ! print changed particle and decay data
-
+Next:numberCount = 20            ! number of times counter appears
 
 ! 2) LHC beams parameter settings. 
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
 Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 13000.                  ! CM energy of collision
 
-! 3) HiddenValley setting
+! 3) HiddenValley setting (from Tim Lou)
 HiddenValley:spinFv = 0 ! zero flavor in hadronization
 HiddenValley:FSR = on ! turn on FSR
 HiddenValley:fragment = on ! turn on fragmentation
@@ -29,6 +29,6 @@ HiddenValley:probVector = .75 ! ratio of spin1 vs spin0 meson production
 ! 4) Settings for the event generation process in the Pythia8 library.
 PartonLevel:MPI = on                ! no multiple interactions
 PartonLevel:ISR = on               ! no initial-state radiation 
-# PartonLevel:ISR = off               ! no initial-state radiation
+#  PartonLevel:ISR = off               ! no initial-state radiation
 PartonLevel:FSR = on               ! no final-state radiation
 HadronLevel:Hadronize = on         ! no hadronization

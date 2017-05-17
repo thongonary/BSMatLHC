@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define _debug 1
+#define _debug 0
 
 using namespace Pythia8; 
 
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
-  ToHepMC.set_free_parton_exception(false);
+ // ToHepMC.set_free_parton_exception(false);
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
@@ -88,16 +88,6 @@ int main(int argc, char* argv[]) {
   pythia.readString("Next:numberShowProcess = 1");
   pythia.readString("Next:numberShowEvent = 1");
 //
-//  // Initialize Les Houches Event File run. List initialization information.
-//  if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
-//  LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
-//  
-//  // Open a file on which LHEF events should be stored, and write header.  
-//  char lhename[256];
-//  sprintf(lhename,"%s.lhe", outfilename.c_str());
-//  if (_debug) cout << "[DEBUG] Opening LHEF file " << lhename << endl;
-//  myLHA.openLHEF(lhename);
-
   // Initialize. Beam parameters set in .pythia file.
   if (_debug) cout << "[DEBUG] Initializing pythia... " << cfg << endl;
   pythia.init();
@@ -132,69 +122,28 @@ int main(int argc, char* argv[]) {
   if (showCPD) pythia.particleData.listChanged();
   if (showAPD) pythia.particleData.listAll();
 
-//  // the output file 
-//  char name[256];
-//  sprintf(name,"%s_GenTree.root", outfilename.c_str());
-//  TFile* treeOut = new TFile(name,"recreate");
-//
-//  // the output TTree with information on the model
-//  double xsec, filtereff;
-//  TTree* infoTree = new TTree("infoTree", "infoTree");
-//  infoTree->Branch("xsec", &xsec, "xsec/D");
-//  infoTree->Branch("filtereff", &filtereff, "filtereff/D");
-//
-//  // the event TTree
-//  GenTree* myTree = new GenTree("GenEvent","GenEvent");
-//  GenCandidateFiller* muonFiller = new GenCandidateFiller(myTree,"Muon");
-//  GenCandidateFiller* electronFiller = new GenCandidateFiller(myTree,"Electron");
-//  GenCandidateFiller* tauFiller = new GenCandidateFiller(myTree,"Tau");
-//  GenCandidateFiller* bFiller = new GenCandidateFiller(myTree,"b");
-//  GenCandidateFiller* cFiller = new GenCandidateFiller(myTree,"c");
-//  GenCandidateFiller* photonFiller = new GenCandidateFiller(myTree,"Photon");
-//  GenCandidateFiller* neutrinoFiller = new GenCandidateFiller(myTree,"Neutrino");
-//  GenCandidateFiller* susyFiller = new GenCandidateFiller(myTree,"SUSY");
-//  GenCandidateFiller* gentreeparticleFiller = new GenCandidateFiller(myTree,"GenTreeParticle");
-//  GenCandidateFiller* particleFiller = new GenCandidateFiller(myTree,"Particle");
-//
-  int iFilteredEvent = 0;
-  int nUnfilteredEvent = 0;
   
-  // Begin event loop.
+// Begin event loop.
   int nPace = max(1, nShow); 
   int iAbort = 0;
-  for (int iEvent = 0; ; ++iEvent) {
-    
-    if (iFilteredEvent >= nEvent) break;
-
+  
+  for (int iEvent = 0; iEvent < nEvent; ++iEvent) {
     
     if (nShow > 0 && iEvent%nPace == 0)      
-    //cout << " Now begin event " << iEvent << endl;
-      cout << " Now begin event " << iFilteredEvent << endl;
+    cout << " Now begin event " << iEvent << endl;
+    //  cout << " Now begin event " << iFilteredEvent << endl;
 
     // Generate events. Quit if many failures.
     if (!pythia.next()) {
+      if (_debug) cout << "iAbort = " << iAbort << endl;
       // First few failures write off as "acceptable" errors, then quit.
       if (++iAbort < nAbort) continue;
-      cout << " Event generation aborted prematurely, owing to error!\n"; 
+      cerr << " Event generation aborted prematurely, owing to error!\n"; 
       break;
     }
-
-    nUnfilteredEvent++;    
-
-    // Find final state photons
-    filter.filter( pythia.process);
+	
+    if (_debug) cout << "Doing fine after !pythia.next()" << endl; 
     
-    //cout << "number of final state neutralinos = " << filter.size() << endl;
-    if (filter.size()<2) {
-      //cout << "< 2 final state neutralinos; not saving" << endl;
-      //filter.list();
-      //pythia.process.list();
-      if (boolFilter) continue;
-    }
-    
-    iFilteredEvent++;
-			
-			 
     // List first few events.
     //if (iEvent < nList) { 
     //  pythia.info.list();
@@ -206,67 +155,17 @@ int main(int argc, char* argv[]) {
     // Fill HepMC event, including PDF info.
     ToHepMC.fill_next_event( pythia, hepmcevt );
     
-//    // write event to root file
-//    muonFiller->FillEvent(hepmcevt);
-//    electronFiller->FillEvent(hepmcevt);
-//    tauFiller->FillEvent(hepmcevt);
-//    bFiller->FillEvent(hepmcevt);
-//    cFiller->FillEvent(hepmcevt);
-//    photonFiller->FillEvent(hepmcevt);
-//    neutrinoFiller->FillEvent(hepmcevt);
-//    susyFiller->FillEvent(hepmcevt);
-//    gentreeparticleFiller->FillEvent(hepmcevt);
-//    particleFiller->FillEvent(hepmcevt);
-//
-//    // write data in TTree
-//    myTree->dumpData();
-//
-//    // Clear the event from memory
-//    muonFiller->ClearEvent();
-//    electronFiller->ClearEvent();
-//    tauFiller->ClearEvent();
-//    bFiller->ClearEvent();
-//    cFiller->ClearEvent();
-//    photonFiller->ClearEvent();
-//    neutrinoFiller->ClearEvent();
-//    susyFiller->ClearEvent();
-//    gentreeparticleFiller->ClearEvent();
-//    particleFiller->ClearEvent();
 
     // Write the HepMC event to file. Done with it.
     ascii_io << hepmcevt;
     delete hepmcevt;
     
-    // Store event info in the LHAup object.
-    //myLHA.setEvent();
-
-    // Write out this event info on the file.
-    // With optional argument (verbose =) false the file is smaller.
-    //myLHA.eventLHEF();
-    
-    // End of event loop.
   }
   cout << "nEvent = " << nEvent << endl;
-  cout << "nUnfilteredEvent = " << nUnfilteredEvent << endl;
-  //filtereff = nEvent*1.0/nUnfilteredEvent;
-  
-  // Write output file
-//  infoTree->Fill();
-//
-//  TTree* roottree = myTree->getTree();
-//  roottree->Write();
-//  infoTree->Write();
-//  treeOut->Close();
 
   // Give statistics. 
   pythia.stat();
   
-  // Update the cross section info based on Monte Carlo integration during run.
-  //myLHA.updateSigma();
-
-  // Write endtag. Overwrite initialization info with new cross sections.
-  //myLHA.closeLHEF(true);
-    
   // Done.
   return 0;
 }
