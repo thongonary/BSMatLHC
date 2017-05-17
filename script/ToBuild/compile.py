@@ -15,14 +15,14 @@ for i in range(len(sys.argv)):
     if sys.argv[i].find("--m32") != -1: m64 = False
     continue
 
-## external code: softsusy-3.4.0
-#os.system("cp extraCode/softsusy-3.4.0.tar.gz . ; tar -xzf softsusy-3.4.0.tar.gz; rm softsusy-3.4.0.tar.gz")
-#os.system("mv softsusy-3.4.0 softsusy")
-#os.chdir("softsusy")
-#options = "CXXFLAGS=-m32"
-#if m64: options = "CXXFLAGS=-m64"
-#os.system("./configure %s; make" %options)
-#os.chdir(BSMDIR)
+# external code: softsusy-3.4.0
+os.system("cp extraCode/softsusy-3.4.0.tar.gz . ; tar -xzf softsusy-3.4.0.tar.gz; rm softsusy-3.4.0.tar.gz")
+os.system("mv softsusy-3.4.0 softsusy")
+os.chdir("softsusy")
+options = "CXXFLAGS=-m32"
+if m64: options = "CXXFLAGS=-m64"
+os.system("./configure %s; make" %options)
+os.chdir(BSMDIR)
 
 # get external code: HepMC 2.06.08
 os.system("mkdir hepmc")
@@ -44,9 +44,11 @@ os.system("mv boost_1_63_0 boost")
 os.system("cp extraCode/LHAPDF-6.1.5.tar.gz .; tar -xzf LHAPDF-6.1.5.tar.gz; rm LHAPDF-6.1.5.tar.gz")
 os.system("cd LHAPDF-6.1.5; ./configure   CC=clang CXX=clang++ --prefix="+BSMDIR+"/lhapdf/ --with-boost="+BSMDIR+"/boost/; make; make install; cd ..; rm -r LHAPDF-6.1.5")
 
-#get external code: PYTHIA 8.223
-os.system("cp extraCode/pythia8223.tar .; tar -xvf pythia8223.tar; rm pythia8223.tar")
-os.system("mv pythia8223 pythia; cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/ --with-lhapdf6="+BSMDIR+"/lhapdf/; make")
+get external code: PYTHIA 8.223
+#os.system("cp extraCode/pythia8223.tar .; tar -xvf pythia8223.tar; rm pythia8223.tar")
+#os.system("mv pythia8223 pythia")
+#os.system("cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/ --with-lhapdf6="+BSMDIR+"/lhapdf/; make")
+os.system("cd pythia;  ./configure --enable-64bit --with-hepmc2="+BSMDIR+"/hepmc/build/; make")  #try ignoring lhapdf
 
 # get external code: MADGRAPH 5
 os.system("cp extraCode/MG5_aMC_v2.3.2.tar.gz .; tar xvzf MG5_aMC_v2.3.2.tar.gz; rm MG5_aMC_v2.3.2.tar.gz")
