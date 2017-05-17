@@ -1,0 +1,97 @@
+#ifndef __P4__
+#define __P4__
+
+#include <cmath>
+
+
+using namespace std;
+
+class P4{
+
+ public:
+  double p[4];
+
+  P4(double px=0, double py=0, double pz=0, double e=0){
+    p[0]=e; p[1]=px;
+    p[2]=py; p[3]=pz;
+  }
+
+  void PtEtaPhi(double pt_, double eta_, double phi_){
+    p[0]=pt_*cosh(eta_);
+    p[3]=pt_*sinh(eta_);
+    p[1]=pt_*cos(phi_);
+    p[2]=pt_*sin(phi_);
+  }
+  
+  double operator[](int i) const{
+    if(i==0 || i==4)
+      return p[0];
+    else return p[i];
+  }
+
+  double& operator[](int i){
+    if(i==0 || i==4)
+      return p[0];
+    else return p[i];
+  }
+
+  P4 operator+(const P4& i) const{
+    return P4(p[1]+i[1], p[2]+i[2], p[3]+i[3], p[0]+i[0]);
+  }
+
+  double operator*(const P4& i) const{
+    return p[0]*i[0] - p[1]*i[1] - p[2]*i[2] - p[3]*i[3];
+  }
+
+  double dot3(const P4& i) const{
+    return p[1]*i[1] + p[2]*i[2] + p[3]*i[3];
+  }
+
+  double m() const{
+    double dot = (*this)*(*this);
+    if(dot < 0)
+      return -sqrt(-dot);
+    else
+      return sqrt(dot);
+  }
+
+  double eta() const{
+    return atanh(p[3]/p[0]);
+  }
+
+  double phi() const{
+    return atan2(p[2],p[1]);
+  }
+
+  double pt() const{
+    return sqrt(p[1]*p[1]+p[2]*p[2]);
+  }
+
+  double p3() const{
+    return sqrt(p[1]*p[1]+p[2]*p[2]+p[3]*p[3]);
+  }
+
+  double eratio(const P4& i) const{
+    if (i[0] > (*this)[0])
+      return (*this)[0]/i[0];
+    else
+      return i[0]/(*this)[0];
+
+  }
+
+  double dphi(const P4& i) const{
+    double result = fabs(phi()-i.phi());
+    if (result > M_PI){
+      result = 2*M_PI - result;
+    }
+    return result;
+  }
+  
+
+  double dtheta(const P4& i) const{
+    return acos(dot3(i)/ (p3()*i.p3()) );
+  }
+  
+};
+
+#endif
