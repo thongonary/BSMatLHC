@@ -1,0 +1,14 @@
+HiddenValley:spinFv = 0 ! zero flavor in hadronization
+HiddenValley:FSR = on ! turn on FSR
+HiddenValley:fragment = on ! turn on fragmentation
+
+4900111:m0 = 20  ! spin0 meson mass (need to fix decay)
+4900113:m0 = 20  ! spin1 meson mass (need to fix decay)
+4900101:m0 = 10  ! hidden valley quark mass 
+
+HiddenValley:Run = on ! turn on running
+HiddenValley:Ngauge  = 2 ! Nc for the gauge group SU(Nc)
+HiddenValley:Lambda = 10. ! confinement scale
+HiddenValley:NBFlavRun = 0 ! number of boson in the running
+HiddenValley:NFFlavRun = 2 ! number of fermions in the running
+HiddenValley:probVector = .75 ! ratio of spin1 vs spin0 meson production
