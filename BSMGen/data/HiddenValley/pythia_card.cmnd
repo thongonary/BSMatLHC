@@ -1,5 +1,5 @@
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 100           ! number of events to generate
+Main:numberOfEvents = 10000           ! number of events to generate
 Main:timesAllowErrors = 100        ! max number of allowed errors
 Init:showChangedSettings = on      ! print changed flags/modes/parameters
 Init:showChangedParticleData = on  ! print changed particle and decay data
@@ -20,7 +20,7 @@ HiddenValley:ffbar2Zv = on
 4900023:m0 = 3000
 4900023:mWidth = 300
 4900023:onMode = 0
-4900023:onIfAny = 4900001 
+4900023:onIfAny = 4900101 
 
 4900111:m0 = 20  ! spin0 meson mass (need to fix decay)
 4900113:m0 = 20  ! spin1 meson mass (need to fix decay)
@@ -62,12 +62,3 @@ HiddenValley:Lambda = 10. ! confinement scale
 HiddenValley:NBFlavRun = 0 ! number of boson in the running
 HiddenValley:NFFlavRun = 2 ! number of fermions in the running
 HiddenValley:probVector = .75 ! ratio of spin1 vs spin0 meson production
-
-! 4) Settings for the event generation process in the Pythia8 library.
-PartonLevel:MPI = on                ! no multiple interactions
-PartonLevel:ISR = on               ! no initial-state radiation 
-# PartonLevel:ISR = off               ! no initial-state radiation
-PartonLevel:FSR = on               ! no final-state radiation
-HadronLevel:Hadronize = on         ! no hadronization
-
-
