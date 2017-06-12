@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
   // Switch off warnings for parton-level events.
   ToHepMC.set_print_inconsistency(false);
-  ToHepMC.set_free_parton_exception(false);
+  //ToHepMC.set_free_parton_exception(false);
 
   // Confirm that external files will be used for input and output.
   cout << " PYTHIA settings will be read from file " << argv[1] << endl;
@@ -87,14 +87,14 @@ int main(int argc, char* argv[]) {
   pythia.readString("Next:numberShowEvent = 1");
 
   // Initialize Les Houches Event File run. List initialization information.
-  if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
-  LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
+  //if (_debug) cout << "[DEBUG] Initializing LHEF... " << endl;
+  //LHAupFromPYTHIA8 myLHA(&pythia.process, &pythia.info);
   
   // Open a file on which LHEF events should be stored, and write header.  
-  char lhename[256];
-  sprintf(lhename,"%s.lhe", outfilename.c_str());
-  if (_debug) cout << "[DEBUG] Opening LHEF file " << lhename << endl;
-  myLHA.openLHEF(lhename);
+  //char lhename[256];
+  //sprintf(lhename,"%s.lhe", outfilename.c_str());
+  //if (_debug) cout << "[DEBUG] Opening LHEF file " << lhename << endl;
+  //myLHA.openLHEF(lhename);
 
   // Initialize. Beam parameters set in .pythia file.
   if (_debug) cout << "[DEBUG] Initializing pythia... " << cfg << endl;
@@ -235,12 +235,12 @@ int main(int argc, char* argv[]) {
     ascii_io << hepmcevt;
     delete hepmcevt;
     
-    // Store event info in the LHAup object.
-    myLHA.setEvent();
-
-    // Write out this event info on the file.
-    // With optional argument (verbose =) false the file is smaller.
-    myLHA.eventLHEF();
+//    // Store event info in the LHAup object.
+//    myLHA.setEvent();
+//
+//    // Write out this event info on the file.
+//    // With optional argument (verbose =) false the file is smaller.
+//    myLHA.eventLHEF();
     
     // End of event loop.
   }
@@ -260,10 +260,10 @@ int main(int argc, char* argv[]) {
   pythia.stat();
   
   // Update the cross section info based on Monte Carlo integration during run.
-  myLHA.updateSigma();
+  //myLHA.updateSigma();
 
   // Write endtag. Overwrite initialization info with new cross sections.
-  myLHA.closeLHEF(true);
+  //myLHA.closeLHEF(true);
     
   // Done.
   return 0;

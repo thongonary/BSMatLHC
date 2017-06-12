@@ -1,23 +1,60 @@
 ! 1) Settings that could be used in a main program, if desired.
-Main:numberOfEvents = 2000        ! number of events to generate
-Main:timesAllowErrors = 20        ! max number of allowed errors
+Main:numberOfEvents = 100           ! number of events to generate
+Main:timesAllowErrors = 100        ! max number of allowed errors
 Init:showChangedSettings = on      ! print changed flags/modes/parameters
 Init:showChangedParticleData = on  ! print changed particle and decay data
-Next:numberCount = 20            ! number of times counter appears
+Init:showAllParticleData = off  ! print all particle and decay data
+Next:numberCount = 200            ! number of times counter appears
 
 ! 2) LHC beams parameter settings. 
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
 Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
 Beams:eCM = 13000.                  ! CM energy of collision
 
-! 3) HiddenValley setting (from Tim Lou)
+! 3) HiddenValley setting 
 HiddenValley:spinFv = 0 ! zero flavor in hadronization
 HiddenValley:FSR = on ! turn on FSR
 HiddenValley:fragment = on ! turn on fragmentation
 
+HiddenValley:ffbar2Zv = on
+4900023:m0 = 3000
+4900023:mWidth = 300
+4900023:onMode = 0
+4900023:onIfAny = 4900001 
+
 4900111:m0 = 20  ! spin0 meson mass (need to fix decay)
 4900113:m0 = 20  ! spin1 meson mass (need to fix decay)
 4900101:m0 = 10  ! hidden valley quark mass 
+4900111:onMode = on
+4900113:onMode = on
+
+4900111:0:bRatio = 0.0000012
+4900111:1:bRatio = 0.0000005
+4900111:2:bRatio = 0.0004920   
+4900111:3:bRatio = 0.0793840   
+4900111:4:bRatio = 0.8679713   
+4900111:5:bRatio = 0.0000000   
+####
+4900111:6:bRatio = 0.43000000   
+####
+4900111:7:bRatio = 0.0001840   
+4900111:8:bRatio = 0.0000000   
+4900111:9:bRatio = 0.0519670   
+4900111:10:bRatio = 0.0000000   
+
+4900113:0:bRatio = 0.0500000
+4900113:1:bRatio = 0.2000000
+4900113:2:bRatio = 0.0500000
+4900113:3:bRatio = 0.2000000
+4900113:4:bRatio = 0.0500000
+4900113:5:bRatio = 0.1500000
+####
+4900113:6:bRatio = 0.4300000
+####
+4900113:7:bRatio = 0.1500000
+4900113:8:bRatio = 0.0000000
+4900113:9:bRatio = 0.1500000
+4900113:10:bRatio = 0.000000
 
 HiddenValley:Run = on ! turn on running
 HiddenValley:Ngauge  = 2 ! Nc for the gauge group SU(Nc)
@@ -29,6 +66,8 @@ HiddenValley:probVector = .75 ! ratio of spin1 vs spin0 meson production
 ! 4) Settings for the event generation process in the Pythia8 library.
 PartonLevel:MPI = on                ! no multiple interactions
 PartonLevel:ISR = on               ! no initial-state radiation 
-#  PartonLevel:ISR = off               ! no initial-state radiation
+# PartonLevel:ISR = off               ! no initial-state radiation
 PartonLevel:FSR = on               ! no final-state radiation
 HadronLevel:Hadronize = on         ! no hadronization
+
+
